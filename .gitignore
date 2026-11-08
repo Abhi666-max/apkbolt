@@ -1,0 +1,33 @@
+node_modules/
+dist/
+build/runtime/
+build/_packout/
+.workbuddy/
+test/out/
+test/fixtures/
+test/*.png
+test/*.log
+test/run-*.log
+test/profile-*.json
+test/debug-*.txt
+test/real-boot.log
+test/qemu-real-*.log
+tools/embed-probe/*.log
+# Runtime downloads and builds: binaries, system images, and AVD data
+runtime/
+avd/
+*.lnk
+out/
+.history/
+.vscode/
+# Store screenshot artifacts
+build/store-shots/
+# Debug screenshots and temporary artifacts
+*.tmp
+*.temp
+debug-*.png
+crash-*.log
+# Backup shortcuts and old links
+*backup*.lnk
+.DS_Store
+Thumbs.db
