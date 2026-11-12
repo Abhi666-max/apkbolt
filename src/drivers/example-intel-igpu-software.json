@@ -1,0 +1,24 @@
+{
+  "format": "apkbolt-driver/1",
+  "id": "example-intel-igpu-software",
+  "name": "Intel Integrated GPU - Software Rendering Fallback (Example)",
+  "version": "1.0.0",
+  "author": "ApkBolt",
+  "description": "Legacy Intel integrated GPUs (prior to HD / UHD 6xx) may encounter GLES initialization failure or artifacts. Pinning rendering mode to software ensures reliable visual output.",
+  "enabled": false,
+  "priority": 0,
+  "match": {
+    "platform": ["win32"],
+    "gpuVendor": ["intel"]
+  },
+  "effect": {
+    "gpuMode": "software",
+    "configIni": {
+      "hw.gpu.mode": "software",
+      "hw.gpu.enabled": "yes"
+    },
+    "notes": [
+      "Software rendering guarantees display stability; recommended for lightweight applications"
+    ]
+  }
+}

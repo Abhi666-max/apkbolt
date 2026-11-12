@@ -1,0 +1,21 @@
+{
+  "format": "apkbolt-driver/1",
+  "id": "example-amd-igpu-swangle",
+  "name": "AMD Integrated GPU - Use Swangle Rendering (Example)",
+  "version": "1.0.0",
+  "author": "ApkBolt",
+  "description": "On some older AMD integrated GPUs and legacy graphics drivers, host GPU acceleration passes self-check but guest crashes after boot. Forcing swangle rendering avoids the crash with slightly reduced framerate.",
+  "enabled": false,
+  "priority": 0,
+  "match": {
+    "platform": ["win32"],
+    "gpuVendor": ["amd"]
+  },
+  "effect": {
+    "gpuMode": "swangle",
+    "notes": [
+      "If graphics render normally but games stutter, adjust resolution to 540x960 in Settings",
+      "Set enabled to true or remove the flag once verified to take effect automatically"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "format": "apkbolt-driver/1",
+  "id": "example-no-hypervisor-tcg",
+  "name": "No Hardware Acceleration - Direct Software Emulation (Example)",
+  "version": "1.0.0",
+  "author": "ApkBolt",
+  "description": "When Virtual Machine Platform is disabled and kernel hypervisor drivers cannot be installed, emulator acceleration fails. This profile configures ApkBolt to use direct software emulation (-accel off) and software GPU rendering.",
+  "enabled": false,
+  "priority": 10,
+  "match": {
+    "platform": ["win32"],
+    "accel": ["none"]
+  },
+  "effect": {
+    "forceTcg": true,
+    "gpuMode": "software",
+    "configIni": {
+      "hw.gpu.mode": "software"
+    },
+    "notes": [
+      "Software emulation is 5-10x slower than hardware virtualization; enabling Virtual Machine Platform in Windows Features is strongly recommended"
+    ]
+  }
+}
