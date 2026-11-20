@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApkBolt User Guide & Troubleshooting Manual</title>
+<style>
+:root {
+  --bg: #0d0f14;
+  --panel: #161922;
+  --fg: #e6edf3;
+  --mut: #8b949e;
+  --line: #30363d;
+  --code: #161b22;
+  --code-border: #30363d;
+  --accent: #f5a623;
+  --accent-soft: rgba(245, 166, 35, 0.15);
+  --accent-hover: #ffb84d;
+  --warn: #d29922;
+  --warn-bg: rgba(210, 153, 34, 0.12);
+  --head: #161922;
+  --tbl: #1c212c;
+  --tbl-even: #12151c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+.wrap {
+  display: flex;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  width: 300px;
+  flex: 0 0 300px;
+  border-right: 1px solid var(--line);
+  padding: 24px 18px;
+  background: var(--head);
+}
+aside h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--mut);
+  letter-spacing: 1px;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+aside h2 svg {
+  fill: var(--accent);
+}
+aside a {
+  display: block;
+  color: var(--mut);
+  text-decoration: none;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  transition: all 0.15s ease;
+}
+aside a:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+#tocSearch {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: 13px/1.4 inherit;
+  background: #0d0f14;
+  color: var(--fg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+#tocSearch:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.toc-l3 {
+  padding-left: 20px !important;
+  font-size: 12px !important;
+  color: #6e7681 !important;
+}
+main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 52px 80px;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+h1 svg {
+  fill: var(--accent);
+  flex-shrink: 0;
+}
+h2 {
+  font-size: 21px;
+  font-weight: 600;
+  margin: 44px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  color: #fff;
+  scroll-margin-top: 20px;
+}
+h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 30px 0 12px;
+  color: #f0f6fc;
+  scroll-margin-top: 20px;
+}
+h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: #f0f6fc;
+}
+p {
+  margin: 12px 0;
+  color: #c9d1d9;
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+code {
+  background: var(--code);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  color: #ffb84d;
+  border: 1px solid var(--line);
+}
+pre {
+  background: var(--code);
+  padding: 16px 18px;
+  border-radius: 8px;
+  overflow: auto;
+  border: 1px solid var(--code-border);
+}
+pre code {
+  background: none;
+  padding: 0;
+  border: none;
+  color: #e6edf3;
+}
+blockquote {
+  margin: 18px 0;
+  padding: 12px 18px;
+  border-left: 4px solid var(--accent);
+  background: var(--warn-bg);
+  color: #e6edf3;
+  border-radius: 0 8px 8px 0;
+}
+blockquote p {
+  margin: 0;
+}
+ul, ol {
+  margin: 12px 0;
+  padding-left: 24px;
+  color: #c9d1d9;
+}
+li {
+  margin: 6px 0;
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 32px 0;
+}
+.tw {
+  overflow: auto;
+  margin: 18px 0;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13.5px;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--tbl);
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+tbody tr:nth-child(even) {
+  background: var(--tbl-even);
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.btnbar {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 10px;
+}
+.btnbar button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: all 0.15s;
+}
+.btnbar button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+@media (max-width: 880px) {
+  aside { display: none; }
+  main { padding: 24px 20px 60px; }
+  h1 { font-size: 24px; }
+}
+@media print {
+  aside, .btnbar { display: none; }
+  main { padding: 0; max-width: none; }
+  h2 { page-break-after: avoid; }
+  table, pre, blockquote { page-break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+<h2>
+  <svg width="14" height="14" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  Documentation
+</h2>
+<input id="tocSearch" type="search" placeholder="Filter topics (Ctrl+F search)" autocomplete="off" />
+<div id="tocList">
+  <a class="toc-l2" href="#apkbolt-user-guide">Overview</a>
+  <a class="toc-l2" href="#1-quick-overview">1. 30-Second Overview</a>
+  <a class="toc-l2" href="#2-installation-first-run">2. Installation & First Run</a>
+  <a class="toc-l3" href="#2-1-choosing-edition">2.1 Choosing an Edition</a>
+  <a class="toc-l3" href="#2-2-first-launch">2.2 What Happens on First Launch</a>
+  <a class="toc-l2" href="#3-daily-usage">3. Daily Usage</a>
+  <a class="toc-l3" href="#3-1-installing-apps">3.1 Installing Apps</a>
+  <a class="toc-l3" href="#3-2-launching-apps">3.2 Launching Apps</a>
+  <a class="toc-l3" href="#3-3-window-display">3.3 Windows & Display</a>
+  <a class="toc-l3" href="#3-4-shortcuts">3.4 Shortcuts & Keybindings</a>
+  <a class="toc-l3" href="#3-5-file-sharing">3.5 File Sharing (Win ↔ Android)</a>
+  <a class="toc-l3" href="#3-6-settings-navigation">3.6 Settings Navigation</a>
+  <a class="toc-l3" href="#3-7-online-updates">3.7 Online Updates</a>
+  <a class="toc-l2" href="#4-core-concepts">4. Three Core Concepts</a>
+  <a class="toc-l3" href="#4-1-runtime-system-image">4.1 Runtime / System Image</a>
+  <a class="toc-l3" href="#4-2-hardware-acceleration">4.2 Hardware Acceleration</a>
+  <a class="toc-l3" href="#4-3-arm-translation-layer">4.3 ARM Translation Layer</a>
+  <a class="toc-l2" href="#5-troubleshooting-first-step">5. Diagnostics & Self-Healing</a>
+  <a class="toc-l3" href="#5-1-system-checkup">5.1 System Checkup & Tuning</a>
+  <a class="toc-l3" href="#5-2-autodiagnostics-network-repair">5.2 Auto-Diagnostics (Auto-Debug)</a>
+  <a class="toc-l3" href="#5-3-exporting-report">5.3 Exporting Diagnostic Reports</a>
+  <a class="toc-l3" href="#5-4-builtin-guide-auto-tutorials">5.4 Built-in Manual & Tutorials</a>
+  <a class="toc-l2" href="#6-troubleshooting-solutions">6. Common Solutions</a>
+  <a class="toc-l3" href="#6-1-hardware-acceleration-slow-boot">6.1 Acceleration / Slow Boot</a>
+  <a class="toc-l3" href="#6-2-installation-failed-install-failed">6.2 Install Failed (INSTALL_FAILED_*)</a>
+  <a class="toc-l3" href="#6-3-arm-translation-layer-issues">6.3 ARM Translation / Crash</a>
+  <a class="toc-l3" href="#6-4-adb-unauthorized-allow-debugging">6.4 adb Unauthorized</a>
+  <a class="toc-l3" href="#6-5-launch-issues-window-rotation">6.5 Launch Issues / Rotation Button</a>
+  <a class="toc-l3" href="#6-6-other-startup-issues-reference">6.6 Startup Issues Quick Reference</a>
+  <a class="toc-l3" href="#6-7-no-sound-low-volume">6.7 No Sound / Low Volume</a>
+  <a class="toc-l3" href="#6-8-store-launch-failure-dll-load-failed">6.8 Store Launch / 0xC0000135 DLL</a>
+  <a class="toc-l2" href="#7-cli-reference">7. CLI Reference</a>
+  <a class="toc-l2" href="#8-data-directory-overview">8. Data & Directory Layout</a>
+  <a class="toc-l2" href="#9-help-and-feedback">9. Help & Feedback</a>
+</div>
+</aside>
+
+<main>
+<h1 id="apkbolt-user-guide" data-alias="apkbolt-product-manual-solutions overview">
+  <svg width="28" height="28" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  ApkBolt User Guide & Troubleshooting Manual
+</h1>
+<blockquote>
+  <strong>Version</strong>: v0.6.3 · <strong>Platform</strong>: Windows 10/11 x64 · <strong>Architecture</strong>: Native Electron + Android 14 Virtualization<br/>
+  ApkBolt is a high-performance Android application launcher for Windows: <strong>Install Android apps just like native Windows applications, complete with Start Menu shortcuts and instant desktop launching.</strong> This manual provides step-by-step guidance and symptom-based solutions.
+</blockquote>
+
+<hr/>
+
+<h2 id="1-quick-overview">1. 30-Second Overview</h2>
+<pre><code>Desktop Shortcut (.lnk with native app icon)
+      │ Double-Click
+      ▼
+ApkBolt.exe --launch &lt;package_name&gt;
+      │ Engine idle? → Auto-boots background Android 14 engine (sub-second if warm)
+      ▼
+Launches resolved Activity entry point
+      ▼
+Seamless Window = App Window (Title, Icon, Aspect Ratio, Centered Presentation)</code></pre>
+
+<p><strong>Key Capabilities</strong></p>
+<ul>
+  <li>⚡ <strong>One-Click Drag-and-Drop & File Association</strong>: Drag APKs straight onto the home screen, or double-click any <code>.apk</code> in Windows Explorer to install automatically.</li>
+  <li>🧩 <strong>Individual Windows Shortcuts</strong>: Automatically extracts high-resolution icons from the APK and generates Desktop & Start Menu shortcuts.</li>
+  <li>🪟 <strong>Standalone Window Experience</strong>: Apps run in their own styled window, preserving orientation, remembering per-app window geometry, and supporting full-screen immersion.</li>
+  <li>🔍 <strong>Windows Search Integration</strong>: Installed apps appear immediately in Windows Search and Start Menu under <code>Programs\ApkBolt\</code>.</li>
+  <li>📁 <strong>Bi-directional File Sharing</strong>: Seamless file exchange between <code>%USERPROFILE%\ApkBoltShared</code> and Android <code>/sdcard/ApkBoltShared</code>.</li>
+  <li>🚀 <strong>Self-Contained Engine</strong>: Completely isolated runtime without relying on bulky third-party emulators.</li>
+</ul>
+
+<hr/>
+
+<h2 id="2-installation-first-run">2. Installation & First Run</h2>
+
+<h3 id="2-1-choosing-edition">2.1 Choosing an Edition</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Edition</th><th>Package</th><th>Recommended Use Case</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Windows Installer</strong></td>
+      <td><code>ApkBolt-Setup.exe</code></td>
+      <td>Full setup with Start Menu shortcuts, desktop icons, and automatic file associations.</td>
+    </tr>
+    <tr>
+      <td><strong>Full Portable</strong></td>
+      <td><code>ApkBolt-win64-full.zip</code></td>
+      <td>Pre-packaged with full offline Android 14 runtime. Extract and run without downloading.</td>
+    </tr>
+    <tr>
+      <td><strong>Lightweight Portable</strong></td>
+      <td><code>ApkBolt-win64-portable.zip</code></td>
+      <td>Minimal 96 MB download; downloads runtime assets on first run with multi-threaded resume.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="2-2-first-launch">2.2 What Happens on First Launch</h3>
+<ol>
+  <li><strong>Runtime Preparation</strong>: If using the lightweight version, downloads Android 14 system images and emulator binaries using 8-threaded accelerated download. Full versions skip this step.</li>
+  <li><strong>System Image Extraction</strong>: Unpacks the base image to <code>%APPDATA%\apkbolt\system-images</code> once.</li>
+  <li><strong>User Data Initialization</strong>: Generates an optimized, encrypted ext4 user data partition.</li>
+  <li><strong>Background Engine Ready</strong>: Subsequent app launches complete in sub-second time via fast snapshot resumption.</li>
+</ol>
+
+<hr/>
+
+<h2 id="3-daily-usage">3. Daily Usage</h2>
+
+<h3 id="3-1-installing-apps">3.1 Installing Apps</h3>
+<ul>
+  <li><strong>Drag-and-Drop</strong>: Drag any <code>.apk</code>, <code>.apks</code>, or <code>.xapk</code> onto the ApkBolt home screen drop area.</li>
+  <li><strong>Browse APK Button</strong>: Click the prominent "Browse APK" button on the home screen.</li>
+  <li><strong>File Explorer Association</strong>: Double-click any <code>.apk</code> file in Windows (enable in Settings → System Integration).</li>
+  <li><strong>Command Line</strong>: Run <code>ApkBolt.exe &lt;path\to\app.apk&gt;</code>.</li>
+</ul>
+
+<h3 id="3-2-launching-apps">3.2 Launching Apps</h3>
+<p>Launch any installed app directly by double-clicking its Desktop or Start Menu shortcut. Since all apps share the unified background engine, opening subsequent apps is instantaneous.</p>
+
+<h3 id="3-3-window-display">3.3 Windows & Display</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Action</th><th>Method</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Toggle Full Screen</td><td>Press <code>F11</code> or right-click the system tray icon.</td></tr>
+    <tr><td>Rotate Screen Orientation</td><td>Press <code>Ctrl+Alt+R</code> or click the titlebar rotation button.</td></tr>
+    <tr><td>Auto Full Screen</td><td>Settings → Display & Window → Auto Full Screen.</td></tr>
+    <tr><td>Force Orientation</td><td>Settings → Display & Window → Screen Orientation.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="3-4-shortcuts">3.4 Shortcuts & Keybindings</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Key Combination</th><th>Function</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>F11</code></td><td>Toggle Full Screen / Windowed mode</td></tr>
+    <tr><td><code>Ctrl+Alt+R</code></td><td>Rotate current app orientation (Portrait / Landscape)</td></tr>
+    <tr><td><code>Ctrl+R</code></td><td>Rotate shell window</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="3-5-file-sharing">3.5 File Sharing (Win ↔ Android)</h3>
+<p>Files placed in <code>%USERPROFILE%\ApkBoltShared</code> are automatically synchronized to Android's <code>/sdcard/ApkBoltShared</code> directory within seconds. Access this from Settings → Integration & Files → File Sharing.</p>
+
+<h3 id="3-6-settings-navigation" data-alias="3-6-settings-navigation settings">3.6 Settings Navigation</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Category</th><th>Features & Controls</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>General & Setup</td><td>Runtime environment, one-click install, auto-start on boot, disk cleanup.</td></tr>
+    <tr><td>Display & Window</td><td>Display mode, auto-fullscreen, orientation presets, tablet layout.</td></tr>
+    <tr><td>Input & Controls</td><td>Mouse mapping, keyboard keymaps and directional controls.</td></tr>
+    <tr><td>Performance & Tuning</td><td>CPU/RAM resource allocation, rendering backend, snapshots, pre-warming.</td></tr>
+    <tr><td>Network & Downloads</td><td>Mirrors, download threads, network proxy configuration.</td></tr>
+    <tr><td>Diagnostics & Repair</td><td>System health checkup, driver/compatibility patches, smart diagnostics.</td></tr>
+    <tr><td>Integration & Files</td><td>Desktop shortcuts, file sharing sync folder, .apk file association.</td></tr>
+    <tr><td>Updates & About</td><td>Version info, changelog, and online updates.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="3-7-online-updates">3.7 Online Updates</h3>
+<p>Check for updates via Settings → Updates & About → Check for Updates, or from the system tray menu. Updates preserve all installed apps, runtime state, and snapshots.</p>
+
+<hr/>
+
+<h2 id="4-core-concepts">4. Three Core Concepts</h2>
+
+<h3 id="4-1-runtime-system-image">4.1 Runtime / System Image</h3>
+<p>ApkBolt operates on a complete, official Android 14 Google Play system image. User data (<code>/data</code>) is maintained as a differential layer, keeping disk usage lean while delivering high fidelity.</p>
+
+<h3 id="4-2-hardware-acceleration">4.2 Hardware Acceleration</h3>
+<p>Windows hypervisor virtualization powers rapid execution through either <strong>WHPX</strong> (Windows Hypervisor Platform) or <strong>AEHD</strong> (Android Emulator Hypervisor Driver). If neither is available, ApkBolt falls back automatically to software emulation.</p>
+
+<h3 id="4-3-arm-translation-layer">4.3 ARM Translation Layer</h3>
+<p>Most modern Android apps provide ARM binaries (arm64-v8a / armeabi-v7a). ApkBolt includes an integrated <code>ndk_translation</code> translation layer, allowing ARM applications to execute seamlessly on x86_64 CPUs without manual intervention.</p>
+
+<hr/>
+
+<h2 id="5-troubleshooting-first-step">5. Diagnostics & Self-Healing</h2>
+
+<h3 id="5-1-system-checkup">5.1 System Checkup & Tuning</h3>
+<p>Navigate to Settings → Diagnostics & Repair → <strong>Run Checkup</strong>. ApkBolt verifies CPU virtualization (VT-x / AMD SVM), WHPX status, GPU capabilities, RAM availability, and driver integrity. Clicking <strong>Apply Recommended Settings</strong> configures the optimal performance profile for your machine.</p>
+
+<h3 id="5-2-autodiagnostics-network-repair" data-alias="5-2-autodiagnostics-autodebug network">5.2 Auto-Diagnostics (Auto-Debug)</h3>
+<p>ApkBolt's background monitor periodically checks runtime health and provides one-click resolutions for stale locks, orphaned processes, invalid snapshots, and ADB connection issues.</p>
+
+<h3 id="5-3-exporting-report">5.3 Exporting Diagnostic Reports</h3>
+<p>Generate a comprehensive, anonymized system report via Settings → Diagnostics & Repair → <strong>Export Diagnostic Report</strong> to share when reporting an issue.</p>
+
+<h3 id="5-4-builtin-guide-auto-tutorials" data-alias="5-4-builtin-manual-tutorials diagnose">5.4 Built-in Manual & Tutorials</h3>
+<p>Access this manual at any time by clicking the <strong>?</strong> icon on the main window titlebar or via Settings → Updates & About → Open User Guide.</p>
+
+<hr/>
+
+<h2 id="6-troubleshooting-solutions">6. Common Solutions</h2>
+
+<h3 id="6-1-hardware-acceleration-slow-boot" data-alias="6-1-hardware-acceleration-slow-boot accel">6.1 Acceleration / Slow Boot</h3>
+<p><strong>Symptom</strong>: Notice indicating "Hardware acceleration disabled" or engine startup takes over a minute.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+  <li>Ensure virtualization (Intel VT-x or AMD-V / SVM) is enabled in your computer's BIOS/UEFI settings.</li>
+  <li>In ApkBolt, open Settings → Diagnostics & Repair → System Checkup, and click <strong>Fix</strong> next to Hypervisor Platform.</li>
+  <li>Alternatively, open PowerShell as Administrator and run:
+    <pre><code>dism /online /enable-feature /featurename:HypervisorPlatform /all /norestart
+dism /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart</code></pre>
+    Then restart your PC.
+  </li>
+</ol>
+
+<h3 id="6-2-installation-failed-install-failed" data-alias="6-2-installation-failed-install-failed install">6.2 Install Failed (INSTALL_FAILED_*)</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Error Code</th><th>Cause</th><th>Resolution</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>INSTALL_FAILED_NO_MATCHING_ABIS</code></td>
+      <td>APK contains only ARM libraries and translation layer needs initialization.</td>
+      <td>ApkBolt handles this automatically by switching to the compatible image and retrying.</td>
+    </tr>
+    <tr>
+      <td><code>INSTALL_FAILED_OLDER_SDK</code></td>
+      <td>App requires a newer Android version than currently running.</td>
+      <td>Update to the latest Android 14 image in Settings.</td>
+    </tr>
+    <tr>
+      <td><code>INSTALL_PARSE_FAILED_NO_CERTIFICATES</code></td>
+      <td>APK is corrupted or lacks a valid signature.</td>
+      <td>Re-download the APK from a verified source.</td>
+    </tr>
+    <tr>
+      <td><code>INSTALL_FAILED_INSUFFICIENT_STORAGE</code></td>
+      <td>Disk space running low.</td>
+      <td>Clean up disk space or expand the data partition size in Settings → General.</td>
+    </tr>
+    <tr>
+      <td><code>INSTALL_FAILED_UPDATE_INCOMPATIBLE</code></td>
+      <td>Signature conflict with existing installation.</td>
+      <td>Uninstall the previous version first, then reinstall.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="6-3-arm-translation-layer-issues" data-alias="6-3-arm-translation-layer-crash arm">6.3 ARM Translation / Crash</h3>
+<p><strong>Symptom</strong>: App crashes immediately on launch with log entries mentioning <code>libndk_translation</code> or <code>DoBadTrampoline</code>.</p>
+<p><strong>Solution</strong>: In Settings → General & Setup → Runtime, verify that the Universal Compatibility Image is active. If needed, click "Download Compatibility Image" to re-fetch translation components.</p>
+
+<h3 id="6-4-adb-unauthorized-allow-debugging" data-alias="6-4-adb-unauthorized-allow-debugging adb">6.4 adb Unauthorized</h3>
+<p><strong>Symptom</strong>: Device status shows unauthorized or offline.</p>
+<p><strong>Solution</strong>: Check if a dialog titled "Allow USB debugging?" is displayed on the emulator screen. Click <strong>Always allow from this computer</strong> and click <strong>Allow</strong>. If stuck, click "Restart Engine" on the ApkBolt home screen.</p>
+
+<h3 id="6-5-launch-issues-window-rotation" data-alias="6-5-launch-issues-window-rotation startup">6.5 Launch Issues / Rotation Button</h3>
+<p><strong>Symptom</strong>: App window displays a placeholder rotation button or fails to display app content.</p>
+<p><strong>Solution</strong>: This typically occurs when a background instance is shutting down. Click the <strong>Restart Engine</strong> button on the ApkBolt titlebar to perform a clean restart.</p>
+
+<h3 id="6-6-other-startup-issues-reference" data-alias="6-6-other-startup-issues-reference other">6.6 Startup Issues Quick Reference</h3>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Issue</th><th>Automatic Action</th><th>Recommended User Action</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Stale Lock Files</td><td>Automatically cleaned</td><td>Close conflicting emulators if open.</td></tr>
+    <tr><td>Port Conflict</td><td>Selects next open port</td><td>Verify no other ADB server is monopolizing port 5044.</td></tr>
+    <tr><td>Snapshot Corrupted</td><td>Discards bad snapshot</td><td>Engine performs cold boot automatically.</td></tr>
+    <tr><td>Path Contains Non-ASCII Characters</td><td>Uses Windows 8.3 short paths</td><td>Move installation to standard path (e.g., <code>C:\ApkBolt</code>).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="6-7-no-sound-low-volume" data-alias="6-7-no-sound-low-volume sound">6.7 No Sound / Low Volume</h3>
+<p><strong>Symptom</strong>: Audio playback is silent within Android applications.</p>
+<p><strong>Solution</strong>:
+<ol>
+  <li>Ensure Windows Audio service (<code>Audiosrv</code>) is running.</li>
+  <li>Check the Windows Volume Mixer to ensure ApkBolt is not muted.</li>
+  <li>In ApkBolt Settings → General & Setup, verify that <strong>Android Application Audio</strong> is checked, then restart the engine.</li>
+</ol>
+</p>
+
+<h3 id="6-8-store-launch-failure-dll-load-failed" data-alias="6-8-store-launch-failure-dll-load-failed dll">6.8 Store Launch / 0xC0000135 DLL</h3>
+<p><strong>Symptom</strong>: Application exits immediately with code <code>0xC0000135</code> (STATUS_DLL_NOT_FOUND).</p>
+<p><strong>Solution</strong>: Install the Microsoft Visual C++ 2015–2022 Redistributable (x64), or navigate to Settings → Diagnostics & Repair → click <strong>Install VC++ Redistributable</strong>.</p>
+
+<hr/>
+
+<h2 id="7-cli-reference">7. CLI Reference</h2>
+<pre><code>ApkBolt.exe                          Launch main application window
+ApkBolt.exe &lt;path\to\package.apk&gt;    Install APK package directly
+ApkBolt.exe --launch &lt;package_name&gt;  Launch installed app by package name</code></pre>
+
+<hr/>
+
+<h2 id="8-data-directory-overview" data-alias="8-data-directory-overview storage">8. Data & Directory Layout</h2>
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>Component</th><th>Path</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Runtime (adb / emulator / images)</td><td><code>%APPDATA%\apkbolt\runtime</code></td></tr>
+    <tr><td>System Images</td><td><code>%APPDATA%\apkbolt\system-images</code></td></tr>
+    <tr><td>AVD, App Data & Snapshots</td><td><code>%APPDATA%\apkbolt\avd</code></td></tr>
+    <tr><td>Extracted App Icons</td><td><code>%APPDATA%\apkbolt\icons\&lt;package&gt;.ico</code></td></tr>
+    <tr><td>Settings & App Manifest</td><td><code>%APPDATA%\ApkBolt\settings.json</code> & <code>apps.json</code></td></tr>
+    <tr><td>Logs & Diagnostics</td><td><code>%APPDATA%\ApkBolt\logs\</code></td></tr>
+    <tr><td>Shared Folder</td><td><code>%USERPROFILE%\ApkBoltShared</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<hr/>
+
+<h2 id="9-help-and-feedback">9. Help & Feedback</h2>
+<p>When requesting support, please include your diagnostic report (Settings → Diagnostics & Repair → Export Diagnostic Report) and recent log entries from <code>%APPDATA%\ApkBolt\logs\app.log</code>.</p>
+<ul>
+  <li>GitHub Repository: <a href="https://github.com/abhi666-max/apkbolt" target="_blank">ApkBolt on GitHub</a></li>
+</ul>
+
+<hr/>
+<p style="font-size: 13px; color: var(--mut);"><em>ApkBolt v0.6.3 · High-performance Android Runtime for Windows.</em></p>
+</main>
+</div>
+
+<div class="btnbar"><button onclick="window.print()">Print / Save PDF</button></div>
+
+<script>
+(function () {
+  var input = document.getElementById('tocSearch');
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocList a'));
+  if (input) {
+    input.addEventListener('input', function () {
+      var q = input.value.trim().toLowerCase();
+      links.forEach(function (a) {
+        a.hidden = !!q && a.textContent.toLowerCase().indexOf(q) < 0;
+      });
+    });
+  }
+  // Scroll to anchor on load
+  function navigateHash() {
+    if (!location.hash) return;
+    var target = decodeURIComponent(location.hash.slice(1));
+    var hit = document.getElementById(target);
+    if (!hit) {
+      // Check data-alias
+      var candidates = document.querySelectorAll('[data-alias]');
+      for (var i = 0; i < candidates.length; i++) {
+        var aliases = (candidates[i].getAttribute('data-alias') || '').split(/\s+/);
+        if (aliases.indexOf(target) >= 0) {
+          hit = candidates[i];
+          break;
+        }
+      }
+    }
+    if (hit) {
+      setTimeout(function () {
+        hit.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }, 80);
+    }
+  }
+  window.addEventListener('hashchange', navigateHash);
+  navigateHash();
+}());
+</script>
+</body>
+</html>

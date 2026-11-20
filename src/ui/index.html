@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+<title>ApkBolt</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+
+<!-- ApkBolt brand mark — inline SVG for crisp rendering at any size -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf40"/>
+      <stop offset="55%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#b87012"/>
+    </linearGradient>
+  </defs>
+  <symbol id="brandMark" viewBox="0 0 48 48">
+    <rect x="1.5" y="1.5" width="45" height="45" rx="13.5" fill="#1a1200"/>
+    <rect x="1.5" y="1.5" width="45" height="45" rx="13.5" fill="none" stroke="rgba(245,166,35,.30)" stroke-width="1.4"/>
+    <!-- Lightning bolt -->
+    <path d="M28 9 L16 26 H23 L20 39 L34 22 H27 Z" fill="url(#brandGrad)"/>
+  </symbol>
+</svg>
+
+<header class="titlebar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="22" height="22"><use href="#brandMark"/></svg>
+    </div>
+    <span class="brand-name">ApkBolt</span>
+    <span class="brand-tag" id="engineTag">Not connected</span>
+  </div>
+  <div class="titlebar-spacer"></div>
+  <div class="titlebar-actions">
+    <!-- Engine restart button — visible when engine is idle/stalled -->
+    <button class="btn ghost sm" id="btnRestartEngine" title="Restart the Android engine" style="display:none">
+      ↺ Restart Engine
+    </button>
+    <button class="icon-btn" id="btnManual" title="User guide & troubleshooting">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.4 9a2.8 2.8 0 1 1 4.4 2.3c-.9.6-1.8 1.1-1.8 2.4"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSettings" title="Settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6h.09A1.7 1.7 0 0 0 10 3.05V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="text" placeholder="Search installed apps…" autocomplete="off" />
+    </div>
+    <div class="toolbar-right">
+      <button class="btn primary" id="btnInstall">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v10"/><path d="m7 12 5 5 5-5"/><path d="M5 20h14"/></svg>
+        Install APK
+      </button>
+    </div>
+  </section>
+
+  <section class="content" id="content">
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty">
+      <!-- Drag & drop hero area -->
+      <div class="drop-hero" id="dropHero">
+        <div class="drop-hero-icon">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+        </div>
+        <strong class="drop-hero-title">Drag &amp; Drop APK to Install</strong>
+        <p class="drop-hero-desc">Drop any Android <code>.apk</code> or <code>.xapk</code> file here to launch in an independent, hardware-accelerated desktop window.</p>
+        <button class="btn primary lg" id="btnInstall2">Select APK from Computer</button>
+      </div>
+      <p class="hint" id="emptyHint"></p>
+    </div>
+  </section>
+
+  <footer class="statusbar">
+    <div class="status-left">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Checking runtime…</span>
+      <button class="status-chip" id="envChip" hidden></button>
+    </div>
+    <div class="status-right">
+      <span class="status-item status-net" id="statusNet" hidden></span>
+      <span class="sep" id="statusNetSep" hidden></span>
+      <span class="status-item" id="statusDevice"></span>
+      <span class="sep"></span>
+      <span class="status-item" id="statusStats"></span>
+      <span class="sep"></span>
+      <a class="status-item powered-link" href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener">ApkBolt by Abhijeet Kangane</a>
+    </div>
+  </footer>
+</main>
+
+<!-- Welcome card -->
+<div class="modal-mask welcome-mask" id="welcomeMask" hidden>
+  <div class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeHi">
+    <div class="welcome-hero">
+      <div class="welcome-halo"></div>
+      <div class="welcome-badge"><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><use href="#brandMark"/></svg></div>
+      <div class="welcome-hi" id="welcomeHi">Welcome to ApkBolt</div>
+      <div class="welcome-sub" id="welcomeSub">Android runtime is ready</div>
+    </div>
+    <div class="welcome-body">
+      <div class="welcome-stats" id="welcomeStats"></div>
+      <div class="welcome-tips" id="welcomeTips"></div>
+      <label class="welcome-opt">
+        <input type="checkbox" id="welcomeNever" />
+        <span>Don't show this automatically on startup</span>
+      </label>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn ghost" id="welcomeSettings">Open Settings</button>
+      <button class="btn primary" id="welcomeOk">Get Started</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Drag-and-drop overlay -->
+<div class="dropzone" id="dropzone">
+  <div class="dropzone-inner">
+    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+    <strong>Release to install</strong>
+    <span>Supports single or multiple .apk files</span>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="ctxmenu" id="ctxmenu"></div>
+
+<!-- Settings modal -->
+<div class="modal-mask" id="settingsMask">
+  <div class="modal">
+    <header class="modal-head">
+      <h2>Settings</h2>
+      <div class="set-search-wrap">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="setSearch" class="set-search" type="search" autocomplete="off" placeholder="Search settings: orientation / memory / proxy / snapshot…" />
+        <button class="set-search-clear" id="btnClearSearch" type="button" hidden aria-label="Clear search">×</button>
+      </div>
+      <button class="icon-btn" id="btnCloseSettings">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="modal-main">
+      <nav class="set-nav" id="setNav" aria-label="Settings categories">
+        <button class="set-nav-item on" type="button" data-cat="basic">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+          <span class="set-nav-label">General & Install</span>
+          <span class="set-nav-badge" data-badge="basic" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="display">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 20h6M12 17v3"/></svg></span>
+          <span class="set-nav-label">Display & Window</span>
+          <span class="set-nav-badge" data-badge="display" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="input">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10v4M17 10v4"/></svg></span>
+          <span class="set-nav-label">Input & Controls</span>
+          <span class="set-nav-badge" data-badge="input" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="perf">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg></span>
+          <span class="set-nav-label">Performance</span>
+          <span class="set-nav-badge" data-badge="perf" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="net">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12a7 7 0 0 1 14 0M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="16" r="1.6"/></svg></span>
+          <span class="set-nav-label">Network & Downloads</span>
+          <span class="set-nav-badge" data-badge="net" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="diag">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 3 8v5c0 5 3.8 7.6 9 9 5.2-1.4 9-4 9-9V8z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="set-nav-label">Diagnostics & Repair</span>
+          <span class="set-nav-badge" data-badge="diag" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="files">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+          <span class="set-nav-label">Integration & Files</span>
+          <span class="set-nav-badge" data-badge="files" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="about">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
+          <span class="set-nav-label">Updates & About</span>
+          <span class="set-nav-badge" data-badge="about" hidden></span>
+        </button>
+        <button class="set-nav-item" type="button" data-cat="lab">
+          <span class="set-nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6M10 3v7L5 20a1 1 0 0 0 .9 1.5h12.2A1 1 0 0 0 19 20l-5-10V3"/><path d="M7.5 15h9"/></svg></span>
+          <span class="set-nav-label">Lab</span>
+          <span class="set-nav-badge" data-badge="lab" hidden></span>
+        </button>
+      </nav>
+    <div class="modal-body" id="settingsBody">
+
+      <!-- ── GENERAL & INSTALL ── -->
+      <div class="group" id="runtimeGroup" data-cat="basic">
+        <div class="group-title">Runtime &amp; Environment</div>
+        <div class="field">
+          <label>Status</label>
+          <div class="row" style="align-items:center;">
+            <span class="inline-note" id="setupStateText">Checking…</span>
+            <span style="flex:1"></span>
+            <button class="btn primary sm" id="btnDeployAll">One-Click Setup</button>
+            <button class="btn ghost sm" id="btnSetupAdvanced">Advanced: Connect Existing Runtime</button>
+          </div>
+          <span class="sub" id="setupNote">Fully automatic — no image selection, no manual acceleration, no memory tuning needed</span>
+        </div>
+        <div class="field">
+          <div class="steps" id="setupSteps"></div>
+        </div>
+        <div id="envCheck" class="env-check" hidden></div>
+
+        <div class="setup-guide" id="setupGuide" hidden>
+          <h2>Install Android to a Virtual Disk</h2>
+          <p class="guide-sub">The virtual machine window is now open. Follow these 6 steps once; ApkBolt will then boot directly from the disk without needing the ISO again.</p>
+          <ol class="guide-list">
+            <li><b>Boot menu</b>: Use <kbd>↓</kbd> to select <code>Installation - Install Android-x86 to harddisk</code> and press Enter</li>
+            <li><b>Choose Partition</b>: Select <code>Create/Modify partitions</code>; when asked about GPT choose <code>No</code></li>
+            <li><b>cfdisk partition</b>: <code>New</code> → <code>Primary</code> → accept default size → <code>Bootable</code> → <code>Write</code> → type <code>yes</code> → <code>Quit</code></li>
+            <li><b>Format</b>: Select <code>vda1</code> → choose <code>ext4</code> → <code>Yes</code></li>
+            <li><b>Bootloader &amp; system</b>: <code>Install GRUB</code> → <code>Yes</code>; <code>Install /system as read-write</code> → <code>Yes</code></li>
+            <li><b>Done</b>: Wait for 100% then click "Mark as Installed" below — ApkBolt will restart and take over</li>
+          </ol>
+          <p class="guide-tip">If adb shows as disconnected afterward: in the VM window press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F1</kbd>, run
+            <code>setprop service.adb.tcp.port 5555</code>, <code>stop adbd</code>, <code>start adbd</code>,
+            then press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F7</kbd> to return to the GUI.</p>
+          <div class="guide-foot">
+            <button class="btn primary" id="btnMarkInstalled">Mark as Installed</button>
+            <button class="btn ghost" id="btnGuideClose">Remind me later</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="group" data-cat="basic">
+        <div class="group-title">Automatic Mode (default — no manual tuning needed)</div>
+        <div class="field">
+          <label>Auto-detected profile</label>
+          <div class="inline-note" id="autoProfileText">Detecting…</div>
+          <span class="sub">Memory, CPU cores, rendering backend, ports, and acceleration are all chosen automatically.
+            If startup fails, ApkBolt falls back gracefully — no manual intervention needed.
+            ApkBolt uses a <b>dedicated adb port 5044</b> (your system adb uses 5037), so the Android device
+            won't appear in a regular <code>adb devices</code> call — this is intentional isolation.
+            To connect manually, set <code>$env:ANDROID_ADB_SERVER_PORT=5044</code> before running adb.
+            Note: do not manually run <code>adb connect</code> against port 5555 — it will pop up an
+            "Allow USB debugging?" system dialog over a running app.</span>
+        </div>
+        <div class="field">
+          <label>Disk usage (runtime + Android data + cache)</label>
+          <div class="row">
+            <span class="inline-note" id="usageText">Calculating…</span>
+            <button class="btn ghost sm" id="btnCleanup">Clean recoverable files</button>
+            <button class="btn ghost sm" id="btnLeftovers" title="Scan and remove old-version directories, stale uninstall entries, and update temp files">Clean legacy leftovers</button>
+            <button class="btn ghost sm" id="btnRepairNetwork" title="If Android apps show a blank/spinning network page, this resets the Android data to fix networking. Your app list is preserved; apps reinstall automatically on next launch.">Repair Network</button>
+            <button class="btn ghost sm danger" id="btnResetData" title="Wipe Android /data user data, installed apps, and fast-boot snapshots — returns to a clean post-install state">Reset Android Data</button>
+          </div>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="chkCleanSnapshots" />
+            <span>Also clear the current AVD fast-boot snapshot (stops runtime first; frees several GB)</span>
+          </label>
+          <span class="sub">The system image is shared across all apps; app data is stored in a differential layer. Old images, old snapshots, logs, and lock files are all recoverable. Logs auto-roll at the size limit. "Reset Android Data" permanently removes several GB of user data, keeping only the system itself.</span>
+        </div>
+        <div class="runtime-actions">
+          <button class="btn ghost sm" id="btnDiagnostics">Export Diagnostics Report</button>
+          <button class="btn ghost sm" id="btnRebuildShortcuts">Rebuild Shortcuts</button>
+          <span class="inline-note">Diagnostics help troubleshoot issues; Rebuild fills in missing desktop &amp; Start Menu entries</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Launch at login (default: on)</label>
+            <span class="sub">Stays in the system tray on Windows login — double-clicking a desktop shortcut opens apps instantly without a manual startup.</span>
+          </div>
+          <input type="checkbox" id="setAutoStart" class="switch" />
+        </div>
+      </div>
+
+      <!-- ── DISPLAY & WINDOW ── -->
+      <div class="group" data-cat="display">
+        <div class="group-title">App Window</div>
+        <div class="field">
+          <label>Display mode</label>
+          <select id="setDisplayMode">
+            <option value="window">Portrait window (freely resizable, remembers size per app)</option>
+            <option value="fullscreen">Fullscreen (fills screen, maintains phone aspect ratio with black bars)</option>
+          </select>
+          <span class="sub">Press <b>F11</b> or right-click the tray to toggle at any time. Fullscreen just maximizes the window — it does not change aspect ratio or restart the app.</span>
+        </div>
+        <div class="field">
+          <label>Auto-fullscreen</label>
+          <select id="setAutoFullscreen">
+            <option value="off">Off (follow the display mode above)</option>
+            <option value="on">On · Launch every app in fullscreen automatically</option>
+          </select>
+          <span class="sub">When on, every app opens fullscreen without pressing F11. Works best with landscape orientation — landscape apps naturally fill the screen without black bars.</span>
+        </div>
+        <div class="field">
+          <label>Screen orientation</label>
+          <select id="setOrientationMode">
+            <option value="auto">Follow app (recommended · auto-selects portrait or landscape, fills the window)</option>
+            <option value="portrait">Force portrait (phone ratio, good for short-video or reading apps)</option>
+            <option value="landscape">Force landscape (widescreen fill, good for video and games)</option>
+          </select>
+          <span class="sub">Android's orientation is determined by the <b>physical panel direction</b> of the virtual device.
+            If the panel direction doesn't match what the app requests, Android only gives it a narrow letterboxed strip.
+            "Follow app" reads the orientation from the APK manifest at install time and restarts the panel to match —
+            so portrait apps launch portrait and fill the window. A panel restart takes ~10–40 s but only happens once per orientation change.</span>
+        </div>
+        <div class="field">
+          <label>Auto-rotate</label>
+          <select id="setAutoRotate">
+            <option value="on">On (default) · System auto-rotate is enabled</option>
+            <option value="off">Off · Revert to locked behavior</option>
+          </select>
+          <span class="sub">Android's <b>auto-rotate is on by default</b>. This does not affect actual screen direction — panel orientation and the orientation policy above still control what the display shows. Only some apps that read this switch value are affected.</span>
+        </div>
+        <div class="field">
+          <label>Tablet layout</label>
+          <select id="setTabletMode">
+            <option value="on">On (recommended · 190 dpi logical density, sw606dp tablet layout)</option>
+            <option value="off">Off (default image density, phone layout)</option>
+          </select>
+          <span class="sub">At 720px wide with 190 dpi, the logical width is 606dp — just past Android's 600dp tablet breakpoint.
+            Disabling reverts to phone layout (larger text, less content). Takes effect on next app launch.</span>
+        </div>
+        <div class="field">
+          <label>Current panel orientation</label>
+          <select id="setLandscape">
+            <option value="portrait">Portrait panel</option>
+            <option value="landscape">Landscape panel</option>
+          </select>
+          <span class="sub">This is the <b>current</b> physical panel direction of the runtime, automatically set by the orientation policy above.
+            Only in "Force" mode does it reflect a user choice.</span>
+        </div>
+        <div class="field">
+          <label>Window embedding</label>
+          <select id="setWindowEmbed">
+            <option value="detached">Native window (default · recommended) · Emulator manages its own window for best frame rate and scaling</option>
+            <option value="embed">Embedded mode · Android canvas embedded inside the ApkBolt window, with rotation button in title bar</option>
+          </select>
+          <span class="sub">Native window is rendered and managed by the emulator directly — drag, resize, and rotation all track perfectly, at the cost of a second taskbar button (use the tray or Ctrl+Alt+R for landscape). Embedded mode looks more integrated and adds a rotation button, but can drop frames and show black bars during resize, rotation, or app switching. Takes effect on next app launch.</span>
+        </div>
+        <div class="field" id="portraitField">
+          <label>Portrait canvas size</label>
+          <select id="setPortrait">
+            <option value="720x1280">Small · 720 × 1280</option>
+            <option value="900x1600">Medium · 900 × 1600</option>
+            <option value="1080x1920">Large · 1080 × 1920</option>
+            <option value="1440x2560">Extra Large · 1440 × 2560</option>
+          </select>
+          <span class="sub">In window mode you can drag the border freely; this sets Android's internal render resolution. Smaller = better performance.</span>
+        </div>
+      </div>
+
+      <!-- ── INPUT & CONTROLS ── -->
+      <div class="group" data-cat="input">
+        <div class="group-title">Mouse Mapping</div>
+        <div class="field">
+          <label>Left click · Confirm / Tap</label>
+          <span class="sub">The emulator natively treats left-click as a finger tap; click-and-drag acts as a swipe. No extra setup needed.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Right click · Android Back</label>
+            <span class="sub">By default the emulator treats right-click as a tap (easy to mis-trigger). Enable this to map right-click to Back instead.</span>
+          </div>
+          <input type="checkbox" id="setMouseRightBack" class="switch" />
+        </div>
+        <div class="field">
+          <label>Scroll wheel · Scroll</label>
+          <select id="setMouseWheelMode">
+            <option value="smooth">Smooth (recommended) · Merges rapid scroll events into one fluid gesture</option>
+            <option value="native">Native · Pass each tick to the emulator individually</option>
+            <option value="off">Off · Don't intercept scroll wheel</option>
+          </select>
+          <span class="sub">Smooth mode batches scroll events over a short window into a single swipe gesture, avoiding jitter and preventing adb from spawning on every tick.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Mouse side buttons · Back / Forward (default: off)</label>
+            <span class="sub">Side-button mapping requires a global mouse hook. The hook is installed only while an ApkBolt app window is in the foreground and removed immediately on blur or close — no desktop slowdown.</span>
+          </div>
+          <input type="checkbox" id="setMouseSideButtons" class="switch" />
+        </div>
+        <div class="field">
+          <span class="sub">All mappings above are only active when an app window has focus; native Windows mouse behavior is fully restored when you switch away or close the window.</span>
+        </div>
+      </div>
+
+      <div class="group" data-cat="input">
+        <div class="group-title">Keyboard Mapping (Gamepad emulation)</div>
+        <div class="field switch-field">
+          <div>
+            <label>Enable keyboard mapping</label>
+            <span class="sub">Map keyboard keys to Android touch taps and swipes. Great for playing games with WASD, skill keys, etc.
+              Each app can have its own mapping — right-click an app card and choose "Key Mapping" to pick a preset or customize.</span>
+          </div>
+          <input type="checkbox" id="setKeymapEnabled" class="switch" />
+        </div>
+        <div class="field">
+          <span class="sub" id="keymapHint">No key mapping configured for the current app. Right-click an app card to quickly apply a preset.</span>
+        </div>
+      </div>
+
+      <!-- ── PERFORMANCE ── -->
+      <div class="group" id="perfGroup" data-cat="perf">
+        <div class="group-title">Performance &amp; Resource Usage</div>
+        <div class="field">
+          <label>Resource profile</label>
+          <select id="setResourceMode">
+            <option value="save">Power Saver · 2 cores / yield to foreground / 540p (old hardware, background)</option>
+            <option value="balanced">Balanced · Half physical cores / yield to foreground / 720p (recommended)</option>
+            <option value="smooth">Performance · No core limit / same priority as foreground (video, games)</option>
+          </select>
+          <span class="sub">Controls how much CPU the Android VM uses and how sharp the display is. Switch to Performance if video or games stutter; use Power Saver for background/idle tasks. Takes effect on next app launch.</span>
+        </div>
+        <div class="field two">
+          <div>
+            <label>Render quality (Android internal resolution)</label>
+            <select id="setRenderSize">
+              <option value="auto">Auto (based on acceleration status)</option>
+              <option value="540x960">Smooth · 540 × 960</option>
+              <option value="720x1280">Balanced · 720 × 1280</option>
+              <option value="1080x1920">High · 1080 × 1920</option>
+            </select>
+          </div>
+          <div>
+            <label>Android data partition (apps &amp; games stored here)</label>
+            <select id="setDataGB">
+              <option value="0">Auto</option>
+              <option value="4">4 GB</option>
+              <option value="6">6 GB</option>
+              <option value="8">8 GB</option>
+              <option value="12">12 GB</option>
+              <option value="16">16 GB</option>
+              <option value="24">24 GB</option>
+              <option value="32">32 GB</option>
+              <option value="48">48 GB</option>
+              <option value="64">64 GB (for 50 GB+ games)</option>
+              <option value="96">96 GB</option>
+              <option value="128">128 GB</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <div class="row">
+            <button class="btn ghost sm" id="btnGrowData">Expand Partition Now</button>
+            <span class="sub" style="flex:1;margin:0">Expansion is done in-place — installed apps and saves are kept. Expect a few extra seconds on the next launch.</span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="sub" id="dataNote">Reading partition info…</span>
+        </div>
+        <div class="field">
+          <label>System language</label>
+          <select id="setLocale">
+            <option value="en-US">English (image default)</option>
+            <option value="zh-CN">Chinese Simplified</option>
+            <option value="zh-TW">Chinese Traditional</option>
+            <option value="ja-JP">Japanese</option>
+            <option value="ko-KR">Korean</option>
+          </select>
+          <span class="sub">Language for system settings, permission dialogs, and date formats. Injected into the VM at boot — <b>takes effect after runtime restart</b>.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Chinese IME (Pinyin input)</label>
+            <span class="sub">The base image ships with English keyboard only. Enable this to silently install and activate the bundled Pinyin IME so you can type Chinese inside Android apps. Disable to keep the native system keyboard.</span>
+          </div>
+          <input type="checkbox" id="setChineseIme" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Fast DNS (recommended)</label>
+            <span class="sub">Points Android to public DNS servers for faster resolution. Without this, Android inherits the host's DNS — which can be slow when a VPN or corporate proxy is active. Disable if you need to reach internal domain names.</span>
+          </div>
+          <input type="checkbox" id="setFastDns" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Android audio</label>
+            <span class="sub">Enables sound from apps and videos. Only turn this off if you don't need audio and want to squeeze out a bit more CPU headroom.</span>
+          </div>
+          <input type="checkbox" id="setAudio" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Keep fast-boot snapshot (recommended)</label>
+            <span class="sub">The second launch of any app takes only a few seconds thanks to a snapshot. The trade-off is ~2–3 GB of disk space for <code>ram.bin</code>. Disabling only affects startup speed — apps and saves are unaffected.</span>
+          </div>
+          <input type="checkbox" id="setKeepSnapshot" class="switch" />
+        </div>
+        <details class="mini-details">
+          <summary>Container details (advanced)</summary>
+          <div class="field switch-field">
+            <div>
+              <label>Lightweight container</label>
+              <span class="sub">Caps vCPU quota and lowers process priority so Windows desktop stays responsive. The Resource Profile above already sets this automatically.</span>
+            </div>
+            <input type="checkbox" id="setLiteMode" class="switch" />
+          </div>
+          <div class="field">
+            <label>VM priority</label>
+            <select id="setPriorityMode">
+              <option value="balanced">Balanced (recommended) · Runtime yields to the foreground window</option>
+              <option value="performance">Performance · Runtime runs at the same priority as the foreground</option>
+              <option value="game">Game / Low-latency · Runtime runs at high priority — best for FPS and rhythm games</option>
+            </select>
+            <span class="sub">Game mode keeps the Android VM at a high CPU priority and reduces host-side polling for minimum input and frame latency. Other apps on the system will run slower as a result.</span>
+          </div>
+        </details>
+        <div class="field switch-field">
+          <div>
+            <label>Deep background trim</label>
+            <span class="sub">Disables extra background packages like Play Store, Setup Wizard, and Print Service, keeping only what's needed to run apps. If an app complains about missing Google Play services, turning this off will restore them automatically.</span>
+          </div>
+          <input type="checkbox" id="setDeepTrim" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Pre-warm on startup (recommended)</label>
+            <span class="sub">Boots the Android environment silently in the background after ApkBolt starts (emulator window stays hidden). Once warm, launching any app skips the full cold-boot wait — from 20+ seconds down to nearly instant. The trade-off is ~1 GB idle RAM. Disabling means the first app launch always cold-boots.</span>
+          </div>
+          <input type="checkbox" id="setPrewarm" class="switch" />
+        </div>
+        <div class="field">
+          <span class="sub">The Android environment boots once and stays resident; subsequent app launches simply start the target app and stop others. Closing the last window parks the container; the next launch is still fast.</span>
+        </div>
+      </div>
+
+      <!-- ── NETWORK & DOWNLOADS ── -->
+      <div class="group" id="downloadGroup" data-cat="net">
+        <div class="group-title">Download &amp; Update Sources</div>
+        <div class="field">
+          <label>Update &amp; download source</label>
+          <select id="setSourcePref">
+            <option value="auto">Auto — pick the fastest source (recommended)</option>
+            <option value="gitee">Gitee only (usually fastest in China)</option>
+            <option value="github">GitHub only</option>
+          </select>
+          <span class="sub">"Auto" queries both GitHub and Gitee for the latest release, speed-tests each download URL with 256 KB samples, and fetches from the fastest one. If one source is unreachable, the other is used automatically.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Auto-try public GitHub mirrors</label>
+            <span class="sub">When GitHub direct is slow, additionally speed-tests ghfast.top and gh-proxy.com (open proxy services for public release files only, no account access). Disable to use only direct connections and your custom prefix below.</span>
+          </div>
+          <input type="checkbox" id="setAutoMirror" class="switch" />
+        </div>
+        <div class="field">
+          <label>Download mirror prefix (optional — accelerates GitHub)</label>
+          <input id="setMirrorPrefix" type="text" placeholder="e.g. https://ghfast.top/" />
+          <span class="sub">If set, this prefix is used exclusively — the two public mirrors above are skipped. Leave blank to let the auto logic decide. The downloader prepends this URL to the original address.</span>
+        </div>
+        <div class="field">
+          <label>Download threads (1–16, default 8)</label>
+          <input id="setConnections" type="number" min="1" max="16" step="1" />
+          <span class="sub">Large files are split and downloaded in parallel. 8 threads saturates most home connections; try 16 for very fast and stable links.</span>
+        </div>
+        <details class="mini-details">
+          <summary>Gitee source (optional)</summary>
+          <div class="field">
+            <label>Gitee read-only token (usually not needed)</label>
+            <input id="setGiteeToken" type="password" placeholder="Leave blank — public repos work without a token" />
+            <span class="sub">The project repository is public, so the Gitee release list is accessible anonymously. Only fill this in if Gitee is rate-limiting you (HTTP 403/429) or you need to read a private branch:
+              gitee.com → Settings → Personal Access Tokens — only check "projects". The token is only used to read release metadata; nothing is uploaded.</span>
+          </div>
+        </details>
+      </div>
+
+      <!-- ── DIAGNOSTICS & REPAIR ── -->
+      <div class="group" id="preflightGroup" data-cat="diag">
+        <div class="group-title">System Check · Auto-configure</div>
+        <div class="field">
+          <span class="sub">Scans this PC: CPU virtualization, Windows Hypervisor Platform, GPU model, VRAM size, RAM, OS version.
+            Settings that can be auto-fixed (memory / cores / render quality / backend) are written immediately and baked into a driver profile.
+            Issues requiring admin privileges get a button; BIOS-only fixes get clear instructions.</span>
+        </div>
+        <div class="field">
+          <div class="row">
+            <button class="btn primary sm" id="btnPreflight">Run System Check</button>
+            <button class="btn ghost sm" id="btnPreflightApply" hidden>Apply recommended settings</button>
+          </div>
+        </div>
+        <div id="preflightList" class="drv-list"></div>
+        <div class="field">
+          <span class="sub" id="preflightSummary"></span>
+        </div>
+      </div>
+
+      <div class="group" id="driverGroup" data-cat="diag">
+        <div class="group-title">Drivers · Compatibility Patches</div>
+        <div class="field">
+          <span class="sub">Some hardware needs specific launch flags to work correctly (old GPU with limited GLES support, missing hardware acceleration, driver versions that crash with hardware rendering).
+            A driver is a JSON file: "match criteria" + "parameters to apply on match". You can write, import, and share them.
+            Drivers only modify whitelisted launch options — <b>no code is executed</b>; unmatched drivers have no effect.</span>
+        </div>
+        <div class="field">
+          <span class="sub" id="drvSummary">Loading drivers…</span>
+        </div>
+        <div id="drvList" class="drv-list"></div>
+        <div class="field">
+          <div class="row">
+            <button class="btn ghost sm" id="btnDrvReload">Refresh</button>
+            <button class="btn ghost sm" id="btnDrvImport">Import driver…</button>
+            <button class="btn ghost sm" id="btnDrvFolder">Open drivers folder</button>
+            <button class="btn ghost sm" id="btnDrvExport">Export template for this PC</button>
+          </div>
+          <span class="sub">"Export template" pre-fills match conditions for this machine. Edit <code>effect.gpuMode</code> / <code>effect.forceTcg</code> to customize. Field reference: <code>docs/drivers.md</code> in the repository.</span>
+        </div>
+      </div>
+
+      <div class="group" id="autodebugGroup" data-cat="diag">
+        <div class="group-title">Auto-detect · Smart Diagnostics</div>
+        <div class="field">
+          <span class="sub">Periodically scans this PC: Android runtime state, adb authorization, free disk space,
+            data partition conflicts, snapshot integrity, and conflicting settings.
+            Only pops a notification for <b>new</b> critical issues — known issues are silently listed below.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Enable auto-detect (default: on)</label>
+            <span class="sub">When off, no background scans run. Click "Run Now" at any time for a manual check.</span>
+          </div>
+          <input type="checkbox" id="setAutodebugAuto" class="switch" />
+        </div>
+        <div class="field two">
+          <div>
+            <label>Scan interval</label>
+            <select id="setAutodebugInterval">
+              <option value="1">Every 1 minute</option>
+              <option value="5">Every 5 minutes</option>
+              <option value="10">Every 10 minutes (recommended)</option>
+              <option value="30">Every 30 minutes</option>
+              <option value="60">Every hour</option>
+            </select>
+          </div>
+          <div class="switch-field" style="align-items:center">
+            <div>
+              <label>Notify me of new issues</label>
+              <span class="sub">Only alerts on critical new problems — known issues won't repeat.</span>
+            </div>
+            <input type="checkbox" id="setAutodebugNotify" class="switch" />
+          </div>
+        </div>
+        <div class="runtime-actions">
+          <button class="btn primary sm" id="btnAutodebugRun">Run Now</button>
+          <button class="btn ghost sm" id="btnAutodebugReport">Export Diagnostics Report</button>
+          <span class="inline-note" id="autodebugStateText">Not yet scanned</span>
+        </div>
+        <div id="autodebugList" class="dbg-list"></div>
+      </div>
+
+      <!-- ── ADVANCED PERFORMANCE ── -->
+      <details class="advanced-group" data-cat="perf">
+        <summary>Advanced parameters (rarely needed)</summary>
+      <div class="group" data-cat="perf">
+        <div class="group-title">Runtime</div>
+        <div class="field">
+          <label>Runtime</label>
+          <div class="row">
+            <input id="setEngineLabel" type="text" readonly value="ApkBolt built-in runtime (QEMU + Android 14, standalone)" />
+          </div>
+          <span class="sub">ApkBolt exclusively runs its own managed runtime — adb, the emulator, and the system image are all downloaded and managed by ApkBolt itself.
+            It does not detect, take over, or depend on any other emulator you may have installed (MuMu, LDPlayer, BlueStacks, WSA — none are touched).
+            This means ApkBolt works the same regardless of what else is on your PC.</span>
+        </div>
+        <div class="field">
+          <label>adb path</label>
+          <input id="setAdbPath" type="text" placeholder="Leave blank to auto-detect from PATH / Android SDK" />
+        </div>
+        <div class="field">
+          <label>Device address</label>
+          <span class="sub" id="deviceAddrNote">Assigned automatically by ApkBolt (emulator-5554, incremented on port conflict). No manual entry needed.</span>
+        </div>
+        <div class="field">
+          <label>System image (ISO)</label>
+          <input id="setSystemImage" type="text" placeholder="Path to Android-x86 / Bliss OS ISO or IMG — leave blank to use default location" />
+        </div>
+        <div class="field two">
+          <div>
+            <label>Memory (MB, 0 = auto)</label>
+            <input id="setMemory" type="number" min="0" step="512" />
+          </div>
+          <div>
+            <label>CPU cores (0 = auto)</label>
+            <input id="setCores" type="number" min="0" max="16" />
+          </div>
+        </div>
+        <div class="field">
+          <span class="sub" id="builtinResNote"></span>
+        </div>
+        <div class="field">
+          <label>Idle reclaim (minutes, 0 = never)</label>
+          <input id="setIdle" type="number" min="0" step="1" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Universal compatibility image (auto-managed)</label>
+            <span class="sub">There is a single Android 14 universal image that runs both x86 and ARM apps. The ARM translation layer is downloaded automatically the first time an ARM-only APK is detected. This toggle exists only for legacy configuration compatibility.</span>
+          </div>
+          <input type="checkbox" id="setCompat" class="switch" />
+        </div>
+        <div class="field" id="compatInstallField" hidden>
+          <label>Compatibility image</label>
+          <div class="row">
+            <span class="inline-note" id="compatImgStatus">Not downloaded</span>
+            <button class="btn ghost sm" id="btnInstallPlay">Download compatibility image</button>
+          </div>
+        </div>
+        <div class="runtime-actions">
+          <button class="btn ghost sm" id="btnRuntimeStart">Start runtime</button>
+          <button class="btn ghost sm" id="btnRuntimeStop">Stop VM</button>
+          <span class="inline-note" id="probeResult"></span>
+        </div>
+      </div>
+      </details>
+
+      <!-- ── ANDROID SYSTEM SETTINGS ── -->
+      <div class="group" data-cat="display">
+        <div class="group-title">Android System Settings (without entering the Android desktop)</div>
+        <div class="field">
+          <label>Runtime status</label>
+          <div class="row">
+            <span class="inline-note" id="androidStatus">Runtime not started</span>
+            <button class="btn ghost sm" id="btnAndroidRefresh">Refresh</button>
+            <button class="btn ghost sm" id="btnAndroidTune">One-click performance boost</button>
+          </div>
+          <span class="sub">Disables system animations, removes background process limits, and whitelists the current app from battery restrictions. Most noticeable on lower-end hardware.</span>
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Wi-Fi</label>
+            <span class="sub">Android VM's internal wireless network. Turning this off saves a small amount of CPU.</span>
+          </div>
+          <input type="checkbox" id="setAndroidWifi" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Airplane mode</label>
+            <span class="sub">Completely cuts networking (including mobile data). Useful for quiet/offline sessions.</span>
+          </div>
+          <input type="checkbox" id="setAndroidAirplane" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>System animations</label>
+            <span class="sub">Disabling animations makes UI transitions noticeably snappier with no functional impact.</span>
+          </div>
+          <input type="checkbox" id="setAndroidAnim" class="switch" />
+        </div>
+        <div class="field">
+          <label>Media volume</label>
+          <div class="row">
+            <input type="range" id="setAndroidVolume" min="0" max="100" step="1" style="flex:1" />
+            <span class="inline-note" id="androidVolumeText">—</span>
+          </div>
+        </div>
+        <div class="field two">
+          <div>
+            <label>Font size</label>
+            <select id="setAndroidFont">
+              <option value="0.85">Small</option>
+              <option value="1.00">Default</option>
+              <option value="1.15">Large</option>
+              <option value="1.30">Extra Large</option>
+            </select>
+          </div>
+          <div>
+            <label>Display size</label>
+            <select id="setAndroidDensity">
+              <option value="240">Compact (best performance)</option>
+              <option value="320">Default</option>
+              <option value="420">Large</option>
+              <option value="480">Extra Large</option>
+            </select>
+          </div>
+        </div>
+        <div class="runtime-actions">
+          <button class="btn ghost sm" id="btnAndroidSettings">Android Settings</button>
+          <button class="btn ghost sm" id="btnAndroidDisplay">Display settings</button>
+          <button class="btn ghost sm" id="btnAndroidSound">Sound settings</button>
+          <button class="btn ghost sm" id="btnAndroidLocale">Language settings</button>
+          <button class="btn ghost sm" id="btnAndroidApps">App management</button>
+        </div>
+      </div>
+
+      <!-- ── INTEGRATION & FILES ── -->
+      <div class="group" data-cat="files">
+        <div class="group-title">Desktop &amp; App Shortcuts</div>
+        <div class="field switch-field">
+          <div>
+            <label>Auto-create desktop shortcut after install</label>
+            <span class="sub">Shortcut uses the real app icon — double-click to launch directly</span>
+          </div>
+          <input type="checkbox" id="setAutoShortcut" class="switch" />
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Also add to Start Menu</label>
+            <span class="sub">Windows Search finds apps by name; taskbar groups by app</span>
+          </div>
+          <input type="checkbox" id="setStartMenuShortcut" class="switch" />
+        </div>
+        <div class="field">
+          <label>Shortcut folder</label>
+          <input id="setShortcutDir" type="text" placeholder="Leave blank = Desktop" />
+        </div>
+        <div class="runtime-actions">
+          <button class="btn ghost sm" id="btnRebuildShortcuts">Rebuild shortcuts</button>
+          <span class="inline-note">If desktop icons are missing or were removed by security software, click here to recreate them all.</span>
+        </div>
+      </div>
+
+      <div class="group" data-cat="files">
+        <div class="group-title">File Sharing</div>
+        <div class="field">
+          <label>Host shared folder</label>
+          <div class="row">
+            <input id="setSharedDir" type="text" />
+            <button class="btn ghost sm" id="btnBrowseShared">Browse</button>
+            <button class="btn ghost sm" id="btnOpenShared">Open</button>
+            <button class="btn ghost sm" id="btnSyncShared">Sync now</button>
+            <button class="btn primary sm" id="btnSaveShared">Save &amp; migrate</button>
+          </div>
+          <span class="sub">Existing files in the old folder are moved to the new one automatically on save. File sharing continues uninterrupted.</span>
+        </div>
+        <div class="field">
+          <label>Android-side folder path</label>
+          <input id="setDeviceSharedDir" type="text" placeholder="/sdcard/ApkBoltShared" />
+        </div>
+        <p class="note">Both folders stay in continuous two-way sync. Files saved to this folder from an Android app will appear on your Windows host automatically.</p>
+      </div>
+
+      <div class="group" data-cat="files">
+        <div class="group-title">System Integration</div>
+        <div class="field switch-field">
+          <div>
+            <label>Associate .apk files</label>
+            <span class="sub">Double-clicking an APK in File Explorer installs it into ApkBolt (writes to current user only — no admin required)</span>
+          </div>
+          <button class="btn ghost sm" id="btnAssoc">Checking…</button>
+        </div>
+        <div class="field">
+          <label>Runtime data directory (system image · installed apps · snapshots)</label>
+          <div class="row">
+            <input id="setRuntimeDir" type="text" readonly placeholder="Default: user data directory on C:" />
+            <button class="btn ghost sm" id="btnBrowseRuntimeDir">Browse</button>
+            <button class="btn ghost sm" id="btnOpenData">Open</button>
+          </div>
+          <span class="sub">This folder uses the most space (several GB). Moving it to a non-system drive frees up C:. Requires an app restart; existing data is not moved automatically — copy it manually then delete the old folder.</span>
+        </div>
+        <div class="field">
+          <label>Android data directory (apps, games, and fast-boot snapshots)</label>
+          <div class="row">
+            <input id="setAvdDir" type="text" readonly placeholder="Default: avd subfolder inside the runtime directory" />
+            <button class="btn ghost sm" id="btnBrowseAvdDir">Browse</button>
+            <button class="btn ghost sm" id="btnOpenAvdDir">Open</button>
+          </div>
+          <span class="sub">This is where disk space is really consumed: the data partition (default 6 GB, expandable above) + fast-boot snapshot (~2–3 GB).
+            Moving to another drive (e.g. D:) takes effect after restart. The existing <code>apkbolt.avd</code> folder can be moved wholesale and the old location deleted.</span>
+        </div>
+        <div class="field">
+          <label>Uninstall ApkBolt</label>
+          <div class="row">
+            <button class="btn ghost sm" id="btnUninstall">Uninstall</button>
+            <span class="inline-note">Removes the .apk file association and the application. For the portable version, manually delete the folder as prompted.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── UPDATES & ABOUT ── -->
+      <div class="group" id="updateGroup" data-cat="about">
+        <div class="group-title">Software Updates</div>
+        <div class="field">
+          <label>Current version <span class="inline-note" id="updateCurrent">—</span></label>
+          <div class="row">
+            <span class="inline-note" id="updateState">Not checked</span>
+            <span style="flex:1"></span>
+            <button class="btn ghost sm" id="btnCheckUpdate">Check for updates</button>
+            <button class="btn primary sm" id="btnDoUpdate" style="display:none" hidden>Update now</button>
+          </div>
+          <div class="update-bar" id="updateBar" hidden><i id="updateBarFill"></i></div>
+          <span class="sub" id="updateNote">
+            Fetches the latest release from GitHub (abhi666-max/apkbolt). The portable build downloads a new package and replaces the binary files automatically — runtime data, installed apps, and snapshots are unaffected.
+          </span>
+        </div>
+      </div>
+
+      <div class="group" id="aboutGroup" data-cat="about">
+        <div class="group-title">About</div>
+        <div class="about-box">
+          <div class="about-brand">
+            <svg viewBox="0 0 48 48" width="56" height="56" aria-label="ApkBolt logo"><use href="#brandMark"/></svg>
+          </div>
+          <div class="about-info">
+            <div class="about-name">ApkBolt <span class="about-ver" id="aboutVer"></span></div>
+            <p class="note">Lightning-fast Android app launcher for Windows — drag, drop, and run APKs instantly in standalone windows with real app icons and desktop shortcuts.</p>
+            <div class="about-author" style="margin: 6px 0; font-size: 13px; color: var(--text-secondary);">
+              Created &amp; Maintained by <b>Abhijeet Kangane</b> (<a href="https://github.com/abhi666-max" target="_blank" rel="noopener" style="color: var(--accent);">@abhi666-max</a>)
+            </div>
+            <div class="about-links">
+              <button class="btn ghost sm" id="btnOpenManual">Open User Guide (includes troubleshooting)</button>
+              <a href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener">GitHub · @abhi666-max/apkbolt</a>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LAB ── -->
+      <div class="group" id="labGroup" data-cat="lab">
+        <div class="group-title">Lab</div>
+        <div class="lab-notice">
+          Features here are experimental and may change between versions. If you encounter issues, use Diagnostics &amp; Repair → Export Diagnostics Report to share feedback.
+        </div>
+        <div class="field switch-field">
+          <div>
+            <label>Windows native multi-window · Multi-instance (experimental)</label>
+            <span class="sub">When enabled, opening a new app no longer closes the previous one — multiple apps can stay resident and be switched back to instantly (login state preserved, no reload needed).
+              Due to the Android runtime having a single emulator window, only one app's canvas is visible at a time; this is not true simultaneous side-by-side windows.
+              Memory usage will increase notably. Disable to return to stable single-app mode.</span>
+          </div>
+          <input type="checkbox" id="setMultiWindow" class="switch" />
+        </div>
+        <div class="field">
+          <label for="setKeepBackground">Background app retention</label>
+          <select id="setKeepBackground">
+            <option value="0">0 · Most memory-efficient (keep only current app)</option>
+            <option value="1">1 · Balanced (recommended)</option>
+            <option value="2">2 · More stable multi-instance</option>
+            <option value="3">3 · Maximum concurrent</option>
+          </select>
+          <span class="sub">In multi-window mode, apps beyond this count are suspended (data kept, instant resume) to free memory.</span>
+        </div>
+      </div>
+    </div>
+    </div>
+    <footer class="modal-foot">
+      <span class="inline-note">Settings take effect immediately</span>
+      <button class="btn primary" id="btnDoneSettings">Done</button>
+    </footer>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

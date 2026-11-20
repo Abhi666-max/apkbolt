@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+<title>ApkBolt</title>
+<link rel="stylesheet" href="splash.css" />
+</head>
+<body>
+<div class="splash" id="splash">
+  <!-- Ambient glow layers -->
+  <div class="aura" aria-hidden="true"></div>
+  <div class="halo" aria-hidden="true"></div>
+
+  <!-- Logo area -->
+  <div class="logo-wrap">
+    <div class="logo-glow" aria-hidden="true"></div>
+    <img class="logo" id="logo" src="assets/logo.png" alt="ApkBolt" draggable="false"
+         onerror="this.style.display='none';document.getElementById('logoBolt').style.display='grid'" />
+    <!-- Fallback SVG bolt shown when logo.png is missing -->
+    <div class="logo-bolt" id="logoBolt" style="display:none" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="92" height="92" fill="none">
+        <rect width="64" height="64" rx="18" fill="url(#splashGrad)"/>
+        <linearGradient id="splashGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2a1800"/>
+          <stop offset="100%" stop-color="#1a0d00"/>
+        </linearGradient>
+        <path d="M38 10 L22 34 H32 L26 54 L46 28 H36 Z" fill="#f5a623"/>
+      </svg>
+    </div>
+    <div class="brand">ApkBolt</div>
+    <div class="tagline">Lightning-fast Android runtime for Windows</div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Status text -->
+  <div class="status" id="status">Initializing…</div>
+
+  <!-- First-run notice (hidden by default, shown by main process) -->
+  <div class="first-run" id="firstRun" hidden>
+    <div class="first-run-title" id="firstRunTitle">First Launch · Setting up automatically</div>
+    <ul class="first-run-list" id="firstRunList">
+      <li>Downloading the Android runtime engine (~200 MB, one-time only)</li>
+      <li>Downloading the system image (~1.5 GB, one-time only)</li>
+      <li>Configuring hardware acceleration and networking</li>
+      <li>Once done, double-click any APK or desktop shortcut to launch instantly</li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">ApkBolt · v<span id="ver"></span> · Native Windows Container</div>
+</div>
+
+<script src="splash.js"></script>
+</body>
+</html>

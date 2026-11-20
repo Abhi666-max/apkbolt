@@ -1,0 +1,183 @@
+/* ApkBolt splash screen — lightning-speed dark aesthetic
+   Large backdrop · glowing bolt · smooth breathe animation */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  background: #0d0f14;
+  color: #e8eaf0;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.splash {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  background: radial-gradient(130% 110% at 50% 48%, #111520 0%, #0a0c10 55%, #060709 100%);
+  transition: opacity .55s cubic-bezier(.4,0,.2,1),
+              transform .55s cubic-bezier(.4,0,.2,1),
+              filter .55s cubic-bezier(.4,0,.2,1);
+}
+
+.splash.out { opacity: 0; transform: scale(1.03); filter: blur(6px); }
+
+/* ── Ambient lightning glow layers ── */
+.aura {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  width: 92%; height: 92%;
+  left: 4%; top: 2%;
+  background: radial-gradient(circle, rgba(245,166,35,.07) 0%, rgba(245,166,35,.025) 42%, transparent 70%);
+  filter: blur(32px);
+  animation: auraBreath 7s ease-in-out infinite;
+}
+.halo {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  width: 60%; height: 60%;
+  left: 20%; top: 14%;
+  background: radial-gradient(circle, rgba(59,130,246,.05) 0%, transparent 68%);
+  filter: blur(28px);
+  animation: auraBreath 7s ease-in-out infinite reverse;
+}
+
+/* ── Logo ── */
+.logo-wrap {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  animation: rise .9s cubic-bezier(.2,.7,.3,1) both;
+}
+.logo-glow {
+  position: absolute;
+  top: 50px; left: 50%;
+  width: 140px; height: 140px;
+  margin: -70px 0 0 -70px;
+  background: radial-gradient(circle, rgba(245,166,35,.30) 0%, rgba(245,166,35,.10) 46%, transparent 72%);
+  filter: blur(22px); border-radius: 50%;
+  animation: glowBreath 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.logo {
+  position: relative;
+  width: 92px; height: 92px;
+  object-fit: contain;
+  animation: breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 8px 24px rgba(245,166,35,.45));
+}
+
+/* ── Bolt SVG icon (shown when logo.png missing) ── */
+.logo-bolt {
+  position: relative;
+  width: 92px; height: 92px;
+  display: grid; place-items: center;
+  animation: breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 8px 24px rgba(245,166,35,.5));
+}
+
+.brand {
+  position: relative;
+  margin-top: 20px;
+  font-size: 28px; font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(92deg, #f5a623, #ffd07a);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  opacity: 0;
+  animation: fadeUp .85s ease-out .2s both;
+}
+.tagline {
+  position: relative;
+  margin-top: 7px;
+  font-size: 12.5px; color: #5c6274;
+  letter-spacing: .4px;
+  opacity: 0;
+  animation: fadeUp .85s ease-out .34s both;
+}
+
+/* ── Progress bar ── */
+.progress-wrap {
+  position: relative;
+  margin-top: 42px;
+  width: 260px; height: 2px;
+  background: rgba(255,255,255,.07);
+  border-radius: 2px; overflow: hidden;
+  opacity: 0;
+  animation: fadeUp .85s ease-out .5s both;
+}
+.progress-bar {
+  width: 0%; height: 100%;
+  background: linear-gradient(90deg, rgba(245,166,35,.6), #f5a623, #fbbf40);
+  border-radius: 2px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 8px rgba(245,166,35,.5);
+}
+
+/* ── Status text ── */
+.status {
+  position: relative;
+  margin-top: 15px;
+  font-size: 12.5px; color: #5c6274;
+  letter-spacing: .2px; min-height: 18px;
+  opacity: 0;
+  animation: fadeUp .85s ease-out .62s both;
+  transition: opacity .35s;
+}
+
+/* ── First-run notice ── */
+.first-run {
+  position: relative;
+  margin-top: 26px; padding: 15px 22px;
+  background: rgba(245,166,35,.04);
+  border: 1px solid rgba(245,166,35,.12);
+  border-radius: 12px; max-width: 376px;
+  opacity: 0;
+  animation: fadeUp .7s ease-out .78s both;
+}
+.first-run-title {
+  font-size: 12.5px; font-weight: 600;
+  color: #f5a623; margin-bottom: 9px;
+}
+.first-run-list {
+  list-style: none; font-size: 11.5px; color: #5c6274; line-height: 1.85;
+}
+.first-run-list li::before { content: '⚡'; margin-right: 8px; color: rgba(245,166,35,.6); }
+
+/* ── Footer ── */
+.footer {
+  position: absolute; bottom: 15px;
+  font-size: 10.5px; color: #2f3647;
+  letter-spacing: .3px;
+  opacity: 0;
+  animation: fadeUp .85s ease-out .95s both;
+}
+
+/* ── Keyframes ── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.038); }
+}
+@keyframes glowBreath {
+  0%, 100% { opacity: .5; transform: scale(.94); }
+  50%      { opacity: 1;  transform: scale(1.08); }
+}
+@keyframes auraBreath {
+  0%, 100% { opacity: .5; transform: scale(.97); }
+  50%      { opacity: 1;  transform: scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura, .halo, .logo-glow, .logo { animation: none !important; }
+  .logo-wrap, .brand, .tagline, .progress-wrap, .status, .first-run, .footer {
+    animation-duration: .01ms !important; opacity: 1;
+  }
+}
