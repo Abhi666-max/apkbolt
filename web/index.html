@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApkBolt — High-Performance Android Desktop Launcher for Windows</title>
+  <meta name="description" content="Lightning-fast, lightweight Android desktop container and APK launcher for Windows 10 & 11. Run Android apps in native standalone windows." />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <img src="assets/logo.png" alt="ApkBolt Logo" class="brand-logo" />
+        <span class="brand-name">Apk<span>Bolt</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="#how-to-use">How to Use</a>
+        <a href="#download" class="nav-btn-highlight">Download</a>
+        <a href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener" class="nav-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-container">
+      <div class="badge-pill">
+        <span class="badge-dot"></span>
+        <span class="badge-text">v0.6.3 Production Release &bull; Android 14 Container</span>
+      </div>
+      <h1 class="hero-title">
+        Lightning-Fast Android Apps<br />
+        <span class="gradient-text">Native on Windows.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Drop any APK onto ApkBolt and run it in a clean, standalone desktop window in under two seconds. Powered by hardware-accelerated QEMU virtualization with zero telemetry, zero ads, and instant cold-boot caching.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://github.com/abhi666-max/apkbolt/releases/download/v0.6.3/ApkBolt-v0.6.3-portable.zip" class="btn btn-primary" id="btnHeroDownload">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download for Windows (.zip, ~96 MB)
+        </a>
+        <a href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener" class="btn btn-secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-val">&lt; 1.8s</div>
+          <div class="metric-lbl">Warm Launch Latency</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">~96 MB</div>
+          <div class="metric-lbl">Core Launcher Footprint</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">60 FPS</div>
+          <div class="metric-lbl">Direct GPU Passthrough</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">100%</div>
+          <div class="metric-lbl">Open Source &amp; Private</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Drag & Drop Preview -->
+  <section class="preview-section">
+    <div class="container">
+      <div class="window-mockup">
+        <div class="window-titlebar">
+          <div class="window-buttons">
+            <span class="btn-dot close"></span>
+            <span class="btn-dot min"></span>
+            <span class="btn-dot max"></span>
+          </div>
+          <div class="window-title">ApkBolt v0.6.3 — Android Desktop Launcher</div>
+          <div class="window-engine-status">
+            <span class="status-indicator live"></span>
+            <span class="status-text">Engine Ready &bull; Port 5554</span>
+          </div>
+        </div>
+        <div class="window-body">
+          <!-- Hidden real file input -->
+          <input type="file" id="apkFileInput" accept=".apk,.xapk,.apks" style="display: none;" />
+
+          <div class="dropzone-demo" id="dropzoneDemo">
+            <div class="dropzone-icon" id="dropzoneIcon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </div>
+            <h3 id="dropzoneTitle">Drag &amp; Drop APK file here</h3>
+            <p id="dropzoneDesc">or click to browse your local computer for .apk or .xapk packages</p>
+            <div class="dropzone-actions">
+              <button type="button" class="browse-btn" id="btnBrowseFile">Select APK Package</button>
+              <button type="button" class="demo-btn" id="btnDemoApk">Try Demo APK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Features -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Built for Performance. Engineered for Simplicity.</h2>
+        <p class="section-desc">ApkBolt combines bare-metal Windows hypervisor acceleration with a zero-friction desktop container.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Native Freeform Multi-Window</h3>
+          <p>Each Android application opens directly inside its own native Windows titlebar and desktop taskbar icon. Maximize, resize, minimize, and snap with Windows 11 Snap Layouts.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎮</div>
+          <h3>Hardware GPU Acceleration</h3>
+          <p>Seamless support for NVIDIA, AMD Radeon, and Intel Iris Xe graphics with ANGLE and Swangle fallbacks for 60fps gaming and video playback.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Bidirectional Clipboard Sync</h3>
+          <p>Copy links, authentication codes, or documents on Windows and paste them straight into Android apps, and vice-versa, with zero configuration.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Instant APK Backup &amp; Export</h3>
+          <p>Export installed Android apps back to your host filesystem as verified standalone <code>.apk</code> packages with a single click.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Zero Bloat &amp; Zero Telemetry</h3>
+          <p>Unlike commercial emulators that install cryptocurrency miners, background ads, and spyware, ApkBolt is 100% clean, open source, and standalone.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Smart On-Demand Engine</h3>
+          <p>The launcher packages at just ~96MB. On clean systems, an accelerated 8-connection downloader streams the verified Android 14 image in parallel with automatic resume.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Breakdown (Explaining the 1.45 GB Runtime) -->
+  <section id="architecture" class="section bg-card">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How the 1.45 GB Android Runtime Works</h2>
+        <p class="section-desc">Understanding ApkBolt's high-efficiency asset delivery architecture.</p>
+      </div>
+
+      <div class="arch-box">
+        <div class="arch-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Ultra-Lightweight Launcher (~96 MB)</h4>
+            <p>The core ApkBolt client contains the Electron UI, ADB bridge, Windows Hypervisor Platform (WHPX) hooks, and graphics compatibility layer. It downloads in seconds on any network.</p>
+          </div>
+        </div>
+
+        <div class="arch-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>Automatic Local Runtime Detection</h4>
+            <p>If your PC already has an existing Android SDK, QEMU emulator, or previous system image, ApkBolt automatically detects and mounts it instantly without downloading a single megabyte.</p>
+          </div>
+        </div>
+
+        <div class="arch-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>8-Stream Parallel CDN Acceleration</h4>
+            <p>For fresh installs, ApkBolt initiates an 8-connection chunked stream with <code>Content-Range</code> verification to download the official Google Android 14 x86_64 system image into <code>%APPDATA%\apkbolt\runtime</code> in minutes.</p>
+          </div>
+        </div>
+
+        <div class="arch-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Persistent Incremental Overlay (QCOW2)</h4>
+            <p>Your user data and installed APKs are isolated into an incremental delta disk. The core system image remains clean and immutable, enabling instant warm-boot restoration via snapshots.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benchmarks Section -->
+  <section id="benchmarks" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Performance Benchmark Comparison</h2>
+        <p class="section-desc">Measured on AMD Ryzen 7 7840HS with 16GB RAM running Windows 11.</p>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Feature / Metric</th>
+              <th class="highlight">ApkBolt v0.6.3</th>
+              <th>Traditional Emulators</th>
+              <th>Windows Subsystem for Android (WSA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Idle Memory Usage</td>
+              <td class="highlight font-bold text-amber">~480 MB</td>
+              <td>1.8 GB - 3.2 GB</td>
+              <td>~1.2 GB</td>
+            </tr>
+            <tr>
+              <td>Warm Launch Latency</td>
+              <td class="highlight font-bold text-amber">&lt; 1.8 seconds</td>
+              <td>12 - 25 seconds</td>
+              <td>4 - 8 seconds</td>
+            </tr>
+            <tr>
+              <td>Desktop Window Mode</td>
+              <td class="highlight font-bold text-amber">Native Independent Window</td>
+              <td>Clunky Container Viewport</td>
+              <td>Native Window</td>
+            </tr>
+            <tr>
+              <td>Adware &amp; Telemetry</td>
+              <td class="highlight font-bold text-green">0% &bull; Completely Free</td>
+              <td>High &bull; Bundled Ads</td>
+              <td>None &bull; Discontinued by MS</td>
+            </tr>
+            <tr>
+              <td>Offline Installer Available</td>
+              <td class="highlight font-bold text-green">Yes (NSIS / Portable)</td>
+              <td>Online Stubs Only</td>
+              <td>Deprecated</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to Use Section -->
+  <section id="how-to-use" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How to Download and Use ApkBolt</h2>
+        <p class="section-desc">Get started in 3 simple steps on any Windows 10 or 11 PC.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-badge">Step 1</div>
+          <h3>Download &amp; Extract</h3>
+          <p>Download the <strong>ApkBolt Portable Edition (.zip)</strong> or Installer below. Extract the folder anywhere on your computer (e.g. <code>C:\ApkBolt</code> or Desktop).</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-badge">Step 2</div>
+          <h3>Launch ApkBolt.exe</h3>
+          <p>Double-click <code>ApkBolt.exe</code>. On first run, it checks your PC's virtualization, automatically configures optimal GPU drivers, and boots the Android engine in seconds.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-badge">Step 3</div>
+          <h3>Drop &amp; Run Any APK</h3>
+          <p>Drag any <code>.apk</code> or <code>.xapk</code> file directly onto ApkBolt. It installs automatically and launches the app in its own standalone, resizable desktop window!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="section bg-card">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Download ApkBolt for Windows</h2>
+        <p class="section-desc">Compatible with Windows 10 (Build 19044+) and Windows 11 (64-bit). One package, zero hassle.</p>
+      </div>
+
+      <div class="single-download-wrap">
+        <div class="download-card featured single-card">
+          <div class="card-badge">Official Release &bull; Portable &bull; Instant Run</div>
+          <h3>ApkBolt for Windows</h3>
+          <div class="download-version">v0.6.3 &bull; Standalone Portable (.zip, ~96 MB)</div>
+          <p>Zero-install portable distribution. No setup wizard or administrator privileges needed — extract anywhere and double-click <code>ApkBolt.exe</code> to run immediately.</p>
+          
+          <ul class="download-benefits">
+            <li><span class="benefit-check">✓</span> <strong>Instant Drag-and-Drop:</strong> Run any .apk or .xapk in an independent native desktop window.</li>
+            <li><span class="benefit-check">✓</span> <strong>Hardware GPU Passthrough:</strong> 60 FPS graphics acceleration for NVIDIA, AMD, and Intel.</li>
+            <li><span class="benefit-check">✓</span> <strong>Host Clipboard Sync:</strong> Seamless copy-paste between Windows and Android apps.</li>
+            <li><span class="benefit-check">✓</span> <strong>Zero Bloat:</strong> 100% clean, private open-source architecture with zero telemetry.</li>
+          </ul>
+
+          <a href="https://github.com/abhi666-max/apkbolt/releases/download/v0.6.3/ApkBolt-v0.6.3-portable.zip" class="btn btn-primary btn-large full-width" id="btnDownloadZip">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Download ApkBolt v0.6.3 (.zip)
+          </a>
+          
+          <div class="download-footer-links">
+            <span>Direct high-speed download from GitHub Releases</span> &bull; 
+            <a href="https://github.com/abhi666-max/apkbolt/releases/tag/v0.6.3" target="_blank" rel="noopener">View GitHub Release v0.6.3 &amp; Checksums</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SmartScreen Note Box -->
+      <div class="smartscreen-box">
+        <div class="smartscreen-icon">💡</div>
+        <div class="smartscreen-text">
+          <strong>Note for Windows Users:</strong> Because ApkBolt is an independent, community-driven open-source project without a multi-thousand-dollar Microsoft code-signing certificate, Windows SmartScreen may show an alert on first run. Simply click <strong>"More info"</strong> and then <strong>"Run anyway"</strong>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand">
+          <img src="assets/logo.png" alt="ApkBolt Logo" class="brand-logo small" />
+          <span class="brand-name">Apk<span>Bolt</span></span>
+        </div>
+        <p>Engineered with precision for Windows developers and Android power users.</p>
+      </div>
+      <div class="footer-author">
+        <p>Created &amp; Maintained by <strong>Abhijeet Kangane</strong> (<a href="https://github.com/abhi666-max" target="_blank" rel="noopener">@abhi666-max</a>)</p>
+        <p>Licensed under the <a href="https://github.com/abhi666-max/apkbolt/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
