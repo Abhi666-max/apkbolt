@@ -1493,7 +1493,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(withMirror(url, 'https://x/') === `https://x/${url}`, 'assertion failed');
 
     // GitHub: Gitee  403, 
-    const giteeUrl = 'https://gitee.com/daily-miku/apkbolt/releases/download/v1/a.zip.part1';
+    const giteeUrl = 'https://gitee.com/abhi666-max/apkbolt/releases/download/v1/a.zip.part1';
     assert(auto.candidates(giteeUrl).length === 1, 'Gitee GitHub');
   });
 
