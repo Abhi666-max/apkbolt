@@ -15,7 +15,7 @@
  * node build/msix.js --sign # certificatesignature()
  * node build/msix.js --identity Name --publisher "CN=..." --display 
  *
- * : APKSTART_MSIX_IDENTITY / APKSTART_MSIX_PUBLISHER / APKSTART_MSIX_DISPLAY
+ * : APKBOLT_MSIX_IDENTITY / APKBOLT_MSIX_PUBLISHER / APKBOLT_MSIX_DISPLAY
  */
 const fs = require('fs');
 const os = require('os');
@@ -49,10 +49,10 @@ function msixVersion(v) {
 const PLACEHOLDER_PUBLISHER = 'CN=AbhijeetKangane';
 const CONFIRMED_IDENTITY = 'AbhijeetKangane.ApkBolt';
 const CONFIRMED_PUBLISHER = 'CN=58CA1DED-8AB3-4D0D-AF50-62C9B781AA4D';
-const IDENTITY = arg('identity') || process.env.APKSTART_MSIX_IDENTITY || CONFIRMED_IDENTITY;
-const PUBLISHER = arg('publisher') || process.env.APKSTART_MSIX_PUBLISHER || CONFIRMED_PUBLISHER;
-const PUBLISHER_DISPLAY = arg('publisherDisplay') || process.env.APKSTART_MSIX_PUBLISHER_DISPLAY || 'Abhijeet Kangane';
-const DISPLAY = arg('display') || process.env.APKSTART_MSIX_DISPLAY || 'ApkBolt';
+const IDENTITY = arg('identity') || process.env.APKBOLT_MSIX_IDENTITY || CONFIRMED_IDENTITY;
+const PUBLISHER = arg('publisher') || process.env.APKBOLT_MSIX_PUBLISHER || CONFIRMED_PUBLISHER;
+const PUBLISHER_DISPLAY = arg('publisherDisplay') || process.env.APKBOLT_MSIX_PUBLISHER_DISPLAY || 'Abhijeet Kangane';
+const DISPLAY = arg('display') || process.env.APKBOLT_MSIX_DISPLAY || 'ApkBolt';
 const APP_ID = arg('appId') || 'ApkBolt';
 const DO_SIGN = !!arg('sign', false);
 
@@ -455,7 +455,7 @@ function sign(file) {
     return;
   }
   const pfx = path.join(OUT_DIR, 'ApkBolt-test.pfx');
-  const pwd = process.env.APKSTART_MSIX_PFX_PASSWORD || 'ApkBolt!test';
+  const pwd = process.env.APKBOLT_MSIX_PFX_PASSWORD || 'ApkBolt!test';
   const subject = PUBLISHER;   // Publisher
   if (!fs.existsSync(pfx)) {
     console.log(`\n(Subject=${subject})...`);

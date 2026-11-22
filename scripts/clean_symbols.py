@@ -1,7 +1,7 @@
 import os
 import re
 
-root = r'd:\Personal Projects\ApkBolt\apkstart'
+root = r'd:\Personal Projects\ApkBolt\apkbolt'
 
 cjk_map = {
     '\uff08': '(',

@@ -160,7 +160,7 @@ const GB = 1024 * 1024 * 1024;
     const v = diskVerdict(10 * 1024, 60 * 1024);
     assert.equal(v.ok, false);
     assert.ok(/Insufficient disk space/i.test(v.message), v.message);
-    assert.ok(/ApkStart |ApkBolt runtime/i.test(v.message), v.message);
+    assert.ok(/ApkBolt |ApkBolt runtime/i.test(v.message), v.message);
   });
 
   test('diskVerdict', () => {

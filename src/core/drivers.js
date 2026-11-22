@@ -2,7 +2,7 @@
 /**
  * driver(patch). 
  *
- * :ApkStart emulator + system image, "":
+ * :ApkBolt emulator + system image, "":
  * GLES 3.1,  WHPX TCG,  + driver host ......
  * defaultparameters, . 
  *

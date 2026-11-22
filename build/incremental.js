@@ -8,8 +8,8 @@
  * version,  resources/app completeupgrade. 
  *
  * ( --out directory, defaultdirectory): 
- * ApkStart-v<version>-manifest.json
- * ApkStart-v<version>-app.zip
+ * ApkBolt-v<version>-manifest.json
+ * ApkBolt-v<version>-app.zip
  *
  * : node build/incremental.js <portable versiondirectory> <tag> [--out directory]
  */
@@ -66,15 +66,15 @@ function zipApp(exe, srcDir, outZip, rootDir) {
 async function build(portableDir, tag, outDir = process.cwd()) {
   const portable = path.resolve(portableDir);
   const appDir = path.join(portable, 'resources', 'app');
-  if (!fs.existsSync(path.join(portable, 'ApkStart.exe'))) throw new Error(' ApkStart.exe');
+  if (!fs.existsSync(path.join(portable, 'ApkBolt.exe'))) throw new Error('ApkBolt.exe not found in portable directory');
   if (!fs.existsSync(path.join(appDir, 'package.json'))) throw new Error(' resources/app/package.json');
 
   const version = String(tag || '').replace(/^v/i, '');
   if (!version) throw new Error(' / tag');
 
   fs.mkdirSync(outDir, { recursive: true });
-  const appName = `ApkStart-v${version}-app.zip`;
-  const manifestName = `ApkStart-v${version}-manifest.json`;
+  const appName = `ApkBolt-v${version}-app.zip`;
+  const manifestName = `ApkBolt-v${version}-manifest.json`;
   const appZip = path.join(outDir, appName);
   const manifestPath = path.join(outDir, manifestName);
 
@@ -105,7 +105,7 @@ async function build(portableDir, tag, outDir = process.cwd()) {
       size: fs.statSync(appZip).size,
       files,
     },
-    full: { asset: `ApkStart-v${version}-win64-portable.zip` },
+    full: { asset: `ApkBolt-v${version}-win64-portable.zip` },
   };
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 

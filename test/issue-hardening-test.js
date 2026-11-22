@@ -32,7 +32,7 @@ async function atest(name, fn) {
   catch (e) { failed++; console.error(`  ✗ ${name}\n    ${e.message}`); }
 }
 
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-hardening-'));
 
 (async () => {
   console.log('\n[issue #2 P0-1  -  ]');
@@ -109,8 +109,8 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
   test('electron-builder Uninstall X.exe', () => {
     const dir = path.join(TMP, 'uninst-a');
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'Uninstall ApkStart.exe'), 'x');
-    assert.equal(findUninstaller(dir), 'Uninstall ApkStart.exe');
+    fs.writeFileSync(path.join(dir, 'Uninstall ApkBolt.exe'), 'x');
+    assert.equal(findUninstaller(dir), 'Uninstall ApkBolt.exe');
   });
   test('uninstaller.exe', () => {
     const dir = path.join(TMP, 'uninst-b');
@@ -127,14 +127,14 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
   console.log('\n[issue #9 8  -  ]');
   await atest(',  / exe', async () => {
     const dataDir = path.join(TMP, 'upd-resume');
-    const exe = path.join(dataDir, 'ApkStart.exe');
+    const exe = path.join(dataDir, 'ApkBolt.exe');
     fs.mkdirSync(dataDir, { recursive: true });
     fs.writeFileSync(exe, 'x');
     const u = new Updater({ currentVersion: '0.5.3', exePath: exe, isPackaged: true, dataDir });
 
     const payload = path.join(dataDir, 'update', '0.5.4', 'payload');
     fs.mkdirSync(payload, { recursive: true });
-    fs.writeFileSync(path.join(payload, 'ApkStart.exe'), 'new');
+    fs.writeFileSync(path.join(payload, 'ApkBolt.exe'), 'new');
     assert.equal(u.findResumableJob(), null, 'assertion failed');
     u._markPayloadReady(payload, '0.5.4');
     const job = u.findResumableJob();
@@ -149,13 +149,13 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
   });
   test('apply ,  , ', () => {
     const dataDir = path.join(TMP, 'upd-apply');
-    const exe = path.join(dataDir, 'ApkStart.exe');
+    const exe = path.join(dataDir, 'ApkBolt.exe');
     fs.mkdirSync(dataDir, { recursive: true });
     fs.writeFileSync(exe, 'old');
     const u = new Updater({ currentVersion: '0.5.3', exePath: exe, isPackaged: true, dataDir });
     const payload = path.join(dataDir, 'update', '0.5.4', 'payload');
     fs.mkdirSync(payload, { recursive: true });
-    fs.writeFileSync(path.join(payload, 'ApkStart.exe'), 'new-version-bytes');
+    fs.writeFileSync(path.join(payload, 'ApkBolt.exe'), 'new-version-bytes');
     const script = u.apply({ mode: 'zip', payload, version: '0.5.4' }, { spawn: false });
     assert.ok(/\(Get-Item \$target\)\.Length -eq \$expected/.test(script), 'exe');
     assert.ok(/keeping payload for next launch/.test(script), 'assertion failed');

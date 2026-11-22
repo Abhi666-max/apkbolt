@@ -1,6 +1,6 @@
 {
-  "name": "apkstart-embed-probe",
-  "productName": "ApkStart Embed Probe",
+  "name": "apkbolt-embed-probe",
+  "productName": "ApkBolt Embed Probe",
   "version": "0.0.1",
   "private": true,
   "main": "index.js"

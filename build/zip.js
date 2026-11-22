@@ -23,7 +23,7 @@ const MIB = 1024 * 1024;
 
 /** 7-Zip (7z.exe 7za.exe) */
 function find7z() {
-  const explicit = process.env.APKSTART_7Z;
+  const explicit = process.env.APKBOLT_7Z;
   if (explicit && fs.existsSync(explicit)) return explicit;
 
   const direct = [

@@ -1,9 +1,9 @@
 'use strict';
 /**
- * runtime: ApkStart QEMU + Android-x86 
+ * runtime: ApkBolt QEMU + Android-x86 
  *
  * : 
- * - default(builtin): adb / QEMU / system image ApkStart , emulator
+ * - default(builtin): adb / QEMU / system image ApkBolt , emulator
  * - Android adb, 
  * - launch, reclaim; launchresident, /app
  */
@@ -66,7 +66,7 @@ class Runtime {
      *
  * 0.5.6 ****: builtin( emulator + system image). 
  * mumu / fydeos / attach -- , settings, configuration
- * runtime,  ApkStart , emulator. 
+ * runtime,  ApkBolt , emulator. 
      */
     this._backend = null;
     this._backendId = '';
@@ -287,7 +287,7 @@ class Runtime {
     const accel = hv.whpx ? 'whpx' : 'tcg';
 
     const args = [
-      '-name', 'ApkStart Runtime',
+      '-name', 'ApkBolt Runtime',
       '-machine', `q35,accel=${accel}`,
       '-cpu', hv.whpx ? 'host' : 'max',
       '-smp', String(Math.max(2, s.engine.cores || 4)),
@@ -849,7 +849,7 @@ class Runtime {
  * emulator. 
  * emulator(5554/5556/...), adb +1. 
  * system boot_completed, runtime, 
- * " ApkStart app", . 
+ * " ApkBolt app", . 
    */
   /**
  * emulator. 
@@ -962,7 +962,7 @@ class Runtime {
 
   /**
  * clean, emulator. 
- * ApkStart emulator detached , qemu ; launch AVD , 
+ * ApkBolt emulator detached , qemu ; launch AVD , 
  * FATAL "Running multiple emulators with the same AVD". 
  * EmulatorEngine, retrypath(killAttempt). 
    */
@@ -1009,7 +1009,7 @@ class Runtime {
       onLog('adb reports device online but unresponsive; restarting runtime...');
     }
 
-    // ApkStart exitemulator(), 
+    // ApkBolt exitemulator(), 
     // , adb server restart-- isOnline() "runtime", 
     // . emulator, bootmemory. 
     const adopted = await this.adoptExisting({ onLog });
@@ -1049,7 +1049,7 @@ class Runtime {
 
     // emulator path: system image, "installdisk"
     if (env.emulator.ok && env.sysimg.ok) {
-      // ApkStart emulator(detached qemu ), 
+      // ApkBolt emulator(detached qemu ), 
       // AVD ,  FATAL "Running multiple emulators with the same AVD". 
       // failure, , "". 
       await this.killOrphanEmulators({ onLog }).catch(() => {});
@@ -1357,7 +1357,7 @@ class Runtime {
  * Android( /data + app + launchsnapshot), 
  * AVD ",  app". 
  * 8-16GB system image, (UI ), 
- * AVD(apkstart.avd), system image,  AVD. 
+ * AVD(apkbolt.avd), system image,  AVD. 
  * config.ini / hardware-qemu.ini, AVD , appcold boot. 
    * @returns {{ok:boolean, reclaimed:number, avdDir:string, error?:string}}
    */
@@ -1366,7 +1366,7 @@ class Runtime {
     const path = require('path');
     try {
       if (this.vmRunning) await this.stop().catch(() => {});
-      const avdDir = path.join(this.provisioner.paths().avdHome, 'apkstart.avd');
+      const avdDir = path.join(this.provisioner.paths().avdHome, 'apkbolt.avd');
       let reclaimed = 0;
       if (fs.existsSync(avdDir)) {
         for (const e of fs.readdirSync(avdDir, { withFileTypes: true })) {
@@ -1613,7 +1613,7 @@ class Runtime {
     // [] qemu: 
     // 1) quickboot snapshot,  GB ram.img , 
     // bootfailure → cold boot, ""; 
-    // 2) ,  ApkStart , app(WSA / app). 
+    // 2) ,  ApkBolt , app(WSA / app). 
     // uninstall(app:removeSelf clean). 
     if (this.vmProc) {
       try { this.vmProc.kill(); } catch (_) { /* ignore */ }

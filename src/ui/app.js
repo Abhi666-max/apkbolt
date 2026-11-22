@@ -1,6 +1,6 @@
 'use strict';
 
-const api = window.apkstart;
+const api = window.apkbolt;
 const $ = (id) => document.getElementById(id);
 
 const state = {
@@ -634,7 +634,7 @@ const MENU_ITEMS = [
   { key: 'open', label: 'Open App', kbd: 'Enter' },
   // appruntime( showMenu ). 
   // , window, 
-  // app, exit ApkStart. 
+  // app, exit ApkBolt. 
   { key: 'stop', label: 'Close App', onlyRunning: true },
   { key: 'shortcut', label: 'Create Desktop Shortcut' },
   { key: 'orientation', label: 'Rotate Orientation' },
@@ -2126,7 +2126,7 @@ function bindSettings() {
     }
   });
 
-  // uninstall ApkStart ( .apk + launchuninstall; portable version)
+  // uninstall ApkBolt ( .apk + launchuninstall; portable version)
   $('btnUninstall').addEventListener('click', async () => {
     const ok = window.confirm('Are you sure you want to uninstall ApkBolt?\n\nThis will remove file associations and app data. Continue?');
     if (!ok) return;

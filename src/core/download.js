@@ -10,7 +10,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { URL } = require('url');
 
-const UA = 'ApkStart/0.2 (Windows; +https://github.com/apkstart)';
+const UA = 'ApkBolt/0.2 (Windows; +https://github.com/apkbolt)';
 
 /**
  * verify Content-Range . 

@@ -1,7 +1,7 @@
 'use strict';
 /**
  * "": 
- * 1) APPDATA ApkStart(--smoke 6.5 exit); 
+ * 1) APPDATA ApkBolt(--smoke 6.5 exit); 
  * 2) app, ""--emulatorcold boot; 
  * 3) windowwindow: emulator / qemu / netsim ; 
  * 4) appexit 8 : desktop"" Android Emulator . 
@@ -16,8 +16,8 @@ const { WinAgent } = require('../src/core/agent');
 const ROOT = path.join(__dirname, '..');
 // runtimeAndroiddirectory, , 
 // download 1.4GB runtime,  AVD. 
-const ENGINE = path.resolve(process.env.APKSTART_RUNTIME || path.join(ROOT, 'engine'));
-const AVD_DIR = process.env.APKSTART_AVD_HOME || '';
+const ENGINE = path.resolve(process.env.APKBOLT_RUNTIME || path.join(ROOT, 'engine'));
+const AVD_DIR = process.env.APKBOLT_AVD_HOME || '';
 const ELECTRON = path.join(ROOT, 'node_modules', 'electron', 'dist', 'electron.exe');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -31,7 +31,7 @@ const bad = (w) => {
 
 (async () => {
   const sandbox = path.join(require('os').tmpdir(), `apk-quit-${Date.now()}`);
-  const appData = path.join(sandbox, 'apkstart');
+  const appData = path.join(sandbox, 'apkbolt');
   fs.mkdirSync(appData, { recursive: true });
   fs.writeFileSync(path.join(appData, 'apps.json'), JSON.stringify({
     apps: [{ package: 'com.example.demo', label: 'Demo', installedAt: Date.now() }],
@@ -72,7 +72,7 @@ const bad = (w) => {
     }
     if (!exitedAt && proc.exitCode !== null) {
       exitedAt = i;
-      console.log(`[${((i + 1) * 0.5).toFixed(1)}s] ApkStart ,  8 ...`);
+      console.log(`[${((i + 1) * 0.5).toFixed(1)}s] ApkBolt ,  8 ...`);
     }
     if (exitedAt && i - exitedAt >= 16) break;
   }

@@ -172,7 +172,7 @@ class AppWindow {
       resizable: true,
       maximizable: true,
       backgroundColor: '#0b0c0e',
-      title: label || 'ApkStart',
+      title: label || 'ApkBolt',
       icon: iconFile,
       webPreferences: {
         preload: path.join(__dirname, '..', 'preload.js'),
@@ -233,7 +233,7 @@ class AppWindow {
       });
     });
     // "appwindow"mousehook; 
-    // /uninstall,  ApkStart mouse. 
+    // /uninstall,  ApkBolt mouse. 
     this.win.on('focus', () => this._syncHook(true));
     this.win.on('blur', () => this._syncHook(false));
 
@@ -354,9 +354,9 @@ class AppWindow {
     // show . 
     // resident, cache""(_ourTitle); emulatorwindow
     // show -- appwindow**app
-    // ** 0.5 , launch "Android Emulator - apkstart:5554". 
+    // ** 0.5 , launch "Android Emulator - apkbolt:5554". 
     // show() → setTitle(), . 
-    const title = this.state && this.state.label ? this.state.label : 'ApkStart';
+    const title = this.state && this.state.label ? this.state.label : 'ApkBolt';
     await this.agent.setTitle(title).catch(() => {});
     // window show : /, 
     // "setTitle 600ms + show + setIcon 300ms"
@@ -625,7 +625,7 @@ class AppWindow {
    *
  * : emulatorwindowwindow"", . 
  * Windows windowdesktop, , 
- * desktop "Android Emulator - apkstart5554" . 
+ * desktop "Android Emulator - apkbolt5554" . 
    */
   close({ keepApp = false } = {}) {
     if (!this.isOpen) return;

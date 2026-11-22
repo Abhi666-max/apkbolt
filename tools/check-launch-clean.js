@@ -1,7 +1,7 @@
 'use strict';
 /**
  * "AndroidappAndroidappwindow": 
- * 1) APPDATA ApkStart, `--apk` install APK(emulator); 
+ * 1) APPDATA ApkBolt, `--apk` install APK(emulator); 
  * 2) `--launch <>` app; 
  * 3) window: emulator(Android Emulator - ...) qemu / netsimd
  * window; appwindow( embed success, window). 
@@ -16,8 +16,8 @@ const { WinAgent } = require('../src/core/agent');
 
 const ROOT = path.join(__dirname, '..');
 // windowruntime/directory(runtime D )
-const ENGINE = path.resolve(process.env.APKSTART_RUNTIME || path.join(ROOT, 'engine'));
-const AVD_DIR = process.env.APKSTART_AVD_HOME || '';
+const ENGINE = path.resolve(process.env.APKBOLT_RUNTIME || path.join(ROOT, 'engine'));
+const AVD_DIR = process.env.APKBOLT_AVD_HOME || '';
 const ELECTRON = path.join(ROOT, 'node_modules', 'electron', 'dist', 'electron.exe');
 const APK = process.argv[2] || path.join(os.tmpdir(), 'fdroid.apk');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -44,7 +44,7 @@ function launch(args, sandbox) {
 (async () => {
   if (!fs.existsSync(APK)) throw new Error(` APK: ${APK}`);
   const sandbox = path.join(os.tmpdir(), `apk-launch-${Date.now()}`);
-  const appData = path.join(sandbox, 'apkstart');
+  const appData = path.join(sandbox, 'apkbolt');
   fs.mkdirSync(appData, { recursive: true });
   fs.writeFileSync(path.join(appData, 'settings.json'), JSON.stringify({
     runtime: { dir: ENGINE, avdDir: AVD_DIR }, engine: { prewarm: true },
@@ -103,7 +103,7 @@ function launch(args, sandbox) {
     if (!sawAppWin) {
       sawAppWin = list.some((w) => {
         const t = String(w.title || '');
-        return t && !bad(w) && !/ApkStart|WorkBuddy|Microsoft|Program Manager||Edge|/.test(t);
+        return t && !bad(w) && !/ApkBolt|WorkBuddy|Microsoft|Program Manager||Edge|/.test(t);
       });
       if (sawAppWin) console.log(`[${((i + 1) * 0.5).toFixed(1)}s] `);
     }

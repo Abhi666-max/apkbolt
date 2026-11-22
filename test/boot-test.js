@@ -13,15 +13,15 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 // : /
-process.env.APPDATA = path.join(os.tmpdir(), `apkstart-boot-test-${Date.now()}`);
-fs.mkdirSync(path.join(process.env.APPDATA, 'apkstart'), { recursive: true });
+process.env.APPDATA = path.join(os.tmpdir(), `apkbolt-boot-test-${Date.now()}`);
+fs.mkdirSync(path.join(process.env.APPDATA, 'apkbolt'), { recursive: true });
 
 const store = require('../src/core/store');
 const { Runtime } = require('../src/core/engine');
 const { downloadParallel } = require('../src/core/download');
 
 const ISO_URL = 'https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.20/releases/x86_64/alpine-virt-3.20.3-x86_64.iso';
-const WORK = path.join(os.tmpdir(), 'apkstart-boot');
+const WORK = path.join(os.tmpdir(), 'apkbolt-boot');
 const ISO = path.join(WORK, 'alpine-virt.iso');
 const DISK = path.join(WORK, 'boot-test.qcow2');
 const SERIAL = path.join(WORK, 'serial.log');

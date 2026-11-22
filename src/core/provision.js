@@ -2,8 +2,8 @@
 /**
  * runtime(Provisioning)
  *
- * ApkStart emulator: adb, QEMU, system imagedownload/verify/. 
- * runtime %APPDATA%\apkstart\runtime , install. 
+ * ApkBolt emulator: adb, QEMU, system imagedownload/verify/. 
+ * runtime %APPDATA%\apkbolt\runtime , install. 
  */
 const fs = require('fs');
 const path = require('path');
@@ -127,7 +127,7 @@ function provisionDirWritable(dir) {
   let ok = false;
   try {
     fs.mkdirSync(dir, { recursive: true });
-    const probe = path.join(dir, `.apkstart-wtest-${process.pid}-${Date.now()}`);
+    const probe = path.join(dir, `.apkbolt-wtest-${process.pid}-${Date.now()}`);
     fs.writeFileSync(probe, 'x');
     fs.rmSync(probe, { force: true });
     ok = true;
@@ -232,8 +232,8 @@ class Provisioner {
     if (r && r.trim()) return r;
     const defaultRoot = path.join(store.DATA_DIR, 'runtime');
     if (fs.existsSync(path.join(defaultRoot, 'emulator', 'emulator.exe'))) return defaultRoot;
-    // Auto-detect and reuse existing Android runtime on this PC (e.g. from apkstart or Android SDK)
-    const legacyRoot = path.join(process.env.APPDATA || '', 'apkstart', 'runtime');
+    // Auto-detect and reuse existing Android runtime on this PC (e.g. from apkbolt or Android SDK)
+    const legacyRoot = path.join(process.env.APPDATA || '', 'apkbolt', 'runtime');
     if (fs.existsSync(path.join(legacyRoot, 'emulator', 'emulator.exe'))) return legacyRoot;
     const sdkRoot = path.join(process.env.LOCALAPPDATA || '', 'Android', 'Sdk');
     if (fs.existsSync(path.join(sdkRoot, 'emulator', 'emulator.exe'))) return sdkRoot;
@@ -265,13 +265,13 @@ class Provisioner {
     // system image: **runtimedirectory**. 
     // "directory", --runtimedirectory D C space, 
     // 1.4GB D , materializeImages 3.3GB system.img
-    // C://Users//...//AppData//Roaming//apkstart//system-images, C , 
+    // C://Users//...//AppData//Roaming//apkbolt//system-images, C , 
     // system image( 1.2GB + 3.3GB ). 
     // : runtimedirectory system-images(extract); 
     // directory(version, ). 
     const rootImg = path.join(root, 'system-images');
     const dataImg = path.join(store.DATA_DIR, 'system-images');
-    const legacyImg = path.join(process.env.APPDATA || '', 'apkstart', 'system-images');
+    const legacyImg = path.join(process.env.APPDATA || '', 'apkbolt', 'system-images');
     const androidSdkImg = path.join(process.env.LOCALAPPDATA || '', 'Android', 'Sdk', 'system-images');
     // : 
     // 1) runtimedirectorysystem image(extract)→ ; 
@@ -301,7 +301,7 @@ class Provisioner {
     else sysRoot = rootImg;
     
     // Reuse legacy AVD if available and local AVD is not initialized
-    const legacyAvd = path.join(process.env.APPDATA || '', 'apkstart', 'avd');
+    const legacyAvd = path.join(process.env.APPDATA || '', 'apkbolt', 'avd');
     const defaultAvd = insideData ? path.join(root, 'avd') : writable;
     const finalAvd = fs.existsSync(defaultAvd) ? defaultAvd : (fs.existsSync(legacyAvd) ? legacyAvd : defaultAvd);
     
@@ -568,7 +568,7 @@ class Provisioner {
 
   /**
  * "Runtime bundle"download. 
- * : ApkStart-runtime-<tag>.zip( .github/workflows/release.yml , 
+ * : ApkBolt-runtime-<tag>.zip( .github/workflows/release.yml , 
  * build/runtime : emulator/ + platform-tools/ + aehd/ + system-images/). 
  * GitHub Gitee , version; , 
  * Google download. 
@@ -594,7 +594,7 @@ class Provisioner {
       if (!item.list) continue;
       for (const rel of item.list) {
         if (!rel || rel.draft) continue;
-        const hit = (rel.assets || []).find((x) => /^ApkStart-runtime-.*\.zip$/i.test(x.name || ''));
+        const hit = (rel.assets || []).find((x) => /^ApkBolt-runtime-.*\.zip$/i.test(x.name || ''));
         if (!hit) continue;
         cands.push({
           url: hit.browser_download_url || hit.url,

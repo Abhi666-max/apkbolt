@@ -3,7 +3,7 @@
  * window:  emulator, "desktopwindow". 
  *
  * window: 
- * 1. "Android Emulator - apkstart5554"(QWindowIcon, emulator)
+ * 1. "Android Emulator - apkbolt5554"(QWindowIcon, emulator)
  * -- embed windowwindow, desktop; 
  * 2. (conhost ConsoleWindowClass / CASCADIA_HOSTING_WINDOW_CLASS)
  * -- qemu, netsimd , launch exe path. 
@@ -17,11 +17,11 @@ const { spawn } = require('child_process');
 const { WinAgent } = require('../src/core/agent');
 
 // runtimedirectory: parameters > > engine/
-const ROOT = path.resolve(process.argv[2] || process.env.APKSTART_RUNTIME || path.join(__dirname, '..', 'engine'));
+const ROOT = path.resolve(process.argv[2] || process.env.APKBOLT_RUNTIME || path.join(__dirname, '..', 'engine'));
 const EMU = path.join(ROOT, 'emulator', 'emulator.exe');
 // AVD (settings runtime.avdDir), ; 
-const AVD_HOME = process.env.APKSTART_AVD_HOME
-  || path.join(process.env.APPDATA || '', 'apkstart', 'avd');
+const AVD_HOME = process.env.APKBOLT_AVD_HOME
+  || path.join(process.env.APPDATA || '', 'apkbolt', 'avd');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const bad = (w) => {
@@ -48,9 +48,9 @@ const bad = (w) => {
   console.log('');
 
   const proc = spawn(EMU, [
-    '-avd', 'apkstart', '-port', '5554', '-no-boot-anim', '-no-metrics',
+    '-avd', 'apkbolt', '-port', '5554', '-no-boot-anim', '-no-metrics',
     '-crash-report-mode', 'disabled', '-gpu', 'swangle', '-memory', '3072',
-    '-cores', '3', '-no-skin', '-snapshot', 'apkstart', '-no-snapshot-load',
+    '-cores', '3', '-no-skin', '-snapshot', 'apkbolt', '-no-snapshot-load',
   ], {
     cwd: path.dirname(EMU),
     env: {

@@ -2,7 +2,7 @@
 /**
  * checkup + configuration. 
  *
- * : ApkStart ,  --
+ * : ApkBolt ,  --
  * 1. CPU (VT-x / AMD-V) BIOS ; 
  * 2. Windows " / Hyper-V"(WHPX ); 
  * 3. (, , driverversion, ); 

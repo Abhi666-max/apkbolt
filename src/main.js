@@ -1,6 +1,6 @@
 'use strict';
 /**
- * ApkStart 
+ * ApkBolt 
  * : window / / single instance / ( apk, desktopshortcutlaunch)/ IPC
  */
 const { app, BrowserWindow, ipcMain, dialog, Tray, Menu, shell, nativeImage, screen, globalShortcut } = require('electron');
@@ -57,7 +57,7 @@ app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 /**
  * ,  Chromium cache(Cache / GPUCache / Local Storage ...)
  * "Androiddirectory". 
- * defaultcache %APPDATA%\apkstart -- C MB , launchfailure, 
+ * defaultcache %APPDATA%\apkbolt -- C MB , launchfailure, 
  * Android, cache C . 
  * app ready settings, . 
  */
@@ -82,8 +82,8 @@ relocateUserDataIfCrowded();
 // window--"Screen is black but Android is running". 
 // 38px launch, , 
 // hardware acceleration Chromium HWND, window. 
-// APKSTART_HWACCEL=1 launch. 
-if (process.env.APKSTART_HWACCEL !== '1') app.disableHardwareAcceleration();
+// APKBOLT_HWACCEL=1 launch. 
+if (process.env.APKBOLT_HWACCEL !== '1') app.disableHardwareAcceleration();
 
 const APP_ROOT = path.join(__dirname, '..');
 const IS_DEV = process.argv.includes('--dev');
@@ -107,7 +107,7 @@ process.on('exit', (code) => appLog(`process exit code=${code}`));
 
 /**
  * (runtime): 
- * ApkStart.exe runtime/(emulator + platform-tools + AEHD + ARM system image). 
+ * ApkBolt.exe runtime/(emulator + platform-tools + AEHD + ARM system image). 
  * launch(settings.json ) runtime.dir , 
  * downloadsettings, . settings. 
  */
@@ -169,7 +169,7 @@ function bootstrapBundledRuntime() {
     // "extract, settings.json path"--
     // : launch, version emulator/system image/snapshot, 
     // upgradestutter, orientationparameters, . 
-    // directory(D:\ApkStartRuntime ). 
+    // directory(D:\ApkBoltRuntime ). 
     const looksForeignBundle = /[\\/]resources[\\/]runtime$/i.test(current)
       && !path.resolve(current).toLowerCase().startsWith(path.resolve(exeDir).toLowerCase());
     if (looksForeignBundle && fs.existsSync(path.join(bundled, 'emulator', 'emulator.exe'))) {
@@ -185,7 +185,7 @@ function bootstrapBundledRuntime() {
     const sameTree = path.resolve(current).toLowerCase()
       .startsWith(path.resolve(exeDir).toLowerCase());
     const currentOk = fs.existsSync(currentExe) && sameTree;
-    // directory( EXE directory,  D:\ApkStartRuntime )
+    // directory( EXE directory,  D:\ApkBoltRuntime )
     // :  C space, portable versionruntime. 
     // exe bundled runtime, 
     // "settingsruntimedirectory, directory / AppData"(issue #23). 
@@ -225,7 +225,7 @@ function bootstrapBundledRuntime() {
 bootstrapBundledRuntime();
 
 // probe( reg.exe)
-const NO_SHELL_PROBE = process.argv.includes('--smoke') || process.env.APKSTART_NO_SHELL_PROBE === '1';
+const NO_SHELL_PROBE = process.argv.includes('--smoke') || process.env.APKBOLT_NO_SHELL_PROBE === '1';
 const ICON_PNG = loadBrandIcon().toPNG();
 
 let mainWindow = null;
@@ -661,7 +661,7 @@ async function toggleDisplayMode() {
 let deploying = false;
 async function autoDeploy({ force = false } = {}) {
   if (deploying || !store.getSettings().autoDeploy) return { ok: false, error: 'skipped' };
-  // downloadfailure:  checkEnv() , launch ApkStart
+  // downloadfailure:  checkEnv() , launch ApkBolt
   // 1.5GB runtime, "download". 
   // failure, 30 retry; ""
   // force=true retry. success. 
@@ -818,8 +818,8 @@ const MSIX_ACCEL_HINT = 'Store edition cannot elevate permissions. Please enable
 
 function createWindow({ show = true } = {}) {
   mainWindow = new BrowserWindow({
-    width: Number(process.env.APKSTART_WIN_W) || 1140,
-    height: Number(process.env.APKSTART_WIN_H) || 740,
+    width: Number(process.env.APKBOLT_WIN_W) || 1140,
+    height: Number(process.env.APKBOLT_WIN_H) || 740,
     minWidth: 900,
     minHeight: 560,
     show: false,
@@ -871,7 +871,7 @@ function createWindow({ show = true } = {}) {
 }
 
 function showWindow() {
-  // window = ApkStart (taskbarapp)
+  // window = ApkBolt (taskbarapp)
   setAumid(APP_AUMID);
   if (!mainWindow) createWindow();
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -1488,7 +1488,7 @@ async function launchOne(pkg) {
 /**
  * /appwindow. 
  * 8 directory adb find/stat, ; 
- * ApkStart launch,  Android app. 
+ * ApkBolt launch,  Android app. 
  * app, window. 
  */
 function onContainerActive(on) {
@@ -1645,7 +1645,7 @@ function registerIpc() {
    *
  * : endApp "appwindow", window
  * window, , app, 
- * exit ApkStart(). 
+ * exit ApkBolt(). 
    */
   ipcMain.handle('app:stop', async (_e, pkg, opts = {}) => stopApp(pkg, opts));
 
@@ -2268,7 +2268,7 @@ function registerIpc() {
   });
 
   ipcMain.handle('runtime:cleanup', async (_e, opts = {}) => {
-    // : , ; clean ApkStart runtimedirectory
+    // : , ; clean ApkBolt runtimedirectory
     const pass = { apply: false, aggressive: !!opts.aggressive, includeSnapshots: !!opts.includeSnapshots };
     if (!opts.apply) return runtime.cleanup(pass);
     const preview = await runtime.cleanup(pass);
@@ -2611,7 +2611,7 @@ function registerIpc() {
 
   ipcMain.handle('assoc:register', () => {
     const l = launcherInfo();
-    const icoPath = path.join(store.ICON_DIR, 'apkstart.ico');
+    const icoPath = path.join(store.ICON_DIR, 'apkbolt.ico');
     if (!fs.existsSync(icoPath)) {
       // ICO,  Logo PNG
       if (fs.existsSync(APPICON_FILE)) fs.copyFileSync(APPICON_FILE, icoPath);
@@ -2650,7 +2650,7 @@ function registerIpc() {
   });
 
   /**
- * uninstall ApkStart : 
+ * uninstall ApkBolt : 
  * 1) .apk (uninstall APK )
  * 2) install: launch NSIS uninstall(/), exit
  * 3) portable version( / install):  uninstaller.exe, hintdirectory
@@ -2660,7 +2660,7 @@ function registerIpc() {
       try { await assoc.unregisterAssociation(); } catch (_) { /* failureuninstall */ }
       const exeDir = path.dirname(process.execPath);
       // updater.flavor : electron-builder
-      // "Uninstall ApkStart.exe",  "uninstaller.exe", 
+      // "Uninstall ApkBolt.exe",  "uninstaller.exe", 
       // install"uninstall"portable version, hintuninstall(issue #51). 
       const unName = findUninstaller(exeDir);
       if (!unName) {
@@ -2884,7 +2884,7 @@ if (!gotLock) {
     // "Electron" -- "/default". 
     // note"", Androidappapp
     // AUMID( openAppWindow), taskbarwindow, 
-    // ApkStart . 
+    // ApkBolt . 
     setAumid(APP_AUMID);
     runtime = new Runtime(APP_ROOT);
     // launch:  app.log versiondirectory
@@ -3089,7 +3089,7 @@ if (!gotLock) {
     attachAgentEvents(winAgent);
 
     // ""emulator. 
-    // " ApkStart 4 ", emulator
+    // " ApkBolt 4 ", emulator
     // qemu window -- . 
     runtime.emulator.onBeforeSpawn = async () => {
       if (!winAgent) return;
@@ -3153,7 +3153,7 @@ if (!gotLock) {
       }
     }).catch(() => {});
 
-    // F11 / window;  ApkStart
+    // F11 / window;  ApkBolt
     try {
       globalShortcut.register('F11', () => { toggleDisplayMode(); });
     } catch (_) { /* ignore */ }
@@ -3177,7 +3177,7 @@ if (!gotLock) {
     }
 
     // :  WSA / appAndroidresident. 
-    // ApkStart (window), app am start. 
+    // ApkBolt (window), app am start. 
     // "app + runtime", /memory. 
     const prewarmEnabled = store.getSettings().engine.prewarm !== false;
     if (prewarmEnabled && !args.launch && store.getApps().length > 0) {
@@ -3330,7 +3330,7 @@ if (!gotLock) {
   app.on('window-all-closed', () => {
     // window(close ), 
     // exit, , single instance. 
-    // : "appwindow, ApkStart ", 
+    // : "appwindow, ApkBolt ", 
     // "window""". 
     appLog(`window-all-closed quitting=${quitting}`);
     if (quitting) app.exit(0);
@@ -3372,7 +3372,7 @@ if (!gotLock) {
     // exitwindowemulatorwindow" + ". 
     // (),  before-quit , completeexit. 
     // , window, Windows emulatorwindowdesktop--
-    // " ApkStart , desktop Android Emulator ". 
+    // " ApkBolt , desktop Android Emulator ". 
     if (!quitReady) {
       e.preventDefault();
       quitReady = true;

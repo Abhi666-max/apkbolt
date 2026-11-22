@@ -1,9 +1,9 @@
-#  ApkStart   - 
+#  ApkBolt   - 
 #  :  →  PowerShell
 #  :  4 , 
 
 $ErrorActionPreference = 'Continue'
-$root = 'D:\apkstart-dsh\apkstart'
+$root = 'D:\apkbolt-dsh\apkbolt'
 #  package.json ,  -- . 
 #  MSIX (0.5.2 → 0.5.2.0),  build/msix.js . 
 $ver = '0.0.0.0'
@@ -16,12 +16,12 @@ try {
     Write-Host '  [!]  package.json  version,  0.5.3.0 ' -ForegroundColor Yellow
     $ver = '0.5.3.0'
 }
-$msix = Join-Path $root ('dist\store\ApkStart_{0}_x64.msix' -f $ver)
+$msix = Join-Path $root ('dist\store\ApkBolt_{0}_x64.msix' -f $ver)
 $guide = Join-Path $root 'docs\store-upload-walkthrough.md'
 $listing = Join-Path $root 'docs\store-listing.md'
 
 Write-Host ''
-Write-Host '  ApkStart ' -ForegroundColor Green
+Write-Host '  ApkBolt ' -ForegroundColor Green
 Write-Host '  ─────────────────────────────' -ForegroundColor DarkGray
 
 if (-not (Test-Path $msix)) {

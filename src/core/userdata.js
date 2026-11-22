@@ -4,7 +4,7 @@
  *
  * (, ): 
  * 1. system image(system-images/.../userdata.img) 1MB 
- * ,  avdmanager SDK mke2fs complete. ApkStart 
+ * ,  avdmanager SDK mke2fs complete. ApkBolt 
  * config.ini emulator ,  -- /data , 
  * "Invalid ext4 superblock on /dev/block/vdc", guest 
  * recovery restart, adbd . "appfailure". 

@@ -102,7 +102,7 @@ function fakeSettings(replies) {
   // `cmd`( Android 11+). 
   if (process.platform !== 'win32') {
     await test('sh :  cmd media,  cmd media', () => {
-      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-vol-'));
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-vol-'));
       const log = path.join(dir, 'calls.log');
       const write = (name, body) => {
         fs.writeFileSync(path.join(dir, name), `#!/bin/sh\necho "${name} $*" >> "${log}"\n${body}\n`);

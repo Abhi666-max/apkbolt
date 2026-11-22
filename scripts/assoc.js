@@ -10,18 +10,18 @@ const fs = require('fs');
 const { registerAssociation, unregisterAssociation } = require('../src/core/assoc');
 
 const action = process.argv[2] || 'on';
-const isDev = !process.env.APKSTART_PACKAGED;
+const isDev = !process.env.APKBOLT_PACKAGED;
 const exe = isDev
   ? path.join(__dirname, '..', 'node_modules', 'electron', 'dist', 'electron.exe')
   : process.execPath;
 const appDir = path.join(__dirname, '..');
 
 if (action === 'on') {
-  const iconPath = path.join(__dirname, '..', 'build', 'apkstart.ico');
+  const iconPath = path.join(__dirname, '..', 'build', 'apkbolt.ico');
   const r = registerAssociation(exe, fs.existsSync(iconPath) ? iconPath : undefined,
     isDev ? `"${appDir}"` : undefined);
   console.log(' .apk : ', r.progId);
-  console.log(' .apk  ApkStart. ');
+  console.log(' .apk  ApkBolt. ');
 } else if (action === 'off') {
   unregisterAssociation();
   console.log(' .apk . ');

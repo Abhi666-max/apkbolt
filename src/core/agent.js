@@ -152,7 +152,7 @@ class WinAgent extends EventEmitter {
      *
  * "path"window,  Windows 
  * `Process.MainModule.FileName` junction / path. 
- * ApkStart directory(junction)launch( dist\ApkStart-win64-portable
+ * ApkBolt directory(junction)launch( dist\ApkBolt-win64-portable
  * build\_packout\...), path,  →
  * ""→ emulatorwindow(log emu:0)→
  * windowfailure → embedded mode, rotatewindow. 
@@ -228,11 +228,11 @@ class WinAgent extends EventEmitter {
     }, 4000);
   }
   /**
- * emulatorwindow "Android Emulator - apkstart:5554" . 
- * default "ApkStart". (Qt ). 
+ * emulatorwindow "Android Emulator - apkbolt:5554" . 
+ * default "ApkBolt". (Qt ). 
    */
-  async setTitle(text = 'ApkStart') {
-    return this.call({ cmd: 'title', text: String(text || 'ApkStart') }, 4000);
+  async setTitle(text = 'ApkBolt') {
+    return this.call({ cmd: 'title', text: String(text || 'ApkBolt') }, 4000);
   }
   /**
  * emulatorwindow(windowtaskbar/Alt+Tab app). 

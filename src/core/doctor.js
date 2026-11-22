@@ -329,7 +329,7 @@ function planVariants(profile) {
     label: 'Conservative cold boot (minimal RAM + clear snapshot)',
     // **** wipe:  wipe:true, diskfailure, 
     // retryapp"snapshot + " --
-    // "disk,  ApkStart app". 
+    // "disk,  ApkBolt app". 
     // userdata ensureDataPartition (system image), 
     // launchparameters -wipe-data. 
     wipe: false,
@@ -368,12 +368,12 @@ async function freePortPair(start = 5554) {
 /**
  * adb server : probe. 
  * " 5044 ",  adb server resident, , 
- * launch ApkStart adb server( 6 ), 
+ * launch ApkBolt adb server( 6 ), 
  * , launchemulator. 
- * 5044 ApkStart ( adb 5037), . 
+ * 5044 ApkBolt ( adb 5037), . 
  */
 async function freeAdbPort(start = 5044) {
-  return Number(process.env.APKSTART_ADB_PORT) || start;
+  return Number(process.env.APKBOLT_ADB_PORT) || start;
 }
 
 /**

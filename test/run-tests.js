@@ -35,7 +35,7 @@ test('package.json', () => {
   header.writeUInt16LE(0, 6);
   header.writeUInt16LE(0, 8); // stored
   const name = Buffer.from('hello.txt');
-  const data = Buffer.from('hello apkstart');
+  const data = Buffer.from('hello apkbolt');
   header.writeUInt16LE(name.length, 26);
   header.writeUInt32LE(data.length, 18);
   header.writeUInt32LE(data.length, 14);
@@ -56,7 +56,7 @@ test('package.json', () => {
 
   const zip = new ZipArchive(Buffer.concat([header, name, data, cen, name, eocd]));
   assert(zip.has('hello.txt'), 'hello.txt');
-  assert(zip.read('hello.txt').toString() === 'hello apkstart', 'assertion failed');
+  assert(zip.read('hello.txt').toString() === 'hello apkbolt', 'assertion failed');
 });
 
 console.log('\n[png.js]');
@@ -81,11 +81,11 @@ const { parseAxml } = require('../src/core/axml');
 const { ResTable } = require('../src/core/arsc');
 const { parseApk, quickCheck } = require('../src/core/apk');
 
-// :  APKSTART_TEST_APK , 
+// :  APKBOLT_TEST_APK , 
 // APK (, )
 function findFixture() {
   const candidates = [
-    process.env.APKSTART_TEST_APK,
+    process.env.APKBOLT_TEST_APK,
     path.join(__dirname, 'fixtures', 'sample.apk'),
   ];
   try {
@@ -128,7 +128,7 @@ if (fixture) {
     }
   });
 } else {
-  console.log('  (:  APK ,  APKSTART_TEST_APK)');
+  console.log('  (:  APK ,  APKBOLT_TEST_APK)');
 }
 
 // APK  test/lib/make-apk.js: , 
@@ -153,7 +153,7 @@ console.log('\n[ APK: axml + apk ]');
   });
 }
 {
-  const tmp = path.join(os.tmpdir(), `apkstart-synth-${Date.now()}.apk`);
+  const tmp = path.join(os.tmpdir(), `apkbolt-synth-${Date.now()}.apk`);
   fs.writeFileSync(tmp, buildApkBytes());
   try {
     const meta = parseApk(tmp);

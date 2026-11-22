@@ -33,7 +33,7 @@ const exists = (p) => { try { return fs.existsSync(p); } catch (_) { return fals
  * runtime, "reclaim". 
  * @returns {{total:number, groups:Array, candidates:Array}}
  */
-function analyze(root, { keepAvd = 'apkstart.avd', aggressive = false, keepSnapshots = false } = {}) {
+function analyze(root, { keepAvd = 'apkbolt.avd', aggressive = false, keepSnapshots = false } = {}) {
   const groups = [];
   const candidates = [];
   if (!exists(root)) return { total: 0, groups, candidates };
@@ -76,7 +76,7 @@ function analyze(root, { keepAvd = 'apkstart.avd', aggressive = false, keepSnaps
   const stray = path.join(root, 'x86_64');
   if (exists(stray)) add(stray, dirSize(stray), 'Duplicate image directory from misaligned extraction', 'dir');
 
-  // 4) AVD:  apkstart ;  apkstart-arm / -houdini
+  // 4) AVD:  apkbolt ;  apkbolt-arm / -houdini
   const avdHome = path.join(root, 'avd');
   if (exists(avdHome)) {
     for (const e of fs.readdirSync(avdHome, { withFileTypes: true })) {

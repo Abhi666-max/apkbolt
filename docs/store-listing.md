@@ -11,7 +11,7 @@ This document contains standard packaging and listing metadata for Microsoft Sto
 | Product Name | ApkBolt |
 | Category | Developer tools → Utilities & tools (or Productivity) |
 | Price | Free |
-| Package Artifact | `dist/store/ApkStart_0.6.3.0_x64.msix` (x64 standalone package) |
+| Package Artifact | `dist/store/ApkBolt_0.6.3.0_x64.msix` (x64 standalone package) |
 | Languages | English (United States) |
 | Repository | https://github.com/abhi666-max/apkbolt |
 | Privacy Policy | https://github.com/abhi666-max/apkbolt/blob/main/docs/privacy.md |

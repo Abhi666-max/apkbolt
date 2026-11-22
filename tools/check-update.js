@@ -28,13 +28,13 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   check(cmpVer('1.0.0', '1.0.1') === -1, '1.0.0 < 1.0.1');
 
   // ---- 2. GitHub release ----
-  const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-upd-'));
+  const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-upd-'));
   const install = path.join(sandbox, 'install');
   fs.mkdirSync(install, { recursive: true });
 
   const u = new Updater({
     currentVersion: '0.0.0',
-    exePath: path.join(install, 'ApkStart.exe'),
+    exePath: path.join(install, 'ApkBolt.exe'),
     isPackaged: true,
     dataDir: sandbox,
   });
@@ -49,21 +49,21 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   }
 
   // install(uninstall) Setup.exe
-  fs.writeFileSync(path.join(install, 'Uninstall ApkStart.exe'), 'stub');
+  fs.writeFileSync(path.join(install, 'Uninstall ApkBolt.exe'), 'stub');
   const u2 = new Updater({
     currentVersion: '0.0.0',
-    exePath: path.join(install, 'ApkStart.exe'),
+    exePath: path.join(install, 'ApkBolt.exe'),
     isPackaged: true,
     dataDir: sandbox,
   });
-  check(u2.flavor === 'setup', '( Uninstall ApkStart.exe)');
+  check(u2.flavor === 'setup', '( Uninstall ApkBolt.exe)');
 
   // ---- 3. ----
   const payload = path.join(sandbox, 'payload');
   fs.mkdirSync(path.join(payload, 'resources', 'app'), { recursive: true });
-  fs.writeFileSync(path.join(payload, 'ApkStart.exe'), 'new-exe');
+  fs.writeFileSync(path.join(payload, 'ApkBolt.exe'), 'new-exe');
   fs.writeFileSync(path.join(payload, 'resources', 'app', 'main.js'), 'new-main');
-  fs.writeFileSync(path.join(install, 'ApkStart.exe'), 'old-exe');
+  fs.writeFileSync(path.join(install, 'ApkBolt.exe'), 'old-exe');
 
   // exit""
   const decoy = spawn(process.execPath, ['-e', 'setTimeout(()=>{},1500)'], { stdio: 'ignore' });
@@ -75,7 +75,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   check(/Copy-Item/.test(script) && /Wait-Process/.test(script), 'assertion failed');
 
   const ps = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
-  // Start-Process ApkStart.exe( exe), 
+  // Start-Process ApkBolt.exe( exe), 
   const body = script.replace(/if \(Test-Path[^\r\n]*relaunched' \}/, "'skipped relaunch'");
   const b64 = Buffer.from(body, 'utf16le').toString('base64');
   try {
@@ -86,9 +86,9 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
     check(false, `: ${e.message}`);
   }
   await sleep(600);
-  const newExe = fs.readFileSync(path.join(install, 'ApkStart.exe'), 'utf8');
+  const newExe = fs.readFileSync(path.join(install, 'ApkBolt.exe'), 'utf8');
   const newMain = fs.readFileSync(path.join(install, 'resources', 'app', 'main.js'), 'utf8');
-  check(newExe === 'new-exe', 'ApkStart.exe');
+  check(newExe === 'new-exe', 'ApkBolt.exe');
   check(newMain === 'new-main', 'assertion failed');
 
   // ---- 4. apply() (, network)----
@@ -96,14 +96,14 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   const payload2 = path.join(sandbox, 'payload2');
   fs.mkdirSync(install2, { recursive: true });
   fs.mkdirSync(payload2, { recursive: true });
-  fs.writeFileSync(path.join(install2, 'ApkStart.exe'), 'old-exe');
+  fs.writeFileSync(path.join(install2, 'ApkBolt.exe'), 'old-exe');
   fs.writeFileSync(path.join(install2, 'marker.txt'), 'old');
-  fs.writeFileSync(path.join(payload2, 'ApkStart.exe'), 'new-exe');
+  fs.writeFileSync(path.join(payload2, 'ApkBolt.exe'), 'new-exe');
   fs.writeFileSync(path.join(payload2, 'marker.txt'), 'new');
 
   const u3 = new Updater({
     currentVersion: '0.0.0',
-    exePath: path.join(install2, 'ApkStart.exe'),
+    exePath: path.join(install2, 'ApkBolt.exe'),
     isPackaged: true,
     dataDir: sandbox,
   });

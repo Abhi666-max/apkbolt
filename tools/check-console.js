@@ -11,9 +11,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { WinAgent } = require('../src/core/agent');
 
-const INSTALL = process.argv[2] || path.join(process.env.LOCALAPPDATA || '', 'Programs', 'apkstart');
+const INSTALL = process.argv[2] || path.join(process.env.LOCALAPPDATA || '', 'Programs', 'apkbolt');
 const EMU = path.join(INSTALL, 'resources', 'runtime', 'emulator', 'emulator.exe');
-const AVD_HOME = path.join(process.env.APPDATA || '', 'apkstart', 'avd');
+const AVD_HOME = path.join(process.env.APPDATA || '', 'apkbolt', 'avd');
 const ROOT = path.join(INSTALL, 'resources', 'runtime');
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -34,9 +34,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // : detached + windowsHide + pipe
   const proc = spawn(EMU, [
-    '-avd', 'apkstart', '-port', '5554', '-no-boot-anim', '-no-metrics',
+    '-avd', 'apkbolt', '-port', '5554', '-no-boot-anim', '-no-metrics',
     '-crash-report-mode', 'disabled', '-gpu', 'swangle', '-memory', '3072',
-    '-cores', '3', '-no-skin', '-snapshot', 'apkstart',
+    '-cores', '3', '-no-skin', '-snapshot', 'apkbolt',
   ], {
     cwd: path.dirname(EMU),
     env: {

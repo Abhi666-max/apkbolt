@@ -2,13 +2,13 @@
 /**
  * incrementalupdate(): , , /verify. 
  *
- * :  ~99MB,  Electron (ApkStart.exe 180MB compress, 
+ * :  ~99MB,  Electron (ApkBolt.exe 180MB compress, 
  * dll, locales), upgrade Electron ; 
  * `resources/app/**`( JS / / node_modules). upgrade
  * 99MB .  tiny : 
- * - `ApkStart-vX-manifest.json`:  app sha256 / size, 
+ * - `ApkBolt-vX-manifest.json`:  app sha256 / size, 
  * Electron version; 
- * - `ApkStart-vX-app.zip`:  app ( MB). 
+ * - `ApkBolt-vX-app.zip`:  app ( MB). 
  * Electron version, , verify
  * `resources/app`; full package, update. 
  *

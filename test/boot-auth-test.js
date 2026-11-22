@@ -77,7 +77,7 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
     const c = Object.create(AdbClient.prototype);
     c.shell = async (cmd) => {
       if (cmd.startsWith('pm path')) return 'package:/data/app/~~x/com.foo-1/base.apk';
-      return '__APKSTART_PRESENT__';
+      return '__APKBOLT_PRESENT__';
     };
     assert.equal(await c.isInstalled('com.foo'), true);
   });

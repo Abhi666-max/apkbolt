@@ -1,7 +1,7 @@
 'use strict';
 /**
  * .apk ( HKCU, )
- * apk → apkstart.exe "%1" → install → desktopshortcut
+ * apk → apkbolt.exe "%1" → install → desktopshortcut
  */
 const { execFileSync } = require('child_process');
 
@@ -48,7 +48,7 @@ function notifyShell() {
   const ps = `
 $sig = '[DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);';
 try {
-  $t = Add-Type -MemberDefinition $sig -Name 'ShNotify' -Namespace 'ApkStart' -PassThru -ErrorAction Stop;
+  $t = Add-Type -MemberDefinition $sig -Name 'ShNotify' -Namespace 'ApkBolt' -PassThru -ErrorAction Stop;
   $t::SHChangeNotify(0x08000000, 0x0000, [IntPtr]::Zero, [IntPtr]::Zero);
 } catch {}
 `;
@@ -60,15 +60,15 @@ try {
 }
 
 /**
- * @param {string} exePath apkstart path( electron.exe)
+ * @param {string} exePath apkbolt path( electron.exe)
  * @param {string} [iconPath] ico
- * @param {string} [extraArgs] appdirectory,  "\"C:\\path\\apkstart\""
+ * @param {string} [extraArgs] appdirectory,  "\"C:\\path\\apkbolt\""
  */
 function registerAssociation(exePath, iconPath, extraArgs) {
   const icon = iconPath || exePath;
   const command = `"${exePath}" ${extraArgs ? extraArgs + ' ' : ''}"%1"`;
 
-  // .apk default: Android, uninstall ApkStart
+  // .apk default: Android, uninstall ApkBolt
   // ,  .apk "default". 
   const prev = regDefault(`${CLASSES}\\${EXT}`);
   if (prev && prev !== PROGID) {
@@ -93,7 +93,7 @@ function registerAssociation(exePath, iconPath, extraArgs) {
 /**
  * . 
  * .apk default("", ), 
- * uninstall ApkStart .apk . : 
+ * uninstall ApkBolt .apk . : 
  * 1) → ; 
  * 2) default → ; 
  * 3) default → . 

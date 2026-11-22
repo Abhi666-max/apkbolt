@@ -1,6 +1,6 @@
 'use strict';
-/* appwindow:  rotate / / / , settings ApkStart */
-const api = window.apkstart;
+/* appwindow:  rotate / / / , settings ApkBolt */
+const api = window.apkbolt;
 const $ = (id) => document.getElementById(id);
 
 const btn = {

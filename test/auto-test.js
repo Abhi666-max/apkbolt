@@ -7,9 +7,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const TMP = path.join(os.tmpdir(), `apkstart-auto-test-${Date.now()}`);
+const TMP = path.join(os.tmpdir(), `apkbolt-auto-test-${Date.now()}`);
 process.env.APPDATA = TMP;
-fs.mkdirSync(path.join(TMP, 'apkstart'), { recursive: true });
+fs.mkdirSync(path.join(TMP, 'apkbolt'), { recursive: true });
 
 let passed = 0;
 let failed = 0;
@@ -92,8 +92,8 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
   });
 
   await test('Image directory switch should not wipe userdata', () => {
-    const c = 'C:/Users/x/AppData/Roaming/apkstart/system-images/android-34/google_apis_playstore/x86_64/';
-    const d = 'D:/ApkStartRuntime/system-images/android-34/google_apis_playstore/x86_64/';
+    const c = 'C:/Users/x/AppData/Roaming/apkbolt/system-images/android-34/google_apis_playstore/x86_64/';
+    const d = 'D:/ApkBoltRuntime/system-images/android-34/google_apis_playstore/x86_64/';
     assert(doctor.imageIdentity(c) === doctor.imageIdentity(d), 'Same image path identity must match');
     const key = (p) => doctor.snapshotKey({ emulatorVersion: '37.3.8', api: '34', tag: 'google_apis_playstore' }, p);
     assert(key(c) === key(d), 'Snapshot persists across disk moves');
@@ -112,7 +112,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(doctor.diagnose(['Failed to initialize GL emulation']).code === 'GPU_INIT');
     assert(doctor.diagnose(['ERROR: x86_64 emulation currently requires hardware acceleration!']).code === 'ACCEL');
     assert(doctor.diagnose(['Cannot allocate memory for guest RAM']).code === 'MEMORY');
-    assert(doctor.diagnose(['panic: AVD apkstart is already running']).code === 'AVD_LOCK');
+    assert(doctor.diagnose(['panic: AVD apkbolt is already running']).code === 'AVD_LOCK');
     assert(doctor.diagnose(['non-ASCII path is not supported']).code === 'NON_ASCII');
     assert(doctor.diagnose(['random line']).code === 'UNKNOWN');
   });
@@ -169,10 +169,10 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     mk(path.join(root, 'system-images', 'android-30', 'default', 'x86_64', 'system.img'), 512);
     mk(path.join(root, 'emulator', 'qemu', 'windows-x86_64', 'qemu-system-aarch64.exe'), 128);
     mk(path.join(root, 'emulator', 'qemu', 'windows-x86_64', 'qemu-system-x86_64.exe'), 128);
-    mk(path.join(root, 'avd', 'apkstart.avd', 'config.ini'), 32);
-    mk(path.join(root, 'avd', 'apkstart.avd', 'snapshots', 'default_boot', 'ram.img'), 256);
-    mk(path.join(root, 'avd', 'apkstart.avd', 'multiInstance.lock'), 8);
-    mk(path.join(root, 'avd', 'apkstart-arm.avd', 'userdata-qemu.img'), 512);
+    mk(path.join(root, 'avd', 'apkbolt.avd', 'config.ini'), 32);
+    mk(path.join(root, 'avd', 'apkbolt.avd', 'snapshots', 'default_boot', 'ram.img'), 256);
+    mk(path.join(root, 'avd', 'apkbolt.avd', 'multiInstance.lock'), 8);
+    mk(path.join(root, 'avd', 'apkbolt-arm.avd', 'userdata-qemu.img'), 512);
 
     const a = layers.analyze(root);
     const paths = a.candidates.map((c) => c.path.replace(/\\/g, '/'));
@@ -181,17 +181,17 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(paths.some((p) => p.includes('android-30')), 'Should list legacy API30 image');
     assert(paths.some((p) => p.endsWith('.lock')), 'Should list lock files');
     assert(paths.some((p) => p.includes('snapshots')), 'Should list stale snapshots');
-    assert(paths.some((p) => p.includes('apkstart-arm.avd')), 'Should list inactive AVDs');
-    assert(!paths.some((p) => p.endsWith('apkstart.avd/config.ini')), 'AVD');
+    assert(paths.some((p) => p.includes('apkbolt-arm.avd')), 'Should list inactive AVDs');
+    assert(!paths.some((p) => p.endsWith('apkbolt.avd/config.ini')), 'AVD');
 
     const dry = layers.prune(root, { apply: false });
     assert(dry.removed.length === 0 && dry.saved === 0, 'dryRun');
-    assert(fs.existsSync(path.join(root, 'avd', 'apkstart-arm.avd', 'userdata-qemu.img')));
+    assert(fs.existsSync(path.join(root, 'avd', 'apkbolt-arm.avd', 'userdata-qemu.img')));
 
     const done = layers.prune(root, { apply: true });
     assert(done.saved > 0 && done.removed.length >= 5, 'assertion failed');
-    assert(!fs.existsSync(path.join(root, 'avd', 'apkstart-arm.avd')), 'AVD');
-    assert(fs.existsSync(path.join(root, 'avd', 'apkstart.avd', 'config.ini')), 'AVD');
+    assert(!fs.existsSync(path.join(root, 'avd', 'apkbolt-arm.avd')), 'AVD');
+    assert(fs.existsSync(path.join(root, 'avd', 'apkbolt.avd', 'config.ini')), 'AVD');
     assert(fs.existsSync(path.join(root, 'emulator', 'qemu', 'windows-x86_64', 'qemu-system-x86_64.exe')), 'x86_64 QEMU');
   });
 
@@ -296,7 +296,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const zlib = require('zlib');
     const { ZipArchive, ZipFile } = require('../src/core/zip');
     const entries = [
-      { name: 'a.txt', data: Buffer.from('hello apkstart'), method: 0 },
+      { name: 'a.txt', data: Buffer.from('hello apkbolt'), method: 0 },
       { name: 'dir/b.bin', data: Buffer.alloc(200000, 7), method: 8 },
     ];
     const locals = [];
@@ -353,7 +353,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
   await test('Zip64: EOCD 0xffff/0xffffffff ,  Zip64 EOCD', async () => {
     const { ZipArchive, ZipFile } = require('../src/core/zip');
     const name = Buffer.from('hello.txt');
-    const data = Buffer.from('hello zip64 apkstart');
+    const data = Buffer.from('hello zip64 apkbolt');
     
     const lh = Buffer.alloc(30);
     lh.writeUInt32LE(0x04034b50, 0);
@@ -403,7 +403,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
 
     const mem = new ZipArchive(buf);
     assert(mem.has('hello.txt'), 'ZipArchive Zip64');
-    assert(String(mem.read('hello.txt')) === 'hello zip64 apkstart', 'ZipArchive');
+    assert(String(mem.read('hello.txt')) === 'hello zip64 apkbolt', 'ZipArchive');
     assert(mem.entries.get('hello.txt').uncompSize === data.length, 'ZipArchive extra');
 
     const zipPath = path.join(TMP, 'zip64.zip');
@@ -411,7 +411,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const file = new ZipFile(zipPath);
     try {
       assert(file.has('hello.txt'), 'ZipFile Zip64');
-      assert(String(file.read('hello.txt')) === 'hello zip64 apkstart', 'ZipFile');
+      assert(String(file.read('hello.txt')) === 'hello zip64 apkbolt', 'ZipFile');
       assert(file.entries.get('hello.txt').localOffset === 0, 'ZipFile extra');
     } finally {
       file.close();
@@ -452,23 +452,23 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     // quickboot. "": 
     // snapshot.pb , , 
     // emulator , , , . 
-    const avdDir = path.join(emu.provisioner.paths().avdHome, 'apkstart.avd');
+    const avdDir = path.join(emu.provisioner.paths().avdHome, 'apkbolt.avd');
     const snapDir = path.join(avdDir, 'snapshots');
     const created = !fs.existsSync(snapDir);
-    fs.mkdirSync(path.join(snapDir, 'apkstart'), { recursive: true });
+    fs.mkdirSync(path.join(snapDir, 'apkbolt'), { recursive: true });
 
     // (12  pb +  ram.img)""
-    fs.writeFileSync(path.join(snapDir, 'apkstart', 'snapshot.pb'), 'x'.repeat(12));
+    fs.writeFileSync(path.join(snapDir, 'apkbolt', 'snapshot.pb'), 'x'.repeat(12));
     assert(!emu.hasSnapshot(), 'assertion failed');
     const broken = emu.buildArgs({ gpu: 'software', memoryMB: 2048, cores: 2, snapshot: true }).join(' ');
     assert(/-no-snapshot-load/.test(broken), '( )');
 
     // : pb  + ram.img ( hasSnapshot )
-    fs.mkdirSync(path.join(snapDir, 'apkstart'), { recursive: true });
-    fs.writeFileSync(path.join(snapDir, 'apkstart', 'snapshot.pb'), 'x'.repeat(2048));
-    fs.writeFileSync(path.join(snapDir, 'apkstart', 'ram.img'), Buffer.alloc(2 * 1024 * 1024));
+    fs.mkdirSync(path.join(snapDir, 'apkbolt'), { recursive: true });
+    fs.writeFileSync(path.join(snapDir, 'apkbolt', 'snapshot.pb'), 'x'.repeat(2048));
+    fs.writeFileSync(path.join(snapDir, 'apkbolt', 'ram.img'), Buffer.alloc(2 * 1024 * 1024));
     const withSnap = emu.buildArgs({ gpu: 'software', memoryMB: 2048, cores: 2, snapshot: true }).join(' ');
-    assert(/-snapshot apkstart/.test(withSnap), 'quickboot');
+    assert(/-snapshot apkbolt/.test(withSnap), 'quickboot');
     assert(!/-no-snapshot-load/.test(withSnap), 'assertion failed');
     if (created) fs.rmSync(snapDir, { recursive: true, force: true });
 
@@ -619,15 +619,15 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
   await test('emulator ram.bin ( 3GB )', () => {
     const { EmulatorEngine } = require('../src/core/emulator');
     const emu = new EmulatorEngine(path.join(__dirname, '..'));
-    const avdDir = path.join(emu.provisioner.paths().avdHome, 'apkstart.avd');
-    const snapDir = path.join(avdDir, 'snapshots', 'apkstart');
+    const avdDir = path.join(emu.provisioner.paths().avdHome, 'apkbolt.avd');
+    const snapDir = path.join(avdDir, 'snapshots', 'apkbolt');
     fs.rmSync(path.join(avdDir, 'snapshots'), { recursive: true, force: true });
     fs.mkdirSync(snapDir, { recursive: true });
     fs.writeFileSync(path.join(snapDir, 'snapshot.pb'), 'x'.repeat(2048));
     fs.writeFileSync(path.join(snapDir, 'ram.bin'), Buffer.alloc(2 * 1024 * 1024));
     assert(emu.hasSnapshot(), 'ram.bin');
     const args = emu.buildArgs({ gpu: 'software', memoryMB: 2048, cores: 2, snapshot: true }).join(' ');
-    assert(/-snapshot apkstart/.test(args), 'quickboot');
+    assert(/-snapshot apkbolt/.test(args), 'quickboot');
     assert(!/-no-snapshot-load/.test(args), 'assertion failed');
     fs.rmSync(path.join(avdDir, 'snapshots'), { recursive: true, force: true });
   });
@@ -955,12 +955,12 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
   await test(':  builtin, ', () => {
     const backends = require('../src/core/backends');
     // 0.5.6 :  MuMu /  /  / WSA, 
-    // ApkStart , . 
+    // ApkBolt , . 
     assert(backends.REGISTRY.length === 1, 'assertion failed');
     assert(backends.REGISTRY[0].id === 'builtin', 'builtin');
   });
 
-  await test('ApkStart: ', () => {
+  await test('ApkBolt: ', () => {
     const root = path.join(__dirname, '..');
     const ps1 = fs.readFileSync(path.join(root, 'src', 'core', 'win', 'agent.ps1'), 'utf8');
     const agent = fs.readFileSync(path.join(root, 'src', 'core', 'agent.js'), 'utf8');
@@ -1044,14 +1044,14 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(shortcut.shortcutExt() === (process.platform === 'win32' ? '.lnk' : '.desktop'), 'assertion failed');
 
     // .desktop ()
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-dt-'));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-dt-'));
     const out = path.join(dir, '.desktop');
     const png = path.join(dir, 'icon.png');
     fs.writeFileSync(png, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
     try {
       shortcut.writeDesktopEntry({
         shortcutPath: out,
-        target: '/opt/ApkStart/ApkStart',
+        target: '/opt/ApkBolt/ApkBolt',
         args: '--launch "com.example.app"',
         iconPngPath: png,
         description: '',
@@ -1061,7 +1061,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
       assert(/\[Desktop Entry\]/.test(body), 'Desktop Entry');
       assert(/^Type=Application$/m.test(body), 'Type Application');
       // , 
-      assert(/^Exec=.*"\/opt\/ApkStart\/ApkStart"/m.test(body), 'Exec');
+      assert(/^Exec=.*"\/opt\/ApkBolt\/ApkBolt"/m.test(body), 'Exec');
       assert(/com\.example\.app/.test(body), 'Exec --launch');
       assert(/^Icon=.*icon\.png$/m.test(body), 'PNG (ICO Linux )');
       // .desktop , 
@@ -1124,22 +1124,22 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(/onCloseApp[\s\S]{0,300}currentAppPkg = null/.test(mainJs) || /onCloseApp[\s\S]{0,300}currentAppPkg === pkg/.test(mainJs), 'onCloseApp currentAppPkg');
   });
 
-  await test(':  ApkStart , ', () => {
+  await test(':  ApkBolt , ', () => {
     const os = require('os');
     const leftovers = require('../src/core/leftovers');
     const np = (p) => { try { return path.resolve(p).toLowerCase(); } catch (_) { return String(p).toLowerCase(); } };
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-left-'));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-left-'));
     try {
-      // "" + "",  ApkStart.exe
+      // "" + "",  ApkBolt.exe
       const mk = (name) => {
         const d = path.join(root, name);
         fs.mkdirSync(d, { recursive: true });
-        fs.writeFileSync(path.join(d, 'ApkStart.exe'), 'fake-exe');
+        fs.writeFileSync(path.join(d, 'ApkBolt.exe'), 'fake-exe');
         return d;
       };
-      const old1 = mk('ApkStart-v0.3.9-win64-portable');
-      const old2 = mk('ApkStart-win64-portable.prev-2026-01-01T00-00-00-000Z'); 
-      const curDir = mk('ApkStart-v0.5.0-win64-portable');
+      const old1 = mk('ApkBolt-v0.3.9-win64-portable');
+      const old2 = mk('ApkBolt-win64-portable.prev-2026-01-01T00-00-00-000Z'); 
+      const curDir = mk('ApkBolt-v0.5.0-win64-portable');
 
       const r = leftovers.scan({ installDir: curDir, dataDir: root, avdHome: '' });
       const found = r.items.filter((i) => i.kind === 'dir').map((i) => np(i.path));
@@ -1437,39 +1437,39 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const { Updater } = require('../src/core/updater');
     const dir = path.join(TMP, 'upd-setup');
     fs.mkdirSync(dir, { recursive: true });
-    const exe = path.join(dir, 'ApkStart.exe');
+    const exe = path.join(dir, 'ApkBolt.exe');
     fs.writeFileSync(exe, 'x');
     const portable = new Updater({ currentVersion: '0.1.0', exePath: exe, isPackaged: true, dataDir: TMP });
     assert(portable.flavor === 'portable', 'assertion failed');
-    fs.writeFileSync(path.join(dir, 'Uninstall ApkStart.exe'), 'x');
+    fs.writeFileSync(path.join(dir, 'Uninstall ApkBolt.exe'), 'x');
     assert(portable.flavor === 'setup', 'assertion failed');
     // ,  check
-    assert(/Setup\.exe$/i.test('ApkStart-0.3.2-Setup.exe'), 'assertion failed');
-    assert(/portable.*\.zip$/i.test('ApkStart-v0.3.2-win64-portable.zip'), 'assertion failed');
+    assert(/Setup\.exe$/i.test('ApkBolt-0.3.2-Setup.exe'), 'assertion failed');
+    assert(/portable.*\.zip$/i.test('ApkBolt-v0.3.2-win64-portable.zip'), 'assertion failed');
   });
 
-  await test('(ApkStart-runtime-*.zip)', async () => {
+  await test('(ApkBolt-runtime-*.zip)', async () => {
     const { Updater } = require('../src/core/updater');
     const dir = path.join(TMP, 'upd-asset');
     fs.mkdirSync(dir, { recursive: true });
-    const exe = path.join(dir, 'ApkStart.exe');
+    const exe = path.join(dir, 'ApkBolt.exe');
     fs.writeFileSync(exe, 'x');
     const mk = (assets) => ({
-      version: '0.5.0', tag: 'v0.5.0', name: 'ApkStart v0.5.0', notes: '', htmlUrl: '',
+      version: '0.5.0', tag: 'v0.5.0', name: 'ApkBolt v0.5.0', notes: '', htmlUrl: '',
       publishedAt: '', sources: [], unreachable: [], assets,
     });
     const u = new Updater({ currentVersion: '0.3.4', exePath: exe, isPackaged: true, dataDir: dir });
     // →
     u.sources = { latest: async () => mk([
-      { name: 'ApkStart-runtime-v0.5.0.zip', url: 'https://x/runtime.zip', urls: ['https://x/runtime.zip'], sizes: {} },
-      { name: 'ApkStart-v0.5.0-win64-portable.zip', url: 'https://x/p.zip', urls: ['https://x/p.zip'], sizes: {} },
+      { name: 'ApkBolt-runtime-v0.5.0.zip', url: 'https://x/runtime.zip', urls: ['https://x/runtime.zip'], sizes: {} },
+      { name: 'ApkBolt-v0.5.0-win64-portable.zip', url: 'https://x/p.zip', urls: ['https://x/p.zip'], sizes: {} },
     ]) };
     let info = await u.check({ force: true });
     assert(/portable/.test(info.asset.name), `,  ${info.asset.name}`);
 
     // ()→ ,  1.5GB
     u.sources = { latest: async () => mk([
-      { name: 'ApkStart-runtime-v0.5.0.zip', url: 'https://x/runtime.zip', urls: ['https://x/runtime.zip'], sizes: {} },
+      { name: 'ApkBolt-runtime-v0.5.0.zip', url: 'https://x/runtime.zip', urls: ['https://x/runtime.zip'], sizes: {} },
     ]) };
     info = await u.check({ force: true });
     assert(!info.asset, 'assertion failed');
@@ -1493,7 +1493,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(withMirror(url, 'https://x/') === `https://x/${url}`, 'assertion failed');
 
     // GitHub: Gitee  403, 
-    const giteeUrl = 'https://gitee.com/daily-miku/apkstart/releases/download/v1/a.zip.part1';
+    const giteeUrl = 'https://gitee.com/daily-miku/apkbolt/releases/download/v1/a.zip.part1';
     assert(auto.candidates(giteeUrl).length === 1, 'Gitee GitHub');
   });
 
@@ -1524,14 +1524,14 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
           assets: [
             { name: 'v0.3.2.zip', size: 999, browser_download_url: 'ge://src' },
             { name: 'v0.3.2.tar.gz', size: 999, browser_download_url: 'ge://src2' },
-            { name: 'ApkStart-v0.3.2-win64-portable.zip', size: 10, browser_download_url: 'ge://ok' },
+            { name: 'ApkBolt-v0.3.2-win64-portable.zip', size: 10, browser_download_url: 'ge://ok' },
           ],
         },
       },
     ];
     const m = await s2.latest();
     assert(m.assets.length === 1 && m.assets[0].url === 'ge://ok',
-      ` ApkStart* ,  ${JSON.stringify(m.assets.map((a) => a.name))}`);
+      ` ApkBolt* ,  ${JSON.stringify(m.assets.map((a) => a.name))}`);
   });
 
   await test('Gitee size :  ( )', async () => {
@@ -1545,15 +1545,15 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
         tag_name: 'v0.3.3',
         // Gitee  name + url,  size()
         assets: [
-          { name: 'ApkStart-v0.3.3-win64-portable.zip.part1', browser_download_url: 'ge://p1' },
-          { name: 'ApkStart-v0.3.3-win64-portable.zip.part2', browser_download_url: 'ge://p2' },
+          { name: 'ApkBolt-v0.3.3-win64-portable.zip.part1', browser_download_url: 'ge://p1' },
+          { name: 'ApkBolt-v0.3.3-win64-portable.zip.part2', browser_download_url: 'ge://p2' },
         ],
       },
     }];
     const m = await s.latest();
     assert(m.assets.length === 1, ` 1 ,  ${m.assets.length}`);
     const a = m.assets[0];
-    assert(a.name === 'ApkStart-v0.3.3-win64-portable.zip', `,  ${a.name}`);
+    assert(a.name === 'ApkBolt-v0.3.3-win64-portable.zip', `,  ${a.name}`);
     assert(a.parts && a.parts.length === 2, 'assertion failed');
     assert(a.parts[0].urls[0] === 'ge://p1' && a.parts[1].urls[0] === 'ge://p2', '/');
     assert(a.size === 0, '0( )');
@@ -1569,7 +1569,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
       version: '9.9.9',
       tag: 'v9.9.9',
       assets: [{
-        name: 'ApkStart-v9.9.9-win64-portable.zip',
+        name: 'ApkBolt-v9.9.9-win64-portable.zip',
         size: 0,
         partial: true,
         parts: [{ index: 1, size: 0, urls: ['https://gitee.com/x/p1'] }, { index: 2, size: 0, urls: ['https://gitee.com/x/p2'] }],
@@ -1586,8 +1586,8 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const { Sources } = require('../src/core/sources');
     const s = new Sources(() => ({ runtime: {} }));
     s.fetchReleases = async () => [
-      { source: 'github', name: 'GitHub', web: 'g', rel: { tag_name: 'v0.4.0', assets: [{ name: 'ApkStart-A-portable.zip', size: 10, browser_download_url: 'gh://a' }] } },
-      { source: 'gitee', name: 'Gitee', web: 'e', rel: { tag_name: 'v0.3.9', assets: [{ name: 'ApkStart-A-portable.zip', size: 10, browser_download_url: 'ge://a' }, { name: 'ApkStart-B.txt', size: 1, browser_download_url: 'ge://b' }] } },
+      { source: 'github', name: 'GitHub', web: 'g', rel: { tag_name: 'v0.4.0', assets: [{ name: 'ApkBolt-A-portable.zip', size: 10, browser_download_url: 'gh://a' }] } },
+      { source: 'gitee', name: 'Gitee', web: 'e', rel: { tag_name: 'v0.3.9', assets: [{ name: 'ApkBolt-A-portable.zip', size: 10, browser_download_url: 'ge://a' }, { name: 'ApkBolt-B.txt', size: 1, browser_download_url: 'ge://b' }] } },
     ];
     const m = await s.latest();
     assert(m.version === '0.4.0', `,  ${m.version}`);
@@ -1615,9 +1615,9 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const gh = 'https://github.com/o/r/releases/download/v0.3.3/a.zip';
     const ge = 'https://gitee.com/o/r/releases/download/v0.3.3/a.zip';
     s.fetchReleases = async () => [
-      { source: 'github', name: 'GitHub', web: 'g', rel: { tag_name: 'v0.3.3', assets: [{ name: 'ApkStart-v0.3.3-win64-portable.zip', size: 108200693, browser_download_url: gh }] } },
+      { source: 'github', name: 'GitHub', web: 'g', rel: { tag_name: 'v0.3.3', assets: [{ name: 'ApkBolt-v0.3.3-win64-portable.zip', size: 108200693, browser_download_url: gh }] } },
       // Gitee  size(),  GitHub
-      { source: 'gitee', name: 'Gitee', web: 'e', rel: { tag_name: 'v0.3.3', assets: [{ name: 'ApkStart-v0.3.3-win64-portable.zip', browser_download_url: ge }] } },
+      { source: 'gitee', name: 'Gitee', web: 'e', rel: { tag_name: 'v0.3.3', assets: [{ name: 'ApkBolt-v0.3.3-win64-portable.zip', browser_download_url: ge }] } },
     ];
     const m = await s.latest();
     assert(m.assets.length === 1, ` 1 ,  ${m.assets.length}`);
@@ -2170,7 +2170,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     let err = null;
     try { await parseBundle(badPath); } catch (e) { err = e; }
     assert(err && (/ APK /.test(err.message) || /No APK splits found/i.test(err.message)), `,  ${err && err.message}`);
-    const dir = path.join(os.tmpdir(), 'apkstart-bundle',
+    const dir = path.join(os.tmpdir(), 'apkbolt-bundle',
       crypto.createHash('sha1').update(badPath).digest('hex').slice(0, 12));
     assert(!fs.existsSync(dir), 'assertion failed');
   });
@@ -2475,7 +2475,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(/--set-icon/.test(packJs), 'assertion failed');
     assert(/--set-file-version/.test(packJs), 'assertion failed');
     assert(/--set-version-string', 'FileDescription'/.test(packJs), 'FileDescription');
-    assert(/--set-version-string', 'ProductName', 'ApkBolt'/.test(packJs), 'ProductName ApkStart');
+    assert(/--set-version-string', 'ProductName', 'ApkBolt'/.test(packJs), 'ProductName ApkBolt');
     assert(/embedExeMeta\(exePath\)/.test(packJs), 'assertion failed');
     // rcedit , "Electron "
     assert(/ rcedit\.exe/.test(packJs), 'rcedit');
@@ -2484,7 +2484,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     assert(/setAumid\(APP_AUMID\);/.test(mainJs), 'AppUserModelID');
 
     // ()
-    assert(/--full/.test(packJs) && /(ApkStart|ApkBolt)-v\$\{PKG\.version\}-win64-full/.test(packJs), '--full');
+    assert(/--full/.test(packJs) && /(ApkBolt|ApkBolt)-v\$\{PKG\.version\}-win64-full/.test(packJs), '--full');
     assert(/build', 'runtime'/.test(packJs), 'build/runtime');
   });
 
@@ -2494,7 +2494,7 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const { msixVersion } = require(path.join(root, 'build', 'msix.js'));
     const four = msixVersion(pkg.version);
     assert(/^\d+\.\d+\.\d+\.0$/.test(four), `MSIX : ${four}`);
-    const artifact = `ApkStart_${four}_x64.msix`;
+    const artifact = `ApkBolt_${four}_x64.msix`;
     for (const f of ['docs/store-listing.md', 'docs/store-msix.md', 'docs/store-upload-walkthrough.md']) {
       const t = fs.readFileSync(path.join(root, f), 'utf8');
       assert(t.includes(artifact), `${f}  ${artifact}`);
@@ -2513,16 +2513,16 @@ const { AdbClient, friendlyInstallError, friendlyLaunchError } = require('../src
     const mainJs = fs.readFileSync(path.join(root, 'src', 'main.js'), 'utf8');
     const shortcutJs = fs.readFileSync(path.join(root, 'src', 'core', 'shortcut.js'), 'utf8');
 
-    // / =  APK  <>.ico,  ApkStart
+    // / =  APK  <>.ico,  ApkBolt
     assert(/const ico = app\.icoPath && fs\.existsSync\(app\.icoPath\) \? app\.icoPath : undefined;/.test(installerJs), 'icoPath');
     assert(/iconIcoPath: ico/.test(installerJs), 'writeShortcut');
-    assert(!/iconIcoPath:\s*(APPICON|appicon|brandIcon)/.test(installerJs), 'ApkStart');
+    assert(!/iconIcoPath:\s*(APPICON|appicon|brandIcon)/.test(installerJs), 'ApkBolt');
     // AUMID verification
     assert(/appUserModelId: `AbhijeetKangane\.ApkBolt\.\$\{app\.package\}`/.test(installerJs), 'AUMID');
     // Windows AUMID matching
     assert(/const APP_AUMID = 'AbhijeetKangane\.ApkBolt';/.test(mainJs), 'AUMID');
     assert(/setAumid\(`\$\{APP_AUMID\}\.\$\{pkg\}`\)/.test(mainJs), 'AUMID');
-    assert(/function showWindow\(\) \{\s*\n\s*\/\/[^\n]*\n\s*setAumid\(APP_AUMID\);/.test(mainJs), 'ApkStart AUMID');
+    assert(/function showWindow\(\) \{\s*\n\s*\/\/[^\n]*\n\s*setAumid\(APP_AUMID\);/.test(mainJs), 'ApkBolt AUMID');
     // writeShortcut  iconIndex  0(ico  0 ), 
     assert(/icon: opt\.iconIcoPath \|\| opt\.target/.test(shortcutJs), 'target');
     assert(/iconIndex: 0/.test(shortcutJs), 'iconIndex 0');

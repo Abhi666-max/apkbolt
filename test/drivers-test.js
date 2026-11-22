@@ -23,7 +23,7 @@ const ROOT = path.join(__dirname, '..');
 const readJSON = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 function tmpDir(name) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `apkstart-drv-${name}-`));
+  return fs.mkdtempSync(path.join(os.tmpdir(), `apkbolt-drv-${name}-`));
 }
 
 const HOST = {

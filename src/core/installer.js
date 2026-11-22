@@ -43,7 +43,7 @@ async function runningHasArm(client) {
  */
 async function parseBundle(filePath) {
   const zip = new ZipFile(filePath);
-  const dir = path.join(os.tmpdir(), 'apkstart-bundle', crypto.createHash('sha1')
+  const dir = path.join(os.tmpdir(), 'apkbolt-bundle', crypto.createHash('sha1')
     .update(filePath).digest('hex').slice(0, 12));
   const cleanup = () => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_) { /* ignore */ } };
   try {
@@ -113,7 +113,7 @@ class Installer {
     if (this.ctx.startMenuDir && store.getSettings().createStartMenuShortcut !== false) {
       // directory:  Windows , appshortcut
       // (""desktop)
-      out.push(path.join(this.ctx.startMenuDir, 'ApkStart', `${safeFileName(app.label)}${shortcutExt()}`));
+      out.push(path.join(this.ctx.startMenuDir, 'ApkBolt', `${safeFileName(app.label)}${shortcutExt()}`));
     }
     return [...new Set(out)];
   }
@@ -280,7 +280,7 @@ class Installer {
     // . APK WebP, nativeImage ,  +
     // fallback,  .lnk ( icoPath null). 
     // iconFallback ", "--warning, 
-    // desktop,  ApkStart . 
+    // desktop,  ApkBolt . 
     let iconPath = null;
     let icoPath = null;
     let iconFallback = '';

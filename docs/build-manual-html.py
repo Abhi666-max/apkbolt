@@ -9,7 +9,7 @@ import re
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(HERE, 'USER-MANUAL.md')
-OUT = os.path.join(HERE, 'ApkStart- .html')
+OUT = os.path.join(HERE, 'ApkBolt- .html')
 #  0.6.2 :  HTML  src/ui, . 
 #  ,  docs/ . 
 APP_OUT = os.path.join(ROOT, 'src', 'ui', 'manual.html')
@@ -155,7 +155,7 @@ doc = '''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ApkStart </title>
+<title>ApkBolt </title>
 <style>
 :root{--bg:#ffffff;--fg:#1f2328;--mut:#57606a;--line:#d0d7de;--code:#eff1f3;--accent:#0969da;--accent-soft:#ddf4ff;--warn:#9a6700;--warn-bg:#fff8c5;--head:#f6f8fa;--tbl:#f6f8fa}
 *{box-sizing:border-box}

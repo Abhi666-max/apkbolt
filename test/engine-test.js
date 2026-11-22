@@ -10,9 +10,9 @@ const http = require('http');
 const net = require('net');
 
 // , 
-const TMP = path.join(os.tmpdir(), `apkstart-test-${Date.now()}`);
+const TMP = path.join(os.tmpdir(), `apkbolt-test-${Date.now()}`);
 process.env.APPDATA = TMP;
-fs.mkdirSync(path.join(TMP, 'apkstart'), { recursive: true });
+fs.mkdirSync(path.join(TMP, 'apkbolt'), { recursive: true });
 
 let passed = 0;
 let failed = 0;

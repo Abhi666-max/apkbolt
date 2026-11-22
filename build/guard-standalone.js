@@ -3,7 +3,7 @@
  * : install****emulator. 
  *
  * : 
- * ApkStart install(NSIS / portable version / MSIX) -- emulator +
+ * ApkBolt install(NSIS / portable version / MSIX) -- emulator +
  * platform-tools + system image, ,  MuMu / / . 
  * 0.5.6 : ****, install"runtime + ", 
  * "runtime". , 
@@ -126,7 +126,7 @@ function assertStandalone(dir, { label = '', exit = true } = {}) {
   console.error(`\n[] ${label} (${vendors}): `);
   for (const h of hits) console.error(`  - ${h.path}`);
   console.error('');
-  console.error('ApkStart , : , , ');
+  console.error('ApkBolt , : , , ');
   console.error('"". ');
   console.error('. \n');
   if (exit) process.exit(4);

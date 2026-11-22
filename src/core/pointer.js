@@ -7,7 +7,7 @@
  * = (, "")
  * wheel = ,  Qt , 
  *
- * ApkStart "appwindow"hook, 
+ * ApkBolt "appwindow"hook, 
  * wheel; wheel `input swipe`, 
  * adb . 
  */

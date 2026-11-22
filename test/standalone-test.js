@@ -2,7 +2,7 @@
 /**
  *  Node :  Electron, , . 
  * (0.5.6 ): 
- *   **ApkStart , , . **
+ *   **ApkBolt , , . **
  * : 
  *   1. (MuMu /  /  / WSA / FydeOS); 
  *   2.  settings.json  mode=mumu / fydeos / attach,  builtin; 
@@ -29,7 +29,7 @@ const read = (...p) => fs.readFileSync(path.join(ROOT, ...p), 'utf8');
 const exists = (...p) => fs.existsSync(path.join(ROOT, ...p));
 
 function tmpDir(name) {
-  const d = fs.mkdtempSync(path.join(os.tmpdir(), `apkstart-${name}-`));
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), `apkbolt-${name}-`));
   return d;
 }
 function touch(dir, rel, bytes = 8) {
@@ -193,7 +193,7 @@ function touch(dir, rel, bytes = 8) {
   });
 
   test('Missing directory skipped cleanly by guard', () => {
-    const r = assertStandalone(path.join(os.tmpdir(), 'apkstart-not-exist-xyz'), { exit: false });
+    const r = assertStandalone(path.join(os.tmpdir(), 'apkbolt-not-exist-xyz'), { exit: false });
     assert.equal(r.ok, true);
     assert.equal(r.skipped, true);
   });

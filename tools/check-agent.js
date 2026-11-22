@@ -7,7 +7,7 @@ const { WinAgent } = require('../src/core/agent');
   try {
     await a.ensure();
     console.log('agent ready, port=', a.port);
-    const sc = await a.scope([process.env.APKSTART_RUNTIME || require('path').join(__dirname, '..', 'engine')]);
+    const sc = await a.scope([process.env.APKBOLT_RUNTIME || require('path').join(__dirname, '..', 'engine')]);
     console.log('scope ->', JSON.stringify(sc));
     const r1 = await a.bootHide();
     console.log('bootHide ->', JSON.stringify(r1));

@@ -2,8 +2,8 @@
 /**
  * :  Google Android Emulator(QEMU )
  *
- * ApkStart default, "": 
- * adb / emulator / system image ApkStart download, 
+ * ApkBolt default, "": 
+ * adb / emulator / system image ApkBolt download, 
  * emulator. 
  *
  * core/engine.js(Runtime) core/emulator.js(EmulatorEngine), 

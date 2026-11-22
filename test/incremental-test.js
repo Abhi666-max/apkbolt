@@ -44,16 +44,16 @@ test('parseManifest', () => {
 test('parseManifest', () => {
   const m = inc.parseManifest(JSON.stringify({
     schema: 1, version: '0.6.3', electronVersion: '33.4.11',
-    app: { asset: 'ApkStart-v0.6.3-app.zip', sha256: 'x', files: sampleFiles },
+    app: { asset: 'ApkBolt-v0.6.3-app.zip', sha256: 'x', files: sampleFiles },
   }));
   assert(m.version === '0.6.3' && m.app.files['resources/app/package.json'], 'assertion failed');
 });
 
 test('( / / )', () => {
-  assert(inc.isAuxAsset('ApkStart-v0.6.3-manifest.json'));
-  assert(inc.isAuxAsset('ApkStart-v0.6.3-app.zip'));
-  assert(inc.isAuxAsset('ApkStart-runtime-v0.6.3.zip'));
-  assert(!inc.isAuxAsset('ApkStart-v0.6.3-win64-portable.zip'));
+  assert(inc.isAuxAsset('ApkBolt-v0.6.3-manifest.json'));
+  assert(inc.isAuxAsset('ApkBolt-v0.6.3-app.zip'));
+  assert(inc.isAuxAsset('ApkBolt-runtime-v0.6.3.zip'));
+  assert(!inc.isAuxAsset('ApkBolt-v0.6.3-win64-portable.zip'));
 });
 
 test('Electron / →', () => {
@@ -94,16 +94,16 @@ console.log('\n[  -  ]');
 
   console.log('\n[  -  check ]');
   await atest('check() , ', async () => {
-    const exe = path.join(TMP, 'check', 'ApkStart.exe');
+    const exe = path.join(TMP, 'check', 'ApkBolt.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
     fs.writeFileSync(exe, 'x');
     const u = new Updater({ currentVersion: '0.6.2', exePath: exe, isPackaged: true, dataDir: path.join(TMP, 'check-data'), electronVersion: '33.4.11' });
     u.sources.latest = async () => ({
       version: '0.6.3', tag: 'v0.6.3', notes: '', htmlUrl: '', publishedAt: '',
       assets: [
-        { name: 'ApkStart-v0.6.3-manifest.json', size: 1, url: 'https://x/m', urls: ['https://x/m'], sizes: {} },
-        { name: 'ApkStart-v0.6.3-app.zip', size: 2, url: 'https://x/a', urls: ['https://x/a'], sizes: {} },
-        { name: 'ApkStart-v0.6.3-win64-portable.zip', size: 3, url: 'https://x/f', urls: ['https://x/f'], sizes: {} },
+        { name: 'ApkBolt-v0.6.3-manifest.json', size: 1, url: 'https://x/m', urls: ['https://x/m'], sizes: {} },
+        { name: 'ApkBolt-v0.6.3-app.zip', size: 2, url: 'https://x/a', urls: ['https://x/a'], sizes: {} },
+        { name: 'ApkBolt-v0.6.3-win64-portable.zip', size: 3, url: 'https://x/f', urls: ['https://x/f'], sizes: {} },
       ],
       sources: [], unreachable: [],
     });
@@ -117,7 +117,7 @@ console.log('\n[  -  ]');
   console.log('\n[  -  apply ]');
   test('app resources/app, ', () => {
     const dataDir = path.join(TMP, 'apply');
-    const exe = path.join(dataDir, 'ApkStart.exe');
+    const exe = path.join(dataDir, 'ApkBolt.exe');
     fs.mkdirSync(dataDir, { recursive: true });
     fs.writeFileSync(exe, 'old');
     const u = new Updater({ currentVersion: '0.6.2', exePath: exe, isPackaged: true, dataDir });
@@ -134,7 +134,7 @@ console.log('\n[  -  ]');
 
   test(', ', () => {
     const dataDir = path.join(TMP, 'forcefull');
-    const exe = path.join(dataDir, 'ApkStart.exe');
+    const exe = path.join(dataDir, 'ApkBolt.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
     fs.writeFileSync(exe, 'x');
     const u = new Updater({ currentVersion: '0.6.2', exePath: exe, isPackaged: true, dataDir });
@@ -143,15 +143,15 @@ console.log('\n[  -  ]');
     fs.writeFileSync(path.join(payload, 'resources', 'app', 'package.json'), '{}');
     u._markPayloadReady(payload, '0.6.3', 'app');
     assert(u.findResumableJob().mode === 'app', 'assertion failed');
-    fs.writeFileSync(path.join(dataDir, 'update', '0.6.3', '.apkstart-force-full'), '');
+    fs.writeFileSync(path.join(dataDir, 'update', '0.6.3', '.apkbolt-force-full'), '');
     assert(u.findResumableJob() === null, 'assertion failed');
     const script = u.apply({ mode: 'app', payload, version: '0.6.3' }, { spawn: false });
-    assert(/\.apkstart-force-full/.test(script), 'apply');
+    assert(/\.apkbolt-force-full/.test(script), 'apply');
   });
 
   test('findResumableJob , ', () => {
     const dataDir = path.join(TMP, 'resume');
-    const exe = path.join(dataDir, 'ApkStart.exe');
+    const exe = path.join(dataDir, 'ApkBolt.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
     fs.writeFileSync(exe, 'x');
     const u = new Updater({ currentVersion: '0.6.2', exePath: exe, isPackaged: true, dataDir });
@@ -164,7 +164,7 @@ console.log('\n[  -  ]');
 
     const zipPayload = path.join(dataDir, 'update', '0.6.4', 'payload');
     fs.mkdirSync(zipPayload, { recursive: true });
-    fs.writeFileSync(path.join(zipPayload, 'ApkStart.exe'), 'new');
+    fs.writeFileSync(path.join(zipPayload, 'ApkBolt.exe'), 'new');
     u._markPayloadReady(zipPayload, '0.6.4', 'zip');
     // 0.6.4  0.6.3
     const job2 = u.findResumableJob();
@@ -175,8 +175,8 @@ console.log('\n[  -  ]');
   test('build/incremental.js', async () => {
     const fixture = path.join(TMP, 'portable');
     fs.mkdirSync(path.join(fixture, 'resources', 'app', 'src'), { recursive: true });
-    fs.writeFileSync(path.join(fixture, 'ApkStart.exe'), 'shell-bytes-not-in-app-pack');
-    fs.writeFileSync(path.join(fixture, 'resources', 'app', 'package.json'), '{"version":"0.6.3","name":"apkstart"}');
+    fs.writeFileSync(path.join(fixture, 'ApkBolt.exe'), 'shell-bytes-not-in-app-pack');
+    fs.writeFileSync(path.join(fixture, 'resources', 'app', 'package.json'), '{"version":"0.6.3","name":"apkbolt"}');
     fs.writeFileSync(path.join(fixture, 'resources', 'app', 'src', 'main.js'), 'console.log("incremental")');
     const out = path.join(TMP, 'assets');
     const { build } = require('../build/incremental');
@@ -185,11 +185,11 @@ console.log('\n[  -  ]');
     const m = inc.parseManifest(fs.readFileSync(r.manifestPath, 'utf8'));
     assert(m.version === '0.6.3' && m.electronVersion, '/ Electron');
     assert(m.app.files['resources/app/src/main.js'], 'app');
-    assert(!m.app.files['ApkStart.exe'], 'assertion failed');
+    assert(!m.app.files['ApkBolt.exe'], 'assertion failed');
     const zf = new ZipFile(r.appZip);
     const names = zf.names();
     assert(names.some((n) => /resources\/app\/package\.json/.test(n)), ` package.json: ${names}`);
-    assert(!names.some((n) => /ApkStart\.exe/.test(n)), 'exe');
+    assert(!names.some((n) => /ApkBolt\.exe/.test(n)), 'exe');
     zf.close();
   });
 

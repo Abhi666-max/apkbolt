@@ -2,7 +2,7 @@
 /**
  *  QEMU ( qemu-system-x86_64.exe)
  * : 
- *  1. ApkStart  QEMU  QEMU 
+ *  1. ApkBolt  QEMU  QEMU 
  *  2. qemu-img 
  *  3. QEMU monitor(TCP) + sendkey + 
  * : node test/qemu-real-test.js   ( QEMU )
@@ -12,8 +12,8 @@ const fs = require('fs');
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 
-process.env.APPDATA = path.join(os.tmpdir(), `apkstart-qemu-test-${Date.now()}`);
-fs.mkdirSync(path.join(process.env.APPDATA, 'apkstart'), { recursive: true });
+process.env.APPDATA = path.join(os.tmpdir(), `apkbolt-qemu-test-${Date.now()}`);
+fs.mkdirSync(path.join(process.env.APPDATA, 'apkbolt'), { recursive: true });
 
 const CANDIDATES = [
   'C:\\Program Files\\qemu\\qemu-system-x86_64.exe',
@@ -41,7 +41,7 @@ function assert(c, m) { if (!c) throw new Error(m || 'Assertion failed'); }
   const store = require('../src/core/store');
   const { Runtime } = require('../src/core/engine');
 
-  const work = path.join(process.env.APPDATA, 'apkstart', 'runtime', 'images');
+  const work = path.join(process.env.APPDATA, 'apkbolt', 'runtime', 'images');
   fs.mkdirSync(work, { recursive: true });
   const disk = path.join(work, 'test.qcow2');
 
@@ -50,7 +50,7 @@ function assert(c, m) { if (!c) throw new Error(m || 'Assertion failed'); }
     assert(fs.existsSync(disk) && fs.statSync(disk).size > 0, 'assertion failed');
   });
 
-  await test('ApkStart QEMU', async () => {
+  await test('ApkBolt QEMU', async () => {
     store.saveSettings({
       engine: { memoryMB: 1024, cores: 2 },
       runtime: { diskPath: disk, headless: true },

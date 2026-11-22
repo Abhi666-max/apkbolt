@@ -1,7 +1,7 @@
 'use strict';
 /**
  * adb 
- * apkstart : install / launch / / uninstall / / 
+ * apkbolt : install / launch / / uninstall / / 
  */
 const { execFile, spawn } = require('child_process');
 const fs = require('fs');
@@ -146,7 +146,7 @@ const LAUNCHER_CACHE = new Map();
 function stageApk(apkPath) {
   const p = String(apkPath || '');
   if (/^[\x20-\x7e]*$/.test(p) && p.length < 200) return { path: p, staged: false };
-  const dir = path.join(os.tmpdir(), 'apkstart-install');
+  const dir = path.join(os.tmpdir(), 'apkbolt-install');
   fs.mkdirSync(dir, { recursive: true });
   const name = `${crypto.createHash('sha1').update(p).digest('hex').slice(0, 12)}.apk`;
   const target = path.join(dir, name);
@@ -355,7 +355,7 @@ class AdbClient {
     if (!isInputCommand(cmd)) throw new Error('Invalid input command');
     const p = this._inputSession();
     const id = ++this._inputSeq;
-    const token = `__APKSTART_${id}__`;
+    const token = `__APKBOLT_${id}__`;
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this._waiters.delete(id);
@@ -566,8 +566,8 @@ class AdbClient {
     if (!paths.length) return false;
     // split APK ; launch.  shell,  adb . 
     const checks = paths.map((p) => `[ -s "${p}" ]`).join(' && ');
-    const probe = await this.shell(`${checks} && echo __APKSTART_PRESENT__`, { timeout: 10000 }).catch(() => '');
-    return /__APKSTART_PRESENT__/.test(String(probe));
+    const probe = await this.shell(`${checks} && echo __APKBOLT_PRESENT__`, { timeout: 10000 }).catch(() => '');
+    return /__APKBOLT_PRESENT__/.test(String(probe));
   }
 
   async listPackages() {
@@ -822,7 +822,7 @@ class AdbClient {
 
  /** app(Windows/ run-as;  adb backup fallback) */
   async exportAppData(pkg, localTarPath) {
-    const remote = `/sdcard/apkstart-tmp-${pkg}.tar`;
+    const remote = `/sdcard/apkbolt-tmp-${pkg}.tar`;
     const cmd = `run-as ${pkg} tar -cf ${remote} . 2>/dev/null || (cd /data/data/${pkg} && tar -cf ${remote} .)`;
     await this.shell(cmd);
     await this.pull(remote, localTarPath);

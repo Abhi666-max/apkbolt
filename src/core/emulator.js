@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Emulator : driver Google Android Emulator ApkStart runtime. 
+ * Emulator : driver Google Android Emulator ApkBolt runtime. 
  *
  * : "parameters". 
  * 1. doctor.chooseProfile() memory/CPU/disk//versionparameters; 
@@ -19,8 +19,8 @@ const doctor = require('./doctor');
 const drivers = require('./drivers');
 const userdata = require('./userdata');
 
-const AVD_NAME = 'apkstart';
-const SNAPSHOT_NAME = 'apkstart';
+const AVD_NAME = 'apkbolt';
+const SNAPSHOT_NAME = 'apkbolt';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -80,7 +80,7 @@ class EmulatorEngine {
 
   /**
  * "launchfailure". 
- * memory(this.attempts), restart ApkStart diagnose, 
+ * memory(this.attempts), restart ApkBolt diagnose, 
  * attempts: [], bootLog: [] , log -- 
  * issue #20/#25 "". 
    */
@@ -462,7 +462,7 @@ class EmulatorEngine {
 
     const cfg = [
       `AvdId=${AVD_NAME}`,
-      'avd.ini.displayname=ApkStart',
+      'avd.ini.displayname=ApkBolt',
       'avd.ini.encoding=UTF-8',
       `abi.type=${choice.abi}`,
       `hw.cpu.arch=${cpuArch}`,
@@ -490,7 +490,7 @@ class EmulatorEngine {
       'hw.mainKeys=no',
       'ShowDeviceFrame=no',
       `PlayStore.enabled=${choice.compat}`,
-      // snapshot -snapshot apkstart : , 
+      // snapshot -snapshot apkbolt : , 
       // default_boot( API30 system imagememory, ). 
       'hw.sdCard=no',
       'hw.audioInput=none',
@@ -518,7 +518,7 @@ class EmulatorEngine {
    *
  * (): 
  * 1. system image userdata.img 1MB ,  avdmanager SDK 
- * mke2fs. ApkStart config.ini emulator,  → /data →
+ * mke2fs. ApkBolt config.ini emulator,  → /data →
  * "Invalid ext4 superblock on /dev/block/vdc" → guest recovery restart →
  * adbd → probe pending,  240s timeout. : . 
  * 2. emulator e2fsck/resize2fs cygwin e2fsprogs 1.42.12, ** encrypt
@@ -707,7 +707,7 @@ class EmulatorEngine {
     // "snapshot -no-snapshot",  -no-snapshot **exit**, 
     // cold bootsnapshot, . 
     // -no-snapshot-load: (snapshot), 
-    // exitmemory apkstart, . 
+    // exitmemory apkbolt, . 
     // snapshot 2~3GB ram.bin(disk, launch)
     const wantSnapshot = this.settings?.engine?.keepSnapshot !== false;
     if (wipe) {
@@ -751,9 +751,9 @@ class EmulatorEngine {
       cwd: path.dirname(loc.emulatorExe),
       env,
       windowsHide: true,
-      // detached: emulator ApkStart . 
+      // detached: emulator ApkBolt . 
       // Electron exit job , --
-      // " ApkStart cold boot 20 ". emulator, 
+      // " ApkBolt cold boot 20 ". emulator, 
       // launch( Runtime.adoptExisting), . 
       detached: true,
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -793,7 +793,7 @@ class EmulatorEngine {
 
     // qemu detached , . 
     // 2~4 vCPU Normal Windows desktop CPU, 
-    // " ApkStart, mouse, ". 
+    // " ApkBolt, mouse, ". 
     const perf = this.settings?.engine?.priorityMode === 'performance';
     setTimeout(() => {
       this.setPriority(perf ? 'normal' : 'below').catch(() => {});
@@ -1422,7 +1422,7 @@ class EmulatorEngine {
         const bootMs = Date.now() - started;
         // : failure, "diagnose"
         this._clearFailure();
-        // quickboot snapshot: emulator ApkStart exit(Electron
+        // quickboot snapshot: emulator ApkBolt exit(Electron
         // job ), snapshot 25 7 . 
         // app installer snapshot, "restartapp". 
         this.snapshotWorthSaving = true;
@@ -1664,7 +1664,7 @@ class EmulatorEngine {
 
   /**
  * emulator.log n (memory). 
- * restart ApkStart diagnose, memory this._log , 
+ * restart ApkBolt diagnose, memory this._log , 
  * UNKNOWN -- log. 
    */
   tailLogFile(n = 300) {

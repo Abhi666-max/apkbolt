@@ -117,7 +117,7 @@ test(', ', () => {
   assert(appJs.includes('function applySettingsFilter'), 'assertion failed');
   assert(appJs.includes('function groupMatches'), 'assertion failed');
   assert(appJs.includes('function focusGroup'), 'assertion failed');
-  assert(appJs.includes('apkbolt.settings.cat') || appJs.includes('apkstart.settings.cat'), 'assertion failed');
+  assert(appJs.includes('apkbolt.settings.cat') || appJs.includes('apkbolt.settings.cat'), 'assertion failed');
 });
 
 test('( )', () => {

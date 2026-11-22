@@ -1,7 +1,7 @@
 'use strict';
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('apkstartSplash', {
+contextBridge.exposeInMainWorld('apkboltSplash', {
   version: () => ipcRenderer.invoke('splash:version'),
   isFirstRun: () => ipcRenderer.invoke('splash:isFirstRun'),
   // ( / MSIX )download(). 

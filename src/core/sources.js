@@ -21,7 +21,7 @@ const { cmpVer } = require('./version');
 
 const OWNER_GH = 'abhi666-max';
 const OWNER_GITEE = 'abhi666-max';
-const REPO = 'apkstart';
+const REPO = 'apkbolt';
 
 const SOURCES = {
   github: {
@@ -61,7 +61,7 @@ function openUrl(url, { timeout = 10000, headers = {}, redirects = 0, followRedi
       method: 'GET',
       timeout,
       headers: {
-        'User-Agent': 'ApkStart/0.3 (Windows)',
+        'User-Agent': 'ApkBolt/0.3 (Windows)',
         'Accept-Encoding': 'identity',
         ...headers,
       },
@@ -206,7 +206,7 @@ function groupParts(assets) {
 /** mirrors : custom, (autoMirror custom) */
 function mirrorList(settings) {
   const r = (settings && settings.runtime) || {};
-  const custom = String(r.mirrorPrefix || process.env.APKSTART_MIRROR || '').trim();
+  const custom = String(r.mirrorPrefix || process.env.APKBOLT_MIRROR || '').trim();
   if (custom) return [custom];
   if (r.autoMirror === false) return [];
   return KNOWN_MIRRORS.slice();
@@ -243,7 +243,7 @@ class Sources {
  * `releases/latest` CDN ,  API . 
    *
  * tag : 
-   *   ApkStart-<tag>-win64-portable.zip / ApkStart-<version>-Setup.exe / ApkStart-runtime-<tag>.zip
+   *   ApkBolt-<tag>-win64-portable.zip / ApkBolt-<version>-Setup.exe / ApkBolt-runtime-<tag>.zip
    */
   async _releaseTagViaRedirect(id) {
     const s = SOURCES[id];
@@ -260,9 +260,9 @@ class Sources {
     const s = SOURCES[id];
     const ver = String(tag).replace(/^v/i, '');
     const names = [
-      `ApkStart-${tag}-win64-portable.zip`,
-      `ApkStart-${ver}-Setup.exe`,
-      `ApkStart-runtime-${tag}.zip`,
+      `ApkBolt-${tag}-win64-portable.zip`,
+      `ApkBolt-${ver}-Setup.exe`,
+      `ApkBolt-runtime-${tag}.zip`,
     ];
     // GitHub Gitee /releases/download/<tag>/<>
     // ( Gitee 302 foruda.gitee.com , ), 
@@ -369,8 +369,8 @@ class Sources {
         if (!key) continue;
         // Gitee ""(v0.3.2.zip / v0.3.2.tar.gz), 
         // install, `\.zip$` updatedownload -- . 
-        // ApkStart , whitelist. 
-        if (!/^ApkStart/i.test(key)) continue;
+        // ApkBolt , whitelist. 
+        if (!/^ApkBolt/i.test(key)) continue;
         raw.push({
           name: key,
           size: Number(a.size) || 0,

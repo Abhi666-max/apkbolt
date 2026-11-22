@@ -1,7 +1,7 @@
 'use strict';
 /**
  * Androidsettings: Androiddesktop, , 
- * adb ApkStart settings. 
+ * adb ApkBolt settings. 
  * shell ,  root. 
  */
 const ACTIONS = {

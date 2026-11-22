@@ -4,7 +4,7 @@
  * ApkBolt.exe(electron.exe + /version)+ resources/app(app)
  * install, extract. 
  *
- * --full( APKSTART_PACK_FULL=1)"": 
+ * --full( APKBOLT_PACK_FULL=1)"": 
  * build/runtime resources/runtime, extract, launchdownload. 
  * directorydefault dist/ApkBolt-v<version>-win64-full, . 
  */
@@ -15,10 +15,10 @@ const { assertStandalone } = require('./guard-standalone');
 
 const ROOT = path.join(__dirname, '..');
 const PKG = require(path.join(ROOT, 'package.json'));
-const FULL = process.argv.includes('--full') || process.env.APKSTART_PACK_FULL === '1';
+const FULL = process.argv.includes('--full') || process.env.APKBOLT_PACK_FULL === '1';
 // directory(directory, )
-let OUT = process.env.APKSTART_PACK_OUT
-  ? path.resolve(process.env.APKSTART_PACK_OUT)
+let OUT = process.env.APKBOLT_PACK_OUT
+  ? path.resolve(process.env.APKBOLT_PACK_OUT)
   : path.join(ROOT, 'dist', FULL ? `ApkBolt-v${PKG.version}-win64-full` : 'ApkBolt-win64-portable');
 const ELECTRON_DIST = path.join(ROOT, 'node_modules', 'electron', 'dist');
 

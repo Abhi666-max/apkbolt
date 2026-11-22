@@ -2,7 +2,7 @@
 
 This guide covers building and validating standalone Windows MSIX packages for ApkBolt.
 
-Package target: `dist/store/ApkStart_0.6.3.0_x64.msix`
+Package target: `dist/store/ApkBolt_0.6.3.0_x64.msix`
 
 ---
 
@@ -19,4 +19,4 @@ Package target: `dist/store/ApkStart_0.6.3.0_x64.msix`
 npm run build:msix
 ```
 
-The script compiles the application, embeds assets, generates `AppxManifest.xml`, and packages the output into `dist/store/ApkStart_0.6.3.0_x64.msix`.
+The script compiles the application, embeds assets, generates `AppxManifest.xml`, and packages the output into `dist/store/ApkBolt_0.6.3.0_x64.msix`.

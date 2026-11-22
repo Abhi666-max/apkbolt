@@ -32,8 +32,8 @@ const SETTINGS = {
   createShortcutOnInstall: true,
   createStartMenuShortcut: true,
   shortcutDir: '',
-  sharedDir: path.join(process.env.USERPROFILE || '', 'ApkStartShared'),
-  deviceSharedDir: '/sdcard/ApkStartShared',
+  sharedDir: path.join(process.env.USERPROFILE || '', 'ApkBoltShared'),
+  deviceSharedDir: '/sdcard/ApkBoltShared',
   autoStart: true,
   notifyOnInstall: true,
   debug: { auto: true, intervalMin: 10, notify: true },
@@ -209,7 +209,7 @@ app.whenReady().then(async () => {
   step('unit test verification', afterClear.length > 0 && afterClear.every((c) => c === 'diag'), `: ${afterClear.join(',')}`);
 
   console.log('\n[  -  ]');
-  const remembered = await evalJs(`localStorage.getItem('apkstart.settings.cat')`);
+  const remembered = await evalJs(`localStorage.getItem('apkbolt.settings.cat')`);
   step('unit test verification', remembered === 'diag', `: ${remembered}`);
 
   console.log('\n[  -  ]');

@@ -59,7 +59,7 @@ npx electron . --smoke test\shot.png
 - When real APK fixtures are unavailable, offline APK parsing tests will mock binary buffers. To test against an authentic APK, specify the test fixture environment variable:
 
 ```powershell
-$env:APKSTART_TEST_APK = "C:\path\to\sample.apk"
+$env:APKBOLT_TEST_APK = "C:\path\to\sample.apk"
 npm test
 ```
 

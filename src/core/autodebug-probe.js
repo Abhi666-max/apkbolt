@@ -150,7 +150,7 @@ async function collect(ctx) {
   };
 
   // ---- ----
-  // audio=false emulator -no-audio launch, " ApkStart "; 
+  // audio=false emulator -no-audio launch, " ApkBolt "; 
   // Windows Audio .  0.6.2 check. 
   obs.audio = {
     checked: true,

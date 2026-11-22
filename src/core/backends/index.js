@@ -4,14 +4,14 @@
  *
  * **: runtime(builtin). **
  *
- * 0.5.6 , ApkStart ,  Android runtime
+ * 0.5.6 , ApkBolt ,  Android runtime
  * ( adb / emulator / system image), probe, , driveremulator
  * (MuMu / / / WSA / FydeOS), "runtime". 
  *
  * , : 
  * - probe,  MuMu "", 
- * " ApkStart emulator", , , system image; 
- * - emulatorupgrade, , configuration ApkStart , ; 
+ * " ApkBolt emulator", , , system image; 
+ * - emulatorupgrade, , configuration ApkBolt , ; 
  * - / portable versionruntime, emulator. 
  * (),  builtin: 
  * settings, configuration,  settings.json . 

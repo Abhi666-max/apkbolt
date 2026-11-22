@@ -3,9 +3,9 @@
  * Automatic Update System: Checks GitHub Releases (Abhi666-max/apkbolt) for updates.
  *
  * : 
- * - install(NSIS): download `ApkStart-x.y.z-Setup.exe`, install(/S); 
- * - ( zip, runtimedownload): download `ApkStart-vX-win64-portable.zip`, 
- * extractdirectory -- runtimedirectory(%APPDATA%\apkstart\runtime)app, 
+ * - install(NSIS): download `ApkBolt-x.y.z-Setup.exe`, install(/S); 
+ * - ( zip, runtimedownload): download `ApkBolt-vX-win64-portable.zip`, 
+ * extractdirectory -- runtimedirectory(%APPDATA%\apkbolt\runtime)app, 
  * snapshotdirectory, ; 
  * - ( runtime): , directory resources\runtime. 
  *
@@ -100,7 +100,7 @@ class Updater {
   async check(opts = {}) {
     const merged = await this.sources.latest({ force: !!opts.force });
     const pick = (re) => merged.assets.find((a) => re.test(String(a.name || '')));
-    // """runtime"(ApkStart-runtime-*.zip). 
+    // """runtime"(ApkBolt-runtime-*.zip). 
     // fallback .zip runtime: runtime, 
     // , updateextractdirectory( 1.5GB , ). 
     const isRuntimePack = (a) => inc.isAuxAsset((a && a.name) || '');
@@ -168,7 +168,7 @@ class Updater {
     // incremental:  + ( MB),  Electron version, 
     // . incremental, full packagedownload. 
     // incrementalfailure → full package, (resumable )
-    const forcedFull = fs.existsSync(path.join(dir, '.apkstart-force-full'));
+    const forcedFull = fs.existsSync(path.join(dir, '.apkbolt-force-full'));
     if (it.incremental && it.hasUpdate !== false && !forcedFull) {
       try {
         const job = await this._prepareApp(it, dir);
@@ -286,7 +286,7 @@ class Updater {
     }
 
     const payload = path.join(dir, 'app-payload');
-    // downloadextractsuccessfailure: (full package .apkstart-ready )
+    // downloadextractsuccessfailure: (full package .apkbolt-ready )
     if (this._payloadReady(payload, it.version)) {
       this.onProgress({ stage: 'ready', percent: 100, message: 'Found existing downloaded incremental package, reusing' });
       return { mode: 'app', payload, version: it.version, manifest };
@@ -379,7 +379,7 @@ class Updater {
   }
 
  /** : extract,  */
-  _readyFile(payload) { return path.join(payload, '.apkstart-ready'); }
+  _readyFile(payload) { return path.join(payload, '.apkbolt-ready'); }
 
   _markPayloadReady(payload, version, mode = 'zip') {
     try {
@@ -398,7 +398,7 @@ class Updater {
         return fs.existsSync(path.join(payload, 'resources', 'app', 'package.json'));
       }
       // :  exe . extract/. 
-      const exeName = path.basename(this.exePath || 'ApkStart.exe');
+      const exeName = path.basename(this.exePath || 'ApkBolt.exe');
       return !!findInDir(payload, exeName);
     } catch (_) {
       return false;
@@ -422,7 +422,7 @@ class Updater {
         if (this._payloadReady(payload, v)) return { mode: 'zip', payload, version: v };
         // incremental(incrementalfailurefull package → )
         const appPayload = path.join(this.updateDir, v, 'app-payload');
-        if (!fs.existsSync(path.join(this.updateDir, v, '.apkstart-force-full'))
+        if (!fs.existsSync(path.join(this.updateDir, v, '.apkbolt-force-full'))
             && this._payloadReady(appPayload, v)) {
           return { mode: 'app', payload: appPayload, version: v };
         }
@@ -485,7 +485,7 @@ class Updater {
         `} else {`,
         `  if ($hasBackup) { try { Remove-Item -LiteralPath $backup -Force } catch {} }`,
         // success, ;  findResumableJob . 
-        `  try { Remove-Item -LiteralPath (Join-Path $src '.apkstart-ready') -Force } catch {}`,
+        `  try { Remove-Item -LiteralPath (Join-Path $src '.apkbolt-ready') -Force } catch {}`,
         `  Remove-Item -Path $src -Recurse -Force`,
         `}`,
       );
@@ -523,12 +523,12 @@ class Updater {
         `  $applyOk = $false`,
         // incrementalfailure(): , launchfull package, 
         // resumable -- issue #98 incremental. 
-        `  try { New-Item -ItemType File -Force -Path ${psq(path.join(this.updateDir, job.version, '.apkstart-force-full'))} | Out-Null } catch {}`,
+        `  try { New-Item -ItemType File -Force -Path ${psq(path.join(this.updateDir, job.version, '.apkbolt-force-full'))} | Out-Null } catch {}`,
         `  if (Test-Path $appDst) { try { Remove-Item -LiteralPath $appDst -Recurse -Force } catch {} }`,
         `  if ($hasBackup) { try { Move-Item -LiteralPath $backup -Destination $appDst -Force } catch {} }`,
         `} else {`,
         `  if ($hasBackup) { try { Remove-Item -LiteralPath $backup -Recurse -Force } catch {} }`,
-        `  try { Remove-Item -LiteralPath (Join-Path $src '.apkstart-ready') -Force } catch {}`,
+        `  try { Remove-Item -LiteralPath (Join-Path $src '.apkbolt-ready') -Force } catch {}`,
         `}`,
       );
     } else {

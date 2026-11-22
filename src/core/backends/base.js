@@ -2,7 +2,7 @@
 /**
  * (backend driver)-- "Android" Runtime . 
  *
- * : ApkStart ( Google Android Emulator / QEMU), 
+ * : ApkBolt ( Google Android Emulator / QEMU), 
  * (boot, snapshot, reclaim, system imagedownload) core/engine.js . 
  * " APK , , appwindow", 
  * : 
@@ -162,7 +162,7 @@ class Backend {
   // eslint-disable-next-line class-methods-use-this
   async resetData() { return { ok: false, error: 'This backend does not support resetting data' }; }
 
- /** (ApkStart exit; default) */
+ /** (ApkBolt exit; default) */
   // eslint-disable-next-line class-methods-use-this
   dispose() {}
 

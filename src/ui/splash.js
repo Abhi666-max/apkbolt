@@ -1,7 +1,7 @@
 'use strict';
-/* ApkStart boot: update,  */
+/* ApkBolt boot: update,  */
 
-const api = window.apkstartSplash;
+const api = window.apkboltSplash;
 if (!api) { /* preload exit */ }
 
 const $ = (id) => document.getElementById(id);

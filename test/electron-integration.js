@@ -58,14 +58,14 @@ app.whenReady().then(async () => {
       target: process.execPath,
       args: '--version',
       iconIcoPath: path.join(OUT, 'icon.ico'),
-      description: 'ApkStart ',
+      description: 'ApkBolt ',
     });
     step('.lnk', fs.existsSync(lnk));
     removeShortcut(lnk);
     step('.lnk', !fs.existsSync(lnk));
 
     // 3.  APK  → ICO
-    const fixture = process.env.APKSTART_TEST_APK
+    const fixture = process.env.APKBOLT_TEST_APK
       || (() => {
         try {
           const dl = path.join(process.env.USERPROFILE || '', 'Documents');

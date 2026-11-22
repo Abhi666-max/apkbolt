@@ -9,7 +9,7 @@
  * electron.exe "directory( package.json)" app,  .js . 
  *
  * : 
- *   set APKSTART_BACKEND=mumu  &  node_modules\electron\dist\electron.exe tools\embed-probe
+ *   set APKBOLT_BACKEND=mumu  &  node_modules\electron\dist\electron.exe tools\embed-probe
  * note ELECTRON_RUN_AS_NODE( 1,  electron node ). 
  *
  * : 
@@ -22,7 +22,7 @@ const { BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-const backendId = process.env.APKSTART_BACKEND || 'mumu';
+const backendId = process.env.APKBOLT_BACKEND || 'mumu';
 const OUT_DIR = path.join(__dirname, '..', '..', '.probe');
 
 function outDir() {

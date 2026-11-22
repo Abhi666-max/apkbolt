@@ -1,7 +1,7 @@
 'use strict';
 /**
  * : app + settings
- * directory: %APPDATA%\apkstart(MSIX/store version STORE_BUILD )
+ * directory: %APPDATA%\apkbolt(MSIX/store version STORE_BUILD )
  */
 const fs = require('fs');
 const path = require('path');
@@ -14,10 +14,10 @@ const { safeFilePart } = require('./pkgname');
  * MSIX full-trust app `%APPDATA%` / `%LOCALAPPDATA%` ****
  * `%LOCALAPPDATA%\Packages\<PackageFamilyName>\LocalCache\...`, 
  * API "path". : 
- * 1. %APPDATA%\apkstart spawn emulator/adb/qemu , 
+ * 1. %APPDATA%\apkbolt spawn emulator/adb/qemu , 
  * path""; 
  * 2. "directory"directory. 
- * store versiondirectory AppData ****(%USERPROFILE%\ApkStart), 
+ * store versiondirectory AppData ****(%USERPROFILE%\ApkBolt), 
  * , . 
  *
  * process.windowsStore Electron MSIX/APPX ( node undefined). 
@@ -27,7 +27,7 @@ const STORE_BUILD = (() => {
 })();
 
 const ROAMING = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
-const LEGACY_DIR = path.join(ROAMING, 'apkstart');
+const LEGACY_DIR = path.join(ROAMING, 'apkbolt');
 const BOLT_DIR = path.join(ROAMING, 'apkbolt');
 
 const DATA_DIR = STORE_BUILD
@@ -58,7 +58,7 @@ const DEFAULT_SETTINGS = {
     idleShutdownMinutes: 15,
     startVisible: true,
     // window:  SurfaceFlinger VSYNC, app. 
-    // windowemulator 60fps + mouse, ApkStart appwindow. 
+    // windowemulator 60fps + mouse, ApkBolt appwindow. 
     headless: false,
     gpuMode: 'auto',         // auto = emulator versionfallback
     // ""( `<emulatorversion>|<gpu>`); auto , 
@@ -98,7 +98,7 @@ const DEFAULT_SETTINGS = {
     deepTrim: false,         // (Play /), default
     // balanced= | performance=qemu Normal | game=qemu High +
   priorityMode: 'balanced',
-    // : launch ApkStart Android, app. 
+    // : launch ApkBolt Android, app. 
     // resident 1GB memory( WSA / app), . 
     prewarm: true,
     // window(B ): app, window. default, 
@@ -113,7 +113,7 @@ const DEFAULT_SETTINGS = {
     keymaps: {},
   },
   runtime: {
-    dir: '',                 // = %APPDATA%\apkstart\runtime
+    dir: '',                 // = %APPDATA%\apkbolt\runtime
     qemuUrl: '',             // QEMU install
     isoUrl: '',              // system image
     isoPath: '',             // system image(ISO)path
@@ -145,8 +145,8 @@ const DEFAULT_SETTINGS = {
     // Gitee update token;  GitHub + system image. 
     giteeToken: '',
   },
-  sharedDir: path.join(os.homedir(), 'ApkStartShared'),
-  deviceSharedDir: '/sdcard/ApkStartShared',
+  sharedDir: path.join(os.homedir(), 'ApkBoltShared'),
+  deviceSharedDir: '/sdcard/ApkBoltShared',
   autoConnect: true,
   createShortcutOnInstall: true,
   createStartMenuShortcut: true, // shortcut = Windows app
@@ -172,7 +172,7 @@ const DEFAULT_SETTINGS = {
     rememberBounds: true,    // appwindow/
     autoFullscreenOnLaunch: false,
     // landscape = AVD 1280x720 restart(+). 
-    // , restart ApkStart orientationboot. 
+    // , restart ApkBolt orientationboot. 
     landscape: false,
     // orientation: 
     // auto = apporientation(recommended, window)
@@ -187,7 +187,7 @@ const DEFAULT_SETTINGS = {
     tabletMode: true,
     // window: false=emulatorwindow(Qt , orientation//
     // , ); 
-    // true=Android SetParent ApkStart window(, 
+    // true=Android SetParent ApkBolt window(, 
     // rotate///). 
     // 0.6.0 defaultwindow: embedded modewindow, 
     // , rotate, app, // --
@@ -292,7 +292,7 @@ const store = {
  * ,  builtin , . 
      *
  * memory, disk: settings, 
- * settings; " ApkStart settings.json". 
+ * settings; " ApkBolt settings.json". 
      */
     s.engine.mode = 'builtin';
     for (const k of ['mumuPath', 'mumuIndex', 'mumuRenderProfile', 'mumuMemoryGB', 'mumuCores', 'fydeosHost']) {

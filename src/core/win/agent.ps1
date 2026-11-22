@@ -1,6 +1,6 @@
-﻿# ApkStart window agent (ASCII only).
+﻿# ApkBolt window agent (ASCII only).
 # A single long-lived helper that owns every Win32 trick we need:
-#   * re-parents the Android emulator Qt window into an ApkStart BrowserWindow (one clean window,
+#   * re-parents the Android emulator Qt window into an ApkBolt BrowserWindow (one clean window,
 #     no emulator sidebar, no emulator title bar);
 #   * hides the floating emulator toolbar window that shows the volume/camera/back rail;
 #   * rotates the device with Ctrl+Left / Ctrl+Right and reports the new window size;
@@ -123,7 +123,7 @@ public class ApkAgent
     static long _embedAt = 0;
     // resident: defaultboot, emulator + + . 
     // "embed complete", **resident** -- sweep
-    // windowwindow, ( ApkStart exitdesktop). 
+    // windowwindow, ( ApkBolt exitdesktop). 
     static volatile bool _quiet = true;
     static volatile bool _perfMode = false;
     static volatile bool _detachedMode = false;
@@ -132,7 +132,7 @@ public class ApkAgent
     // window(Win11 Windows Terminal),  200~300ms; 
     // 250ms ,  15 window. 
     static long _consoleSweep = 0;
-    // fallbacktimeout:  embed ( ApkStart app), 
+    // fallbacktimeout:  embed ( ApkBolt app), 
     // 120ms CPU. window. 
     static long _bootHideUntil = 0;
     static long _bootHideStart = Environment.TickCount;
@@ -141,13 +141,13 @@ public class ApkAgent
 
     // Which windows count as "ours": only those created by a process whose exe lives
     // inside one of these directories (the runtime root / bundled engine dir).
-    // This is the whole fix for "ApkStart conflicts with WeChat": WeChat 4.x is Qt 6
+    // This is the whole fix for "ApkBolt conflicts with WeChat": WeChat 4.x is Qt 6
     // too (its windows are QWindowIcon / QWindowToolSaveBits), so any matching that
     // relied on window class names alone could hide or even re-parent WeChat's own
     // windows. Class names are never unique; the owning process's path is.
     static readonly System.Collections.Generic.List<string> _scopeDirs = new System.Collections.Generic.List<string>();
     static readonly System.Collections.Generic.Dictionary<uint, bool> _oursCache = new System.Collections.Generic.Dictionary<uint, bool>();
-    // PID of the ApkStart main process. The only window we are ever allowed to embed
+    // PID of the ApkBolt main process. The only window we are ever allowed to embed
     // into / swallow clicks for. Guard against a recycled HWND: if _host later belongs
     // to somebody else, the mouse hook must pass events through instead of eating them.
     static uint _appPid = 0;
@@ -285,7 +285,7 @@ public class ApkAgent
     // appwindow. " Android Emulator , 
     // window".  / hint(QWindowTool), . 
     //
-    // ApkStart windowapp( "title" ), 
+    // ApkBolt windowapp( "title" ), 
     // "".  volatile . 
     public static string _ourTitle = "";
     // apppath: Qt windowdefault, . 
@@ -530,8 +530,8 @@ public class ApkAgent
     }
 
     // resident: emulatorwindow"windowwindow", . 
-    // emulatorboot, ,  ApkStart exit(windowdesktop, 
-    // window),  "Android Emulator - apkstart5554" . 
+    // emulatorboot, ,  ApkBolt exit(windowdesktop, 
+    // window),  "Android Emulator - apkbolt5554" . 
     // (QWindowTool)window(qemu / netsimd / emulator). 
 
     // embed Electron window, FindChromeRender 0, 
@@ -563,7 +563,7 @@ public class ApkAgent
         if (_detachedMode)
         {
             // Qt /window "Android Emulator - ...". 
-            // , taskbar ApkStart(app). 
+            // , taskbar ApkBolt(app). 
             if (_ourTitle.Length > 0 && _emu != IntPtr.Zero
                 && !String.Equals(TitleOf(_emu), _ourTitle, StringComparison.Ordinal))
                 SetWindowTextW(_emu, _ourTitle);
@@ -722,7 +722,7 @@ public class ApkAgent
         if (h < 16) h = 16;
         // "window". 
         // embed failure(emulatorwindow / ), Fit window
-        // desktop -- "Android Emulator - apkstart5554" . 
+        // desktop -- "Android Emulator - apkbolt5554" . 
         IntPtr ep = GetParent(_emu);
         bool embedded = ep != IntPtr.Zero
                      && (ep == _host || ep == _chromeRender);
@@ -766,7 +766,7 @@ public class ApkAgent
 
     // Detach , ****window: window. 
     // , Windows windowdesktop, 
-    // "Android Emulator - apkstart5554" . 
+    // "Android Emulator - apkbolt5554" . 
     static void ParkEmulator()
     {
         if (_emu == IntPtr.Zero) _emu = FindEmulator();
@@ -1144,7 +1144,7 @@ public class ApkAgent
 
             try
             {
-                // (ApkStart exit / ): . 
+                // (ApkBolt exit / ): . 
                 // emulatorboot,  Qt window --
                 // , desktop Android Emulator . 
                 // "", emulator. 
@@ -1200,7 +1200,7 @@ public class ApkAgent
                         uint wantPid = 0;
                         if (want != IntPtr.Zero) GetWindowThreadProcessId(want, out wantPid);
                         // Never re-parent into a foreign window: a stale handle could
-                        // point at another app (the exact way "ApkStart ate WeChat's
+                        // point at another app (the exact way "ApkBolt ate WeChat's
                         // window" can happen).
                         if (want == IntPtr.Zero || (_appPid != 0 && wantPid != _appPid))
                         {
@@ -1301,11 +1301,11 @@ public class ApkAgent
                     }
                     else if (cmd == "title")
                     {
-                        // emulatorwindow "Android Emulator - apkstart:5554"
-                        // (default "ApkStart"). Qt window
+                        // emulatorwindow "Android Emulator - apkbolt:5554"
+                        // (default "ApkBolt"). Qt window
                         // ,  QuietSweep (). 
                         string t = S(line, "text");
-                        if (t.Length == 0) t = "ApkStart";
+                        if (t.Length == 0) t = "ApkBolt";
                         _ourTitle = t;
                         if (_emu == IntPtr.Zero) _emu = FindEmulator();
                         bool ok = _emu != IntPtr.Zero && SetWindowTextW(_emu, t);

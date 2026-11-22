@@ -87,7 +87,7 @@ def run(cmd, env=None):
     return res
 
 def main():
-    os.chdir(r"d:\Personal Projects\ApkBolt\apkstart")
+    os.chdir(r"d:\Personal Projects\ApkBolt\apkbolt")
     print("Building clean multi-stage git history...")
 
     # Create fresh orphan branch

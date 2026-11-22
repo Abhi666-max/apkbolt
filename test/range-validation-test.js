@@ -54,7 +54,7 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
     assert.equal(validRange(hdr('bytes 0-3/8', '4'), 0, 3, 8), true);
   });
 
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-range-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkbolt-range-'));
   try {
     // /416:  Range  416,  Range  "good"
     // /bad:  bytes=0-0 ,  bytes 0-3/8()
