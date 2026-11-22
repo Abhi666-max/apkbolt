@@ -1,16 +1,16 @@
 'use strict';
 /**
- * cleanversion。
+ * cleanversion. 
  *
- * upgrade ApkStart 「version、uninstall」：portable versionversion
- * ApkStart-vX.Y.Z-win64-portable directory；NSIS installupgradedirectory
- * uninstall；updatedirectorytemporary。
+ * upgrade ApkStart "version, uninstall": portable versionversion
+ * ApkStart-vX.Y.Z-win64-portable directory; NSIS installupgradedirectory
+ * uninstall; updatedirectorytemporary. 
  *
- * ****clean：
- * - 「directory ApkStart.exe」versiondirectory，；
- * - 「InstallLocation 」uninstall（）；
- * - updatecachetemporary/desktopshortcut。
- * ，。
+ * ****clean: 
+ * - "directory ApkStart.exe"versiondirectory, ; 
+ * - "InstallLocation "uninstall(); 
+ * - updatecachetemporary/desktopshortcut. 
+ * , . 
  */
 const fs = require('fs');
 const path = require('path');
@@ -29,7 +29,7 @@ function dirSize(p) {
       try {
         if (e.isDirectory()) walk(f);
         else n += fs.statSync(f).size;
-      } catch (_) { /* /， */ }
+      } catch (_) { /* /,  */ }
     }
   };
   walk(p);
@@ -41,14 +41,14 @@ function norm(p) {
 }
 
 /**
- * 「」directoryversiondirectory。
+ * ""directoryversiondirectory. 
  *
- * exe directory + LOCALAPPDATA\Programs + ProgramFiles，
- * portable versionextract（E:\download、desktop、directory） —— 
- * 「version」。：
- * - install；
- * - diskdirectory（portable version D:\ApkStart-…）；
- * - desktop / shortcut exe directory（，）。
+ * exe directory + LOCALAPPDATA\Programs + ProgramFiles, 
+ * portable versionextract(E:\download, desktop, directory) -- 
+ * "version". : 
+ * - install; 
+ * - diskdirectory(portable version D:\ApkStart-...); 
+ * - desktop / shortcut exe directory(, ). 
  */
 function candidateRoots(installDir) {
   const roots = new Set();
@@ -65,7 +65,7 @@ function candidateRoots(installDir) {
     add(path.join(home, 'Desktop'));
     add(path.join(home, 'Documents'));
   }
-  // diskdirectory（portable version）
+  // diskdirectory(portable version)
   try {
     for (const drv of ['C:\\', 'D:\\', 'E:\\', 'F:\\', 'G:\\', 'H:\\']) {
       if (fs.existsSync(drv)) add(drv.replace(/\\+$/, ''));
@@ -75,9 +75,9 @@ function candidateRoots(installDir) {
 }
 
 /**
- * shortcut（.lnk / .desktop） ApkStart.exe directory。
- * ：desktop，path，
- * 、。
+ * shortcut(.lnk / .desktop) ApkStart.exe directory. 
+ * : desktop, path, 
+ * , . 
  */
 function rootsFromShortcuts() {
   const dirs = new Set();
@@ -104,7 +104,7 @@ function rootsFromShortcuts() {
             if (exePath && /[\\/]ApkStart(\.exe)?$/i.test(exePath)) dirs.add(path.dirname(exePath));
           }
         } else {
-          // .lnk ，path， ApkStart*.exe
+          // .lnk , path,  ApkStart*.exe
           const buf = fs.readFileSync(full);
           const s = buf.toString('latin1');
           const re = /[A-Za-z]:\\[^\x00\x01-\x1f]*?ApkStart(?:-[^\x00\x01-\x1f]*)?[\\/]?ApkStart\.exe|[A-Za-z]:\\[^\x00\x01-\x1f]*?ApkStart\.exe/gi;
@@ -119,7 +119,7 @@ function rootsFromShortcuts() {
   return [...dirs];
 }
 
-/** versiondirectory： ApkStart*， ApkStart.exe，installdirectory */
+/** versiondirectory:  ApkStart*,  ApkStart.exe, installdirectory */
 function scanDirs(installDir) {
   const out = [];
   const seen = new Set();
@@ -129,7 +129,7 @@ function scanDirs(installDir) {
     if (seen.has(key)) return;
     seen.add(key);
     if (key === cur) return;
-    // 「 ApkStart」directory，
+    // " ApkStart"directory, 
     if (!fs.existsSync(path.join(full, EXE))) return;
     out.push({
       kind: 'dir',
@@ -147,10 +147,10 @@ function scanDirs(installDir) {
       consider(path.join(root, e.name));
     }
   }
-  // shortcutdirectory：versiondirectory，/directory
+  // shortcutdirectory: versiondirectory, /directory
   for (const d of rootsFromShortcuts()) {
     if (/^ApkStart/i.test(path.basename(d))) consider(d);
-    // （dist versiondirectory）
+    // (dist versiondirectory)
     const parent = path.dirname(d);
     let sib = [];
     try { sib = fs.readdirSync(parent, { withFileTypes: true }); } catch (_) { continue; }
@@ -175,7 +175,7 @@ function scanRegistry() {
       text = execFileSync('reg', ['query', root, '/s', '/f', 'ApkStart', '/t', 'REG_SZ'],
         { encoding: 'utf8', windowsHide: true, timeout: 15000, maxBuffer: 4 * 1024 * 1024 });
     } catch (_) { continue; }
-    // reg query chunk「 → 」，
+    // reg query chunk" → ", 
     const blocks = String(text).split(/\r?\n\r?\n/);
     for (const b of blocks) {
       const key = (/^(HKEY_[^\r\n]+)$/m.exec(b) || [])[1];
@@ -187,7 +187,7 @@ function scanRegistry() {
       const install = (loc || '').trim().replace(/^"|"$/g, '');
       const uninsPath = (unins || '').trim().replace(/^"|"$/g, '');
       const installMissing = install ? !fs.existsSync(install) : false;
-      // 「、app」
+      // ", app"
       const deadUninstaller = uninsPath && !fs.existsSync(uninsPath.split('"')[0]);
       if (!installMissing && !deadUninstaller) continue;
       out.push({
@@ -222,8 +222,8 @@ function scanTemp(dataDir) {
   return out;
 }
 
-/** /launchsnapshot：default_boot version（ ram.img 3GB），
- * *.stale-* 「」。snapshot apkstart，。 */
+/** /launchsnapshot: default_boot version( ram.img 3GB), 
+ * *.stale-* "". snapshot apkstart, .  */
 function scanSnapshots(avdHome) {
   const out = [];
   if (!avdHome) return out;
@@ -270,7 +270,7 @@ function clean(items, { installDir }) {
   for (const it of items || []) {
     try {
       if (it.kind === 'dir') {
-        // ：directory
+        // : directory
         if (norm(it.path) === cur) { failed.push({ path: it.path, reason: 'This is the currently running version' }); continue; }
         if (!fs.existsSync(path.join(it.path, EXE))) { failed.push({ path: it.path, reason: 'Directory does not contain ' + EXE }); continue; }
         if (rm(it.path)) { freed += it.size || 0; removed.push(it.path); }

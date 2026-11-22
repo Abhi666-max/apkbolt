@@ -1,23 +1,23 @@
 'use strict';
 /**
- * checkup + configuration。
+ * checkup + configuration. 
  *
- * ：ApkStart ， ——
- * 1. CPU （VT-x / AMD-V） BIOS ；
- * 2. Windows 「 / Hyper-V」（WHPX ）；
- * 3. （、、driverversion，）；
- * 4. memory / disk 2~8GB Android。
+ * : ApkStart ,  --
+ * 1. CPU (VT-x / AMD-V) BIOS ; 
+ * 2. Windows " / Hyper-V"(WHPX ); 
+ * 3. (, , driverversion, ); 
+ * 4. memory / disk 2~8GB Android. 
  *
- * 「launchfailure → log → 」。，
- * （memory、、、），（ / driver），
- * BIOS 、。
+ * "launchfailure → log → ". , 
+ * (memory, , , ), ( / driver), 
+ * BIOS , . 
  *
- * ：
- * - collect() —— probe（Windows PowerShell ），fallbackpath；
- * - evaluate() —— ：probe「checkup + configuration」，；
- * - app main.js（settings / ），。
+ * : 
+ * - collect() -- probe(Windows PowerShell ), fallbackpath; 
+ * - evaluate() -- : probe"checkup + configuration", ; 
+ * - app main.js(settings / ), . 
  *
- * note：** BIOS **。，。
+ * note: ** BIOS **. , . 
  */
 
 const os = require('os');
@@ -27,10 +27,10 @@ const path = require('path');
 // ---------------- probe ----------------
 
 /**
- * （Windows powershell.exe）， JSON；failure/timeout null。
+ * (Windows powershell.exe),  JSON; failure/timeout null. 
  *
- * execFile execFileSync：launch + CIM 1~2 ，
- * （），「checkup」。
+ * execFile execFileSync: launch + CIM 1~2 , 
+ * (), "checkup". 
  */
 function psJson(script, timeout = 15000) {
   if (process.platform !== 'win32') return Promise.resolve(null);
@@ -56,7 +56,7 @@ const HW_SCRIPT = [
   '$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1 Name,NumberOfCores,NumberOfLogicalProcessors,VirtualizationFirmwareEnabled,VMMonitorModeExtensions,SecondLevelAddressTranslationExtensions;',
   '$cs = Get-CimInstance Win32_ComputerSystem | Select-Object -First 1 HypervisorPresent,TotalPhysicalMemory;',
   '$gpu = @(Get-CimInstance Win32_VideoController | Select-Object Name,DriverVersion,DriverDate,AdapterRAM,VideoProcessor,Status);',
-  // AdapterRAM >4GB 4294967295； qwMemorySize（ 000N ）
+  // AdapterRAM >4GB 4294967295;  qwMemorySize( 000N )
   '$vram = 0;',
   'Get-ChildItem "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}" -ErrorAction SilentlyContinue | ForEach-Object {',
   '  $v = (Get-ItemProperty $_.PSPath -Name "HardwareInformation.qwMemorySize" -ErrorAction SilentlyContinue)."HardwareInformation.qwMemorySize";',
@@ -74,7 +74,7 @@ const FEATURE_SCRIPT = [
   '$o | ConvertTo-Json -Compress',
 ].join(' ');
 
-/** （probe WHPX API / AEHD driver / ） */
+/** (probe WHPX API / AEHD driver / ) */
 function fileExists(rel) {
   try {
     return fs.existsSync(path.join(process.env.SystemRoot || 'C:\\Windows', rel));
@@ -95,12 +95,12 @@ function dateToISO(v) {
 }
 
 /**
- * probe。
+ * probe. 
  *
- * null/0，**probefailure**：
- * 「」，checkup「」，。
+ * null/0, **probefailure**: 
+ * "", checkup"", . 
  *
- * @param {object} o { accel } accel provisioner.emulatorAccel() ， emulator
+ * @param {object} o { accel } accel provisioner.emulatorAccel() ,  emulator
  * @returns {object} hw
  */
 async function collect({ accel = null } = {}) {
@@ -111,7 +111,7 @@ async function collect({ accel = null } = {}) {
   const cs = (raw && raw.cs) || {};
   const gpus = Array.isArray(raw && raw.gpu) ? raw.gpu : (raw && raw.gpu ? [raw.gpu] : []);
 
-  // 「」： Microsoft Basic Display /
+  // "":  Microsoft Basic Display /
   const usable = gpus.filter((g) => g && g.Name && !/microsoft basic|remote display|virtual display/i.test(g.Name));
   const gpu = (usable[0] || gpus[0]) || {};
   const name = String(gpu.Name || '');
@@ -122,17 +122,17 @@ async function collect({ accel = null } = {}) {
 
   const ramBytes = Number(gpu.AdapterRAM) || 0;
   const qw = Number((raw && raw.vram) || 0);
-  // AdapterRAM 32 ，>4GB 4095MB，
+  // AdapterRAM 32 , >4GB 4095MB, 
   const vramMB = Math.round((qw > 0 ? qw : (ramBytes > 0 && ramBytes < 4096 * 1024 * 1024 ? ramBytes : 0)) / 1048576);
 
   const hypervisor = cs.HypervisorPresent === true;
   const accelOk = !!(accel && accel.ok);
   /**
- * note WMI （）：
- * Hyper-V / VBS VT，`VMMonitorModeExtensions` 
- * `SecondLevelAddressTranslationExtensions` False —— hardware acceleration。
- * 「False」「 Hypervisor、」「」，
- * 「」，。
+ * note WMI (): 
+ * Hyper-V / VBS VT, `VMMonitorModeExtensions` 
+ * `SecondLevelAddressTranslationExtensions` False -- hardware acceleration. 
+ * "False"" Hypervisor, """, 
+ * "", . 
    */
   const vmExt = cpu.VMMonitorModeExtensions;
   const slatRaw = cpu.SecondLevelAddressTranslationExtensions;
@@ -140,7 +140,7 @@ async function collect({ accel = null } = {}) {
   if (vmExt === false && !hypervisor && !accelOk) vtSupported = false;
   else if (vmExt !== true) vtSupported = 'unknown';
   const slat = slatRaw === true ? true : (slatRaw === false && !hypervisor && !accelOk ? false : 'unknown');
-  // BIOS ：，Hypervisor firmware
+  // BIOS : , Hypervisor firmware
   let vtFirmware = null;
   if (cpu.VirtualizationFirmwareEnabled === true) vtFirmware = true;
   else if (cpu.VirtualizationFirmwareEnabled === false && !hypervisor && !accelOk) vtFirmware = false;
@@ -194,13 +194,13 @@ async function collect({ accel = null } = {}) {
   };
 }
 
-// ---------------- （） ----------------
+// ---------------- () ----------------
 
-/** recommended：memory / / 。，。 */
+/** recommended: memory / / . , .  */
 function recommendResources({ totalMB = 0, cores = 0, accelOk = false, vramMB = 0 } = {}) {
   const mem = Number(totalMB) || 0;
   const n = Number(cores) || 1;
-  // ， 1 Windows；
+  // ,  1 Windows; 
   let memoryMB = 2048;
   if (mem >= 32768) memoryMB = 8192;
   else if (mem >= 16384) memoryMB = 6144;
@@ -212,12 +212,12 @@ function recommendResources({ totalMB = 0, cores = 0, accelOk = false, vramMB = 
   }
   const wantCores = n >= 8 ? 4 : n >= 4 ? Math.max(2, n - 2) : 2;
   const c = Math.max(1, Math.min(wantCores, n - 1));
-  // software emulation + ： 540p，（ 56%）
+  // software emulation + :  540p, ( 56%)
   const renderSize = (!accelOk || (vramMB > 0 && vramMB < 512)) ? '540x960' : 'auto';
   return { memoryMB, cores: c, renderSize };
 }
 
-/** ： + + 「」 */
+/** :  + + "" */
 function recommendGpu({ vendor = 'unknown', accelOk = false, vramMB = 0 } = {}) {
   if (!accelOk) return { gpuMode: 'software', why: 'No hardware acceleration available; using software renderer' };
   if (vendor === 'unknown') return { gpuMode: 'auto', why: 'GPU model not identified; passing to fallback chain' };
@@ -229,7 +229,7 @@ function recommendGpu({ vendor = 'unknown', accelOk = false, vramMB = 0 } = {}) 
 }
 
 /**
- * probecheckup。
+ * probecheckup. 
  *
  * @param {object} o { hw, settings, edition } edition: 'store' | 'installer'
  * @returns {{ level:string, items:Array, patch:object|null, driver:object|null, summary:string }}
@@ -243,13 +243,13 @@ function evaluate({ hw = {}, settings = {}, edition = 'installer' } = {}) {
 
   const add = (item) => items.push(item);
 
-  // ---- 1. CPU （BIOS） ----
+  // ---- 1. CPU (BIOS) ----
   if (cpu.vtSupported === false) {
     add({
       key: 'vt-unsupported',
       level: 'bad',
       title: 'CPU does not support hardware virtualization',
-      detail: 'Running in software mode (5–10x slower). Suitable for lightweight apps.',
+      detail: 'Running in software mode (5-10x slower). Suitable for lightweight apps.',
       action: null,
     });
   } else if (cpu.vtFirmware === false) {
@@ -266,7 +266,7 @@ function evaluate({ hw = {}, settings = {}, edition = 'installer' } = {}) {
       key: 'vt-ok',
       level: 'ok',
       title: 'Hardware virtualization enabled in BIOS',
-      detail: cpu.name ? `${cpu.name} · ${cpu.cores || '?'} cores / ${cpu.threads || '?'} threads` : '',
+      detail: cpu.name ? `${cpu.name}  -  ${cpu.cores || '?'} cores / ${cpu.threads || '?'} threads` : '',
       action: null,
     });
   } else {
@@ -279,7 +279,7 @@ function evaluate({ hw = {}, settings = {}, edition = 'installer' } = {}) {
     });
   }
 
-  // ---- 2. Windows ：WHPX / Hyper-V ----
+  // ---- 2. Windows : WHPX / Hyper-V ----
   const hp = String(v.hypervisorPlatform || 'unknown');
   const hpxOn = hp === 'enabled' || (hp === 'unknown' && v.winHvApi && v.hypervisorPresent);
   if (hpxOn) {
@@ -351,7 +351,7 @@ function evaluate({ hw = {}, settings = {}, edition = 'installer' } = {}) {
       key: 'gpu-info',
       level: 'ok',
       title: `${gpu.name}`,
-      detail: `${vram}${gpu.driverVersion ? ` · Driver ${gpu.driverVersion}` : ''}${gpu.driverDate ? `（${gpu.driverDate}）` : ''}`,
+      detail: `${vram}${gpu.driverVersion ? `  -  Driver ${gpu.driverVersion}` : ''}${gpu.driverDate ? `(${gpu.driverDate})` : ''}`,
       action: null,
     });
     const old = /^(19|20)\d{2}-\d{2}-\d{2}$/.test(gpu.driverDate || '')
@@ -409,13 +409,13 @@ function evaluate({ hw = {}, settings = {}, edition = 'installer' } = {}) {
       memoryMB: rec.memoryMB,
       cores: rec.cores,
       renderSize: rec.renderSize,
-      // → software emulation，； auto fallback
+      // → software emulation, ;  auto fallback
       gpuMode: v.accelOk ? 'auto' : 'software',
       forceTcg: !v.accelOk,
     },
   };
 
-  // driver：boot，checkup
+  // driver: boot, checkup
   const vendor = gpu.vendor && gpu.vendor !== 'unknown' ? gpu.vendor : 'unknown';
   const driver = {
     format: 'apkbolt-driver/1',

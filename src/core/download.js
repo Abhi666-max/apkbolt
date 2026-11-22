@@ -1,7 +1,7 @@
 'use strict';
 /**
- * download：、resume download、、SHA-256 verify
- * http/https， Node 。
+ * download: , resume download, , SHA-256 verify
+ * http/https,  Node . 
  */
 const fs = require('fs');
 const path = require('path');
@@ -13,10 +13,10 @@ const { URL } = require('url');
 const UA = 'ApkStart/0.2 (Windows; +https://github.com/apkstart)';
 
 /**
- * verify Content-Range 。
- * resume download/chunkdownload「 Range、」「chunk」——
- * 、。、
- * Content-Length，，/。
+ * verify Content-Range . 
+ * resume download/chunkdownload" Range, ""chunk"--
+ * , . , 
+ * Content-Length, , /. 
  */
 function validRange(res, start, end, total) {
   const m = /^bytes (\d+)-(\d+)\/(\d+)$/.exec(String(res.headers['content-range'] || ''));
@@ -75,16 +75,16 @@ function sha256File(file) {
 }
 
 /**
- * failuredownload。
+ * failuredownload. 
  *
- * 「download」：failurepath、，
- * tmp zip + .chunks.json 。
- * downloadParallel/download Range ，
- * /chunk，failure → →
- * 。「download」。
+ * "download": failurepath, , 
+ * tmp zip + .chunks.json . 
+ * downloadParallel/download Range , 
+ * /chunk, failure → →
+ * . "download". 
  *
- * resume download，「」；
- * downloadfailure，，。
+ * resume download, ""; 
+ * downloadfailure, , . 
  */
 function discardPartial(dest) {
   for (const p of [dest, `${dest}.chunks.json`, `${dest}.part`]) {
@@ -93,7 +93,7 @@ function discardPartial(dest) {
 }
 
 /**
- * download（）。
+ * download(). 
  * @param {string} url
  * @param {string} dest
  * @param {object} opt { onProgress({got,total,percent,speed}), signal, expectSha256, timeoutMs }
@@ -115,9 +115,9 @@ async function download(url, dest, opt = {}) {
 
     if (res.statusCode === 416) {
       res.resume();
-      // 416 ：，（
-      // Range ）。success，"download"。
-      // Range retry，；retrysuccesserror。
+      // 416 : , (
+      // Range ). success, "download". 
+      // Range retry, ; retrysuccesserror. 
       if (existing > 0 && attempt <= retries + 1) {
         discardPartial(dest);
         continue;
@@ -127,7 +127,7 @@ async function download(url, dest, opt = {}) {
     if (res.statusCode !== 200 && res.statusCode !== 206) {
       res.resume();
       if (attempt <= retries) { await new Promise((r) => setTimeout(r, 1500)); continue; }
-      discardPartial(dest);   // retry：
+      discardPartial(dest);   // retry: 
       throw new Error(`Download failed HTTP ${res.statusCode}: ${url}`);
     }
 
@@ -145,7 +145,7 @@ async function download(url, dest, opt = {}) {
       : Number(res.headers['content-length']) || 0;
 
     if (res.statusCode === 200 && existing > 0) {
-      // ，
+      // , 
       fs.rmSync(dest, { force: true });
     }
 
@@ -157,9 +157,9 @@ async function download(url, dest, opt = {}) {
         let lastBytes = got;
         const ws = fs.createWriteStream(dest, { flags: startSize > 0 ? 'a' : 'w' });
 
-        // chunkdownload： promise settle。
-        // （/） res end error，pipe finish，
-        // download，、error。
+        // chunkdownload:  promise settle. 
+        // (/) res end error, pipe finish, 
+        // download, , error. 
         const idleMs = Number(opt.idleMs) > 0 ? Number(opt.idleMs) : 30000;
         let settled = false;
         let idle = null;
@@ -206,7 +206,7 @@ async function download(url, dest, opt = {}) {
         res.on('close', () => { if (!res.complete) finish(new Error('Connection interrupted')); });
       });
     } catch (e) {
-      // / timeout / failure：failure
+      // / timeout / failure: failure
       discardPartial(dest);
       throw e;
     }
@@ -214,7 +214,7 @@ async function download(url, dest, opt = {}) {
     break;
   }
 
-  // ： 100%
+  // :  100%
   const finalSize = fs.existsSync(dest) ? fs.statSync(dest).size : 0;
   onProgress({ got: finalSize, total: finalSize, percent: 100, speed: 0, eta: 0 });
 
@@ -222,23 +222,23 @@ async function download(url, dest, opt = {}) {
     const actual = await sha256File(dest);
     if (actual.toLowerCase() !== expectSha256.toLowerCase()) {
       discardPartial(dest);
-      throw new Error(`Checksum failed: expected ${expectSha256.slice(0, 12)}… got ${actual.slice(0, 12)}…`);
+      throw new Error(`Checksum failed: expected ${expectSha256.slice(0, 12)}... got ${actual.slice(0, 12)}...`);
     }
   }
   return { file: dest, size: fs.statSync(dest).size };
   } catch (e) {
-    // openStream reject（ / DNS failure / timeout）
-    // try/catch —— ，failure。
-    // ：。
+    // openStream reject( / DNS failure / timeout)
+    // try/catch -- , failure. 
+    // : . 
     discardPartial(dest);
     throw e;
   }
 }
 
 /**
- * chunkdownload（）。
- * TCP system image KB/s，chunk。
- * 「」；，chunk。
+ * chunkdownload(). 
+ * TCP system image KB/s, chunk. 
+ * ""; , chunk. 
  */
 async function downloadParallel(url, dest, opt = {}) {
   const {
@@ -278,7 +278,7 @@ async function downloadParallel(url, dest, opt = {}) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.rmSync(dest, { force: true });
 
-  // ， write
+  // ,  write
   const fd = fs.openSync(dest, 'w');
   fs.ftruncateSync(fd, total);
 
@@ -316,8 +316,8 @@ async function downloadParallel(url, dest, opt = {}) {
       throw new Error('Server returned mismatched chunk range');
     }
     await new Promise((resolve, reject) => {
-      // 「promise settle」：res.destroy(err)
-      // close error， guard ，download。
+      // "promise settle": res.destroy(err)
+      // close error,  guard , download. 
       let settled = false;
       const finish = (err) => {
         if (settled) return;
@@ -331,8 +331,8 @@ async function downloadParallel(url, dest, opt = {}) {
         idle = setTimeout(() => { res.destroy(); finish(new Error('Connection stalled (no data for extended period)')); }, idleMs);
       };
       res.on('data', (buf) => {
-        // chunk，chunk，
-        // 。failure，。
+        // chunk, chunk, 
+        // . failure, . 
         if (buf.length > c.end - c.pos + 1) {
           res.destroy();
           return finish(new Error('Chunk response exceeded requested range'));
@@ -373,7 +373,7 @@ async function downloadParallel(url, dest, opt = {}) {
     }));
   } catch (e) {
     try { fs.closeSync(fd); } catch (_) { /* ignore */ }
-    discardPartial(dest);   // ，
+    discardPartial(dest);   // , 
     throw e;
   }
   fs.closeSync(fd);
@@ -387,7 +387,7 @@ async function downloadParallel(url, dest, opt = {}) {
   return { file: dest, size, parallel: n };
 }
 
-/** ，success */
+/** , success */
 async function downloadAny(urls, dest, opt = {}) {
   const errors = [];
   for (const u of urls) {
@@ -405,23 +405,23 @@ async function downloadAny(urls, dest, opt = {}) {
 }
 
 /**
- * multi sourcedownload：，****，。
+ * multi sourcedownload: , ****, . 
  *
- * ：GitHub ，system image；
- * 8 ，。 4 GitHub、
- * 4 system image，，。
+ * : GitHub , system image; 
+ * 8 , .  4 GitHub, 
+ * 4 system image, , . 
  *
- * ：「」，；
- * failure，chunkretry（）。
+ * : "", ; 
+ * failure, chunkretry(). 
  */
 async function downloadMulti(urls, dest, opt = {}) {
   const {
     connections = 8,
     onProgress = () => {},
     minChunk = 2 * 1024 * 1024,
-    // chunkretry。3 「」：
-    // 1.4GB runtimeretry，。 6 （）。
-    // retry（c.pos ），download。
+    // chunkretry. 3 "": 
+    // 1.4GB runtimeretry, .  6 (). 
+    // retry(c.pos ), download. 
     retries = 6,
   } = opt;
   const idleMs = Number(opt.idleMs) > 0 ? Number(opt.idleMs) : 20000;
@@ -430,7 +430,7 @@ async function downloadMulti(urls, dest, opt = {}) {
   if (!list.length) throw new Error('No available download URLs');
   if (list.length === 1) return downloadParallel(list[0], dest, opt);
 
-  // 1) probe： + Range
+  // 1) probe:  + Range
   const probes = await Promise.all(list.map(async (u) => {
     try {
       const res = await openStream(u, { headers: { Range: 'bytes=0-0' } });
@@ -447,26 +447,26 @@ async function downloadMulti(urls, dest, opt = {}) {
   if (!usable.length) {
     return downloadAnyParallel(list, dest, opt);
   }
-  // 「」，。
-  // ****（usable rank() ，
-  // probe Promise.all ）：
-  // GitHub Gitee （ MB ），
-  // Math.max， —— network
-  // 「 Gitee 、 GitHub 」。
+  // "", . 
+  // ****(usable rank() , 
+  // probe Promise.all ): 
+  // GitHub Gitee ( MB ), 
+  // Math.max,  -- network
+  // " Gitee ,  GitHub ". 
   const total = usable[0].total;
   const same = usable.filter((p) => p.total === total);
   if (same.length === 1 || total < minChunk * 2) {
     return downloadParallel(same[0].url, dest, opt);
   }
 
-  // 2) ，
+  // 2) , 
   const n = Math.max(2, Math.min(connections, Math.ceil(total / minChunk)));
   const per = Math.ceil(total / n);
   fs.mkdirSync(path.dirname(dest), { recursive: true });
 
-  // chunkresume download：1.4GB 「system image」retry，
-  // ，。「」
-  // ，（path、chunk）。
+  // chunkresume download: 1.4GB "system image"retry, 
+  // , . ""
+  // , (path, chunk). 
   const meta = `${dest}.chunks.json`;
   let doneSet = new Set();
   let resume = false;
@@ -491,7 +491,7 @@ async function downloadMulti(urls, dest, opt = {}) {
     pos: i * per,
     src: i % same.length,
     tries: 0,
-    rotates: 0,   // ：undefined < 2 false，
+    rotates: 0,   // : undefined < 2 false, 
   })).filter((c) => !doneSet.has(c.start));
 
   const saveMeta = () => {
@@ -500,7 +500,7 @@ async function downloadMulti(urls, dest, opt = {}) {
     } catch (_) { /* download */ }
   };
 
-  // complete， 0
+  // complete,  0
   let got = resume ? [...doneSet].reduce((sum, start) => (
     sum + (Math.min(total - 1, start + per - 1) - start + 1)
   ), 0) : 0;
@@ -522,9 +522,9 @@ async function downloadMulti(urls, dest, opt = {}) {
     });
   };
 
-  // ： KB/s ，download
-  // 「 95% 」。 slowAfterMs slowBps 、
-  // （，）。 2 ，。
+  // :  KB/s , download
+  // " 95% ".  slowAfterMs slowBps , 
+  // (, ).  2 , . 
   const slowAfterMs = Number(opt.slowAfterMs) > 0 ? Number(opt.slowAfterMs) : 45000;
   const slowBps = Number(opt.slowBps) > 0 ? Number(opt.slowBps) : 120 * 1024;
 
@@ -541,14 +541,14 @@ async function downloadMulti(urls, dest, opt = {}) {
     }
     const startPos = c.pos;
     const startedAt = Date.now();
-    // destroy ，、，
-    // 。
+    // destroy , , , 
+    // . 
     let rotated = false;
     await new Promise((resolve, reject) => {
-      // + 「 settle」：（
-      // 「TCP /」）， socket timeout 30 ； res.destroy(err)
-      // close error，promise reject —— 、
-      // download（）。 finish。
+      // + " settle": (
+      // "TCP /"),  socket timeout 30 ;  res.destroy(err)
+      // close error, promise reject -- , 
+      // download().  finish. 
       let settled = false;
       const finish = (err) => {
         if (settled) return;
@@ -562,7 +562,7 @@ async function downloadMulti(urls, dest, opt = {}) {
         idle = setTimeout(() => { res.destroy(); finish(new Error('Connection stalled (timeout)')); }, idleMs);
       };
       res.on('data', (buf) => {
-        // ：，chunk
+        // : , chunk
         if (buf.length > c.end - c.pos + 1) {
           res.destroy();
           return finish(new Error('Chunk response exceeded requested range'));
@@ -577,14 +577,14 @@ async function downloadMulti(urls, dest, opt = {}) {
         got += buf.length;
         kick();
         tick(false);
-        // → （c.pos ，）
+        // → (c.pos , )
         const took = Date.now() - startedAt;
         if (!rotated && took > slowAfterMs && (c.rotates || 0) < 2 && c.pos <= c.end) {
           const bps = (c.pos - startPos) / (took / 1000);
           if (bps < slowBps) {
             rotated = true;
             c.rotates = (c.rotates || 0) + 1;
-            // c.src： catch ，failure
+            // c.src:  catch , failure
             res.destroy();
             finish(new Error(`Source speed too low (${(bps / 1024).toFixed(0)} KB/s); switching source`));
           }
@@ -611,13 +611,13 @@ async function downloadMulti(urls, dest, opt = {}) {
         } catch (e) {
           c.tries += 1;
           if (c.tries >= retries) {
-            // retry：「」，
-            // 。 + ，。
-            // saveMeta() ， → 。
+            // retry: "", 
+            // .  + , . 
+            // saveMeta() ,  → . 
             discardPartial(dest);
             throw new Error(`Chunk failed (${c.start}-${c.end}): ${e.message}`);
           }
-          // ：system imagedownload
+          // : system imagedownload
           c.src += 1;
           // eslint-disable-next-line no-await-in-loop
           await new Promise((r) => setTimeout(r, 600 * c.tries));
@@ -641,12 +641,12 @@ async function downloadMulti(urls, dest, opt = {}) {
   return { file: dest, size, parallel: n, sources: same.length, multi: true, resumed: resume };
 }
 
-/** （chunk），success */
+/** (chunk), success */
 async function downloadAnyParallel(urls, dest, opt = {}) {
   const errors = [];
   for (const u of urls) {
-    // ：，
-    // A B ，（verifyfailure → ）。
+    // : , 
+    // A B , (verifyfailure → ). 
     discardPartial(dest);
     try {
       // eslint-disable-next-line no-await-in-loop

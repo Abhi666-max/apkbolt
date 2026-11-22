@@ -2,8 +2,8 @@
 /**
  * desktopshortcut + ICO 
  *
- * ICO Electron nativeImage ICO （DIB ， Windows version），
- * ， ImageMagick。
+ * ICO Electron nativeImage ICO (DIB ,  Windows version), 
+ * ,  ImageMagick. 
  */
 const fs = require('fs');
 const path = require('path');
@@ -20,13 +20,13 @@ function buildDib(bgra, size) {
   header.writeUInt32LE(0, 16);           // BI_RGB
   header.writeUInt32LE(size * size * 4, 20);
 
-  // XOR ：， BGRA
+  // XOR : ,  BGRA
   const xor = Buffer.alloc(size * size * 4);
   for (let y = 0; y < size; y++) {
     const srcRow = (size - 1 - y) * size * 4;
     bgra.copy(xor, y * size * 4, srcRow, srcRow + size * 4);
   }
-  // AND ：1bpp， 4 ， 0（ alpha ）
+  // AND : 1bpp,  4 ,  0( alpha )
   const maskRow = Math.ceil(size / 32) * 4;
   const mask = Buffer.alloc(maskRow * size, 0);
   return Buffer.concat([header, xor, mask]);
@@ -77,8 +77,8 @@ function safeFileName(name) {
 }
 
 /**
- * PNG-in-ICO：Vista ICO PNG，、 alpha。
- * APK WebP/ PNG， DIB failure。
+ * PNG-in-ICO: Vista ICO PNG, ,  alpha. 
+ * APK WebP/ PNG,  DIB failure. 
  */
 function pngBytesToIco(png) {
   if (!Buffer.isBuffer(png) || png.length < 24 || png.toString('ascii', 1, 4) !== 'PNG') return null;
@@ -101,10 +101,10 @@ function pngBytesToIco(png) {
 }
 
 /**
- * APK → ICO。fallback，shortcut：
- * 1) Electron （ PNG/JPEG）→ DIB ICO；
- * 2) decode （ Chromium WebP）→ PNG-in-ICO；
- * 3) → PNG-in-ICO。
+ * APK → ICO. fallback, shortcut: 
+ * 1) Electron ( PNG/JPEG)→ DIB ICO; 
+ * 2) decode ( Chromium WebP)→ PNG-in-ICO; 
+ * 3) → PNG-in-ICO. 
  */
 async function iconToIco(raw, { decode, onFallback } = {}) {
   const fail = (why) => { try { if (onFallback) onFallback(why); } catch (_) { /* ignore */ } };
@@ -116,7 +116,7 @@ async function iconToIco(raw, { decode, onFallback } = {}) {
       const ico = pngToIco(img.toPNG());
       if (ico) return ico;
     }
-  } catch (_) { /* PNG/JPEG， */ }
+  } catch (_) { /* PNG/JPEG,  */ }
 
   if (typeof decode === 'function') {
     try {
@@ -137,20 +137,20 @@ async function iconToIco(raw, { decode, onFallback } = {}) {
 }
 
 /**
- * shortcut：Windows .lnk，Linux（FydeOS / ChromeOS Linux 、
- * ） .desktop（freedesktop ）。
+ * shortcut: Windows .lnk, Linux(FydeOS / ChromeOS Linux , 
+ * ) .desktop(freedesktop ). 
  */
 function shortcutExt() {
   return process.platform === 'win32' ? '.lnk' : '.desktop';
 }
 
 /**
- * freedesktop .desktop launch。
+ * freedesktop .desktop launch. 
  *
- * Windows .lnk ，note：
- * - Exec path， .desktop `%` ， `%%`；
- * - chmod +x，desktoplaunch；
- * - PNG/SVG path，ICO Linux 。
+ * Windows .lnk , note: 
+ * - Exec path,  .desktop `%` ,  `%%`; 
+ * - chmod +x, desktoplaunch; 
+ * - PNG/SVG path, ICO Linux . 
  *
  * @param {object} opt { shortcutPath, target, args, iconPngPath, description }
  */
@@ -162,7 +162,7 @@ function writeDesktopEntry(opt) {
     throw new Error(`Shortcut directory not writable: ${dir} (${e.message})`);
   }
   const quote = (s) => `"${String(s).replace(/(["\\$`])/g, '\\$1').replace(/%/g, '%%')}"`;
-  // args shell ，parameters
+  // args shell , parameters
   const argv = String(opt.args || '').match(/"[^"]*"|\S+/g) || [];
   const execLine = [quote(opt.target), ...argv.map((a) => quote(a.replace(/^"|"$/g, '')))].join(' ');
   const icon = opt.iconPngPath && fs.existsSync(opt.iconPngPath) ? opt.iconPngPath : '';
@@ -180,7 +180,7 @@ function writeDesktopEntry(opt) {
     '',
   ].filter((l) => l !== '').join('\n');
   fs.writeFileSync(opt.shortcutPath, body, { encoding: 'utf8', mode: 0o755 });
-  try { fs.chmodSync(opt.shortcutPath, 0o755); } catch (_) { /* ，ignore */ }
+  try { fs.chmodSync(opt.shortcutPath, 0o755); } catch (_) { /* , ignore */ }
   if (!fs.existsSync(opt.shortcutPath)) {
     throw new Error(`Shortcut file was not written: ${opt.shortcutPath}`);
   }
@@ -190,14 +190,14 @@ function writeDesktopEntry(opt) {
 /**
  * desktopshortcut
  *
- * writeShortcutLink true ：、
- * desktopdirectory「success」。
- * ，path。
+ * writeShortcutLink true : , 
+ * desktopdirectory"success". 
+ * , path. 
  *
  * @param {object} opt { shortcutPath, target, args, iconIcoPath, description, cwd }
  */
 function writeShortcut(opt) {
-  // Linux / FydeOS： .desktop， Windows COM
+  // Linux / FydeOS:  .desktop,  Windows COM
   if (process.platform !== 'win32') {
     return writeDesktopEntry({
       shortcutPath: opt.shortcutPath,

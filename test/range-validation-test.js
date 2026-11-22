@@ -1,11 +1,11 @@
 'use strict';
 /**
- *  Node （/）。
- *  #9 2  Content-Range  416 ：
- *   - validRange 、、Content-Length；
- *   -  416 、；
- *   - /，。
- * ：node test/range-validation-test.js
+ *  Node (/). 
+ *  #9 2  Content-Range  416 : 
+ *   - validRange , , Content-Length; 
+ *   -  416 , ; 
+ *   - /, . 
+ * : node test/range-validation-test.js
  */
 const assert = require('assert/strict');
 const http = require('http');
@@ -56,8 +56,8 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-range-'));
   try {
-    // /416:  Range  416， Range  "good"
-    // /bad:  bytes=0-0 ， bytes 0-3/8（）
+    // /416:  Range  416,  Range  "good"
+    // /bad:  bytes=0-0 ,  bytes 0-3/8()
     const server = await serve((req, res) => {
       const r = req.headers.range;
       if (req.url === '/416') {
@@ -78,7 +78,7 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
     });
     const base = baseOf(server);
     try {
-      await atest('416：', async () => {
+      await atest('416: ', async () => {
         const out = path.join(dir, 'one');
         fs.writeFileSync(out, 'corrupt data');
         await download(`${base}/416`, out);
@@ -91,7 +91,7 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
         await assert.rejects(download(`${base}/bad`, out), /range/i);
       });
 
-      await atest('downloadParallel ，', async () => {
+      await atest('downloadParallel , ', async () => {
         const out = path.join(dir, 'two');
         await assert.rejects(
           downloadParallel(`${base}/bad`, out, { connections: 2, minChunk: 2, retries: 1 }),
@@ -108,7 +108,7 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
         );
       });
 
-      await atest('（ ）', async () => {
+      await atest('( )', async () => {
         const out = path.join(dir, 'ok');
         const r = await download(`${base}/ok`, out, { retries: 1 });
         assert.equal(fs.readFileSync(out, 'utf8'), 'abcdefgh');
@@ -121,6 +121,6 @@ const baseOf = (server) => `http://127.0.0.1:${server.address().port}`;
     fs.rmSync(dir, { recursive: true, force: true });
   }
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -1,26 +1,26 @@
 'use strict';
 /**
- * （memory / CPU / ）。
+ * (memory / CPU / ). 
  *
- * ：「Androidmemory」 qemu （-memory / -cores），
- * boot；「」「」，
- * electron，CI require 。
+ * : "Androidmemory" qemu (-memory / -cores), 
+ * boot; """", 
+ * electron, CI require . 
  *
- * （）：
- * 1. memory：Windows + 25%，，
- * Androidblack screen、，「emulator」。
- * 2. 「install × 1.8 + 2GB」：50GB 80~90GB，
- * install，failure。
- * 3. ：default， NaN。
+ * (): 
+ * 1. memory: Windows + 25%, , 
+ * Androidblack screen, , "emulator". 
+ * 2. "install × 1.8 + 2GB": 50GB 80~90GB, 
+ * install, failure. 
+ * 3. : default,  NaN. 
  */
 
 const DEFAULT_STEP_MB = 512;
 const MIN_MEM_MB = 1024;
-/** （Windows + ） */
+/** (Windows + ) */
 const HOST_RESERVE_RATIO = 0.25;
-/** hint「」 */
+/** hint"" */
 const TIGHT_RATIO = 0.8;
-/** （） */
+/** () */
 const ABSOLUTE_MIN_MB = 768;
 
 function toInt(v, fallback = 0) {
@@ -29,7 +29,7 @@ function toInt(v, fallback = 0) {
 }
 
 /**
- * 。parameters，；。
+ * . parameters, ; . 
  * @returns {{ totalMB:number, cores:number }}
  */
 function hostProfile(sys) {
@@ -42,7 +42,7 @@ function hostProfile(sys) {
     totalMB = Math.round(Number(src.totalmem) / 1048576);
   } else {
     try {
-      // require('os') ：
+      // require('os') : 
       const os = require('os');
       totalMB = Math.round(os.totalmem() / 1048576);
       cores = os.cpus() ? os.cpus().length : 0;
@@ -53,7 +53,7 @@ function hostProfile(sys) {
 }
 
 /**
- * memory。memory， 0。
+ * memory. memory,  0. 
  * @returns {{ minMB:number, maxMB:number, stepMB:number, totalMB:number }}
  */
 function memoryLimits(totalMB) {
@@ -65,7 +65,7 @@ function memoryLimits(totalMB) {
 }
 
 /**
- * memory。0 = ， 0（）。
+ * memory. 0 = ,  0(). 
  * @returns {{ mb:number, capped:boolean, reason:string }}
  */
 function clampMemoryMB(mb, totalMB) {
@@ -85,8 +85,8 @@ function clampMemoryMB(mb, totalMB) {
 }
 
 /**
- * CPU 。0 = 。
- * 「 - 1」， 1 ； 1 。
+ * CPU . 0 = . 
+ * " - 1",  1 ;  1 . 
  */
 function clampCores(n, hostCores) {
   const want = toInt(n);
@@ -100,7 +100,7 @@ function clampCores(n, hostCores) {
 }
 
 /**
- * memory（hint + ）。
+ * memory(hint + ). 
  * @returns {{ level:'ok'|'tight'|'insufficient'|'unknown', ratio:number, note:string }}
  */
 function memVerdict(allocMB, hostMB) {
@@ -108,23 +108,23 @@ function memVerdict(allocMB, hostMB) {
   const host = toInt(hostMB);
   if (!alloc || !host) return { level: 'unknown', ratio: 0, note: '' };
   if (alloc < ABSOLUTE_MIN_MB) {
-    return { level: 'insufficient', ratio: alloc / host, note: `Only ${alloc} MB allocated — Android may not start` };
+    return { level: 'insufficient', ratio: alloc / host, note: `Only ${alloc} MB allocated - Android may not start` };
   }
   const ratio = alloc / host;
   if (ratio > 1 - HOST_RESERVE_RATIO) {
     return {
       level: 'insufficient',
       ratio,
-      note: `Using ${Math.round(ratio * 100)}% of host memory — Windows will start paging and the emulator will slow down`,
+      note: `Using ${Math.round(ratio * 100)}% of host memory - Windows will start paging and the emulator will slow down`,
     };
   }
   if (ratio > TIGHT_RATIO * (1 - HOST_RESERVE_RATIO)) {
-    return { level: 'tight', ratio, note: `Using ${Math.round(ratio * 100)}% of host memory — consider closing browser tabs` };
+    return { level: 'tight', ratio, note: `Using ${Math.round(ratio * 100)}% of host memory - consider closing browser tabs` };
   }
   return { level: 'ok', ratio, note: '' };
 }
 
-/** installdata partitionspace（update） */
+/** installdata partitionspace(update) */
 function diskRequiredMB(packageBytes, ratio = 1.8, reserveMB = 2048) {
   const bytes = Math.max(0, Number(packageBytes) || 0);
   if (!bytes) return reserveMB;
@@ -132,18 +132,18 @@ function diskRequiredMB(packageBytes, ratio = 1.8, reserveMB = 2048) {
 }
 
 /**
- * data partition。disk 64GB failure。
+ * data partition. disk 64GB failure. 
  * @returns {{ maxGB:number, warnGB:number, freeMB:number }}
  */
 function diskLimits(freeMB) {
   const free = Math.max(0, toInt(freeMB));
-  // system imagespace（system image）， 20%
+  // system imagespace(system image),  20%
   const maxGB = Math.max(0, Math.floor((free / 1024) * 0.8));
   return { maxGB, warnGB: Math.max(0, maxGB - 8), freeMB: free };
 }
 
 /**
- * data partition（GB）。0 = 。
+ * data partition(GB). 0 = . 
  * @returns {{ gb:number, capped:boolean, reason:string }}
  */
 function clampDataGB(gb, freeMB) {
@@ -162,7 +162,7 @@ function clampDataGB(gb, freeMB) {
 }
 
 /**
- * 。
+ * . 
  * @returns {{ ok:boolean, needMB:number, freeMB:number, shortMB:number, note:string }}
  */
 function storageVerdict(freeMB, packageBytes) {
@@ -181,8 +181,8 @@ function storageVerdict(freeMB, packageBytes) {
 }
 
 /**
- * diskspace（50GB failure）。
- * storageVerdict ：「」，install。
+ * diskspace(50GB failure). 
+ * storageVerdict : "", install. 
  * @returns {{ ok:boolean, unknown?:boolean, freeMB:number, requiredMB:number, message:string }}
  */
 function diskVerdict(freeMB, requiredMB) {

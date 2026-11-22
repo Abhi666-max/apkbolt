@@ -1,15 +1,15 @@
 'use strict';
 /**
- * check · （）
+ * check  -  ()
  *
- * ：****snapshot obs， src/core/autodebug.js 。
- * failure —— ，「」，。
+ * : ****snapshot obs,  src/core/autodebug.js . 
+ * failure -- , "", . 
  *
- * （ 2~5 ）：
- * - runtime（ status： + adb ）
+ * ( 2~5 ): 
+ * - runtime( status:  + adb )
  * - adb 
- * - disk、data partitioncapacity、directory
- * - AVD 、snapshot、emulator
+ * - disk, data partitioncapacity, directory
+ * - AVD , snapshot, emulator
  * - logerror
  */
 const fs = require('fs');
@@ -17,7 +17,7 @@ const path = require('path');
 const { execFile } = require('child_process');
 const { AVD_NAME, SNAPSHOT_NAME } = require('./emulator');
 
-/** ：「 ready」 */
+/** : " ready" */
 let bootingSince = 0;
 
 function withTimeout(promise, ms, fallback) {
@@ -27,7 +27,7 @@ function withTimeout(promise, ms, fallback) {
   ]);
 }
 
-/** AVD directory .lock（directory） */
+/** AVD directory .lock(directory) */
 function countLocks(avdDir) {
   try {
     return fs.readdirSync(avdDir).filter((f) => /\.lock$/i.test(f)).length;
@@ -37,9 +37,9 @@ function countLocks(avdDir) {
 }
 
 /**
- * snapshot「」：snapshot.pb memorysystem image。
- * snapshotboot「failurecold boot」， GB disk。
- * ， —— repair。
+ * snapshot"": snapshot.pb memorysystem image. 
+ * snapshotboot"failurecold boot",  GB disk. 
+ * ,  -- repair. 
  */
 function inspectSnapshot(avdHome, avdName, snapshotName) {
   const base = path.join(avdHome, `${avdName}.avd`, 'snapshots', snapshotName);
@@ -52,7 +52,7 @@ function inspectSnapshot(avdHome, avdName, snapshotName) {
   return { present: true, stale, mb };
 }
 
-/** emulator（emulator.exe / qemu-system*.exe） */
+/** emulator(emulator.exe / qemu-system*.exe) */
 function countOrphanProcesses() {
   return new Promise((resolve) => {
     let out = '';
@@ -70,9 +70,9 @@ function countOrphanProcesses() {
 }
 
 /**
- * Windows Audio（Audiosrv）。
- * sc query true/false；probefailure null，
- * 「」，failure「」。
+ * Windows Audio(Audiosrv). 
+ * sc query true/false; probefailure null, 
+ * "", failure"". 
  */
 function queryWindowsAudioService() {
   return new Promise((resolve) => {
@@ -92,7 +92,7 @@ function queryWindowsAudioService() {
   });
 }
 
-/** logerror（ 300 ） */
+/** logerror( 300 ) */
 function recentLogErrors(files, max = 300) {
   const out = [];
   for (const file of files) {
@@ -136,13 +136,13 @@ async function collect(ctx) {
     audio: { checked: false, enabled: null, serviceRunning: null },
   };
 
-  // ---- settings（，） ----
+  // ---- settings(, ) ----
   let settings = {};
   try { settings = store.getSettings() || {}; } catch (_) { settings = {}; }
   obs.settings = {
     orientationMode: (settings.display && settings.display.orientationMode) || 'auto',
     landscape: !!(settings.display && settings.display.landscape),
-    // 0.6.0 defaultwindow： true embedded mode
+    // 0.6.0 defaultwindow:  true embedded mode
     windowEmbed: !!(settings.display && settings.display.windowEmbed === true),
     autoFullscreen: !!(settings.display && settings.display.autoFullscreenOnLaunch),
     keepSnapshot: !(settings.engine && settings.engine.keepSnapshot === false),
@@ -150,8 +150,8 @@ async function collect(ctx) {
   };
 
   // ---- ----
-  // audio=false emulator -no-audio launch，「 ApkStart 」；
-  // Windows Audio 。 0.6.2 check。
+  // audio=false emulator -no-audio launch, " ApkStart "; 
+  // Windows Audio .  0.6.2 check. 
   obs.audio = {
     checked: true,
     enabled: !(settings.engine && settings.engine.audio === false),
@@ -242,7 +242,7 @@ async function collect(ctx) {
 
   const orphans = await countOrphanProcesses();
   if (orphans !== null) {
-    // emulator.exe + qemu ，。
+    // emulator.exe + qemu , . 
     const expected = running ? 2 : 0;
     obs.runtime.orphans = Math.max(0, orphans - expected);
   }

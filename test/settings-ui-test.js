@@ -1,11 +1,11 @@
 'use strict';
 /**
- *  UI （ Electron ）
- * ：electron test/settings-ui-test.js
- * ：test/out/settings-*.png
- * ：（），
- *  Node ，「、」。
- * ： →  →  → 。
+ *  UI ( Electron )
+ * : electron test/settings-ui-test.js
+ * : test/out/settings-*.png
+ * : (), 
+ *  Node , ", ". 
+ * :  →  →  → . 
  */
 
 const { app, ipcMain, BrowserWindow } = require('electron');
@@ -40,9 +40,9 @@ const SETTINGS = {
 };
 
 const DEBUG_ISSUES = [
-  { code: 'device.unauthorized', category: 'device', severity: 'error', title: '', hint: '。', fix: 'restartRuntime', detail: '' },
-  { code: 'storage.diskLow', category: 'storage', severity: 'warn', title: '', hint: ' 8 GB。', fix: 'disk', detail: ' 5120 MB' },
-  { code: 'settings.orientationConflict', category: 'settings', severity: 'warn', title: '', hint: '。', fix: 'orientation', detail: '' },
+  { code: 'device.unauthorized', category: 'device', severity: 'error', title: '', hint: '. ', fix: 'restartRuntime', detail: '' },
+  { code: 'storage.diskLow', category: 'storage', severity: 'warn', title: '', hint: ' 8 GB. ', fix: 'disk', detail: ' 5120 MB' },
+  { code: 'settings.orientationConflict', category: 'settings', severity: 'warn', title: '', hint: '. ', fix: 'orientation', detail: '' },
 ];
 
 const OVERRIDES = {
@@ -51,7 +51,7 @@ const OVERRIDES = {
   'app:info': () => ({ version: '0.6.0', isDev: true, dataDir: 'C:\\data', runtimeDir: 'C:\\data\\runtime' }),
   'apps:list': () => ({ apps: [] }),
   'assoc:status': () => ({ registered: false }),
-  'doctor:profile': () => ({ profile: {}, text: ' · 4  / 4 GB / 720p' }),
+  'doctor:profile': () => ({ profile: {}, text: '  -  4  / 4 GB / 720p' }),
   'doctor:selfCheck': () => ({ issues: [], accel: { ok: true }, free: 102400 }),
   'doctor:report': () => ({ ok: true, file: 'C:\\report.txt' }),
   'runtime:usage': () => ({ totalText: '8.2 GB', reclaimableText: '1.1 GB', count: 3 }),
@@ -73,7 +73,7 @@ const OVERRIDES = {
   'keymap:isEnabled': () => ({ enabled: true }),
 };
 
-// ：app.js  .catch /
+// : app.js  .catch /
 const CHANNELS = [
   'apk:pick', 'apk:parse', 'apk:install', 'apk:reveal', 'dialog:openDir',
   'settings:restoreSystem', 'settings:refreshPointer', 'settings:unhook', 'settings:setSharedDir',
@@ -125,8 +125,8 @@ app.whenReady().then(async () => {
 
   const evalJs = (code) => win.webContents.executeJavaScript(code, true);
 
-  console.log('\n[ · ]');
-  // （）
+  console.log('\n[  -  ]');
+  // ()
   await evalJs(`document.getElementById('btnSettings').click()`);
   await new Promise((r) => setTimeout(r, 900));
   const modalOpen = await evalJs(`document.getElementById('settingsMask').classList.contains('on')`);
@@ -140,23 +140,23 @@ app.whenReady().then(async () => {
   }))()`);
   step('unit test verification', navInfo.items === 9, `${navInfo.items} `);
   step('unit test verification', navInfo.cats.indexOf('lab') >= 0, navInfo.cats.join(','));
-  // ：（localStorage），「」
+  // : (localStorage), ""
   const oneCat = navInfo.visible.length > 0 && navInfo.visible.every((c) => c === navInfo.visible[0]);
-  step('unit test verification', oneCat, `：${navInfo.visible.join(',')}`);
+  step('unit test verification', oneCat, `: ${navInfo.visible.join(',')}`);
 
-  // 「」
+  // ""
   await evalJs(`document.querySelector('#setNav .set-nav-item[data-cat="display"]').click()`);
   await new Promise((r) => setTimeout(r, 300));
   const afterSwitch = await evalJs(`(() => ({
     visible: Array.from(document.querySelectorAll('#settingsBody [data-cat]')).filter(g => !g.hidden).map(g => g.dataset.cat),
     on: document.querySelector('#setNav .set-nav-item.on') ? document.querySelector('#setNav .set-nav-item.on').dataset.cat : '',
   }))()`);
-  step('「 」', afterSwitch.visible.length > 0 && afterSwitch.visible.every((c) => c === 'display'), `：${afterSwitch.visible.join(',')}`);
-  step('unit test verification', afterSwitch.on === 'display', `：${afterSwitch.on}`);
+  step('" "', afterSwitch.visible.length > 0 && afterSwitch.visible.every((c) => c === 'display'), `: ${afterSwitch.visible.join(',')}`);
+  step('unit test verification', afterSwitch.on === 'display', `: ${afterSwitch.on}`);
 
   await win.capturePage().then((img) => fs.writeFileSync(path.join(OUT, 'settings-display.png'), img.toPNG()));
 
-  // 「」，
+  // "", 
   await evalJs(`document.querySelector('#setNav .set-nav-item[data-cat="lab"]').click()`);
   await new Promise((r) => setTimeout(r, 300));
   const lab = await evalJs(`(() => ({
@@ -165,11 +165,11 @@ app.whenReady().then(async () => {
     hasKeep: !!document.getElementById('setKeepBackground'),
     notice: (document.querySelector('#labGroup .lab-notice') || {}).textContent || '',
   }))()`);
-  step('「 」', lab.visible.length > 0 && lab.visible.every((c) => c === 'lab'), `：${lab.visible.join(',')}`);
+  step('" "', lab.visible.length > 0 && lab.visible.every((c) => c === 'lab'), `: ${lab.visible.join(',')}`);
   step('unit test verification', lab.hasSwitch && lab.hasKeep, `switch=${lab.hasSwitch} keep=${lab.hasKeep}`);
   step('unit test verification', /Experimental/i.test(lab.notice), lab.notice.slice(0, 30));
 
-  // 「」，
+  // "", 
   await evalJs(`document.querySelector('#setNav .set-nav-item[data-cat="diag"]').click()`);
   await new Promise((r) => setTimeout(r, 400));
   const diag = await evalJs(`(() => ({
@@ -179,17 +179,17 @@ app.whenReady().then(async () => {
     text: (document.getElementById('autodebugStateText') || {}).textContent || '',
     fixBtns: document.querySelectorAll('#autodebugList .dbg-fix').length,
   }))()`);
-  step('「 」 、', diag.visible.includes('diag') && diag.visible.length === 3, `：${diag.visible.join(',')}`);
+  step('" " , ', diag.visible.includes('diag') && diag.visible.length === 3, `: ${diag.visible.join(',')}`);
   step('unit test verification', diag.groups >= 3 && diag.items === 3, `${diag.groups}  / ${diag.items} `);
-  step('「 」', diag.fixBtns === 3, `${diag.fixBtns} `);
+  step('" "', diag.fixBtns === 3, `${diag.fixBtns} `);
   step('unit test verification', /Last checked/i.test(diag.text), diag.text);
 
-  // （，）
+  // (, )
   await evalJs(`document.getElementById('autodebugGroup').scrollIntoView({ block: 'start' })`);
   await new Promise((r) => setTimeout(r, 900));
   await win.capturePage().then((img) => fs.writeFileSync(path.join(OUT, 'settings-diag.png'), img.toPNG()));
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
   await evalJs(`(() => { const s = document.getElementById('setSearch'); s.value = ''; s.dispatchEvent(new Event('input')); })()`);
   await new Promise((r) => setTimeout(r, 300));
   const search = await evalJs(`(() => ({
@@ -197,8 +197,8 @@ app.whenReady().then(async () => {
     names: Array.from(document.querySelectorAll('#settingsBody [data-cat]')).filter(g => !g.hidden).map(g => (g.querySelector('.group-title')||{}).textContent),
     clearVisible: !document.getElementById('btnClearSearch').hidden,
   }))()`);
-  step('「 」', search.visible >= 1, ` ${search.visible} ：${search.names.join(' / ')}`);
-  step('（ ）', search.visible >= 1);
+  step('" "', search.visible >= 1, ` ${search.visible} : ${search.names.join(' / ')}`);
+  step('( )', search.visible >= 1);
   step('unit test verification', search.clearVisible);
 
   await win.capturePage().then((img) => fs.writeFileSync(path.join(OUT, 'settings-search.png'), img.toPNG()));
@@ -206,17 +206,17 @@ app.whenReady().then(async () => {
   await evalJs(`document.getElementById('btnClearSearch').click()`);
   await new Promise((r) => setTimeout(r, 250));
   const afterClear = await evalJs(`(() => Array.from(document.querySelectorAll('#settingsBody [data-cat]')).filter(g => !g.hidden).map(g => g.dataset.cat))()`);
-  step('unit test verification', afterClear.length > 0 && afterClear.every((c) => c === 'diag'), `：${afterClear.join(',')}`);
+  step('unit test verification', afterClear.length > 0 && afterClear.every((c) => c === 'diag'), `: ${afterClear.join(',')}`);
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
   const remembered = await evalJs(`localStorage.getItem('apkstart.settings.cat')`);
-  step('unit test verification', remembered === 'diag', `：${remembered}`);
+  step('unit test verification', remembered === 'diag', `: ${remembered}`);
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
   const realErrors = errors.filter((e) => !/Autofill|devtools|Request Autofill/i.test(e));
   step('unit test verification', realErrors.length === 0, realErrors.slice(0, 3).join(' | '));
 
-  console.log(`\n：${passed} ，${failed} `);
+  console.log(`\n: ${passed} , ${failed} `);
   app.exit(failed ? 1 : 0);
 }).catch((e) => {
   console.error(e);

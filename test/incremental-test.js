@@ -1,7 +1,7 @@
 'use strict';
 /**
- * ：、、、apply 、。
- * ， GitHub / Gitee。
+ * : , , , apply , . 
+ * ,  GitHub / Gitee. 
  */
 const fs = require('fs');
 const path = require('path');
@@ -32,12 +32,12 @@ const sampleFiles = {
   'resources/app/src/main.js': { sha256: 'BBB', size: 9 },
 };
 
-console.log('\n[ · ]');
+console.log('\n[  -  ]');
 test('parseManifest', () => {
   for (const bad of ['not json', '{}', JSON.stringify({ schema: 2 }), JSON.stringify({ schema: 1, version: '1' })]) {
     let threw = false;
     try { inc.parseManifest(bad); } catch (_) { threw = true; }
-    assert(threw, `：${bad.slice(0, 30)}`);
+    assert(threw, `: ${bad.slice(0, 30)}`);
   }
 });
 
@@ -49,7 +49,7 @@ test('parseManifest', () => {
   assert(m.version === '0.6.3' && m.app.files['resources/app/package.json'], 'assertion failed');
 });
 
-test('（ / / ）', () => {
+test('( / / )', () => {
   assert(inc.isAuxAsset('ApkStart-v0.6.3-manifest.json'));
   assert(inc.isAuxAsset('ApkStart-v0.6.3-app.zip'));
   assert(inc.isAuxAsset('ApkStart-runtime-v0.6.3.zip'));
@@ -65,7 +65,7 @@ test('Electron / →', () => {
   assert(inc.chooseMode({ flavor: 'portable', electronVersion: '33.4.11', manifest, assets: [] }).mode === 'full');
 });
 
-console.log('\n[ · ]');
+console.log('\n[  -  ]');
 (async () => {
   const dir = path.join(TMP, 'hash');
   fs.mkdirSync(path.join(dir, 'resources', 'app', 'src'), { recursive: true });
@@ -85,15 +85,15 @@ console.log('\n[ · ]');
     assert(!r.ok);
   });
 
-  await atest('verifyExtracted ，', async () => {
+  await atest('verifyExtracted , ', async () => {
     const ok = { 'resources/app/package.json': files['resources/app/package.json'] };
     assert((await inc.verifyExtracted({ payload: dir, files: ok, hash })).length === 0);
     const bad = { 'resources/app/package.json': { sha256: '0'.repeat(64) } };
     assert((await inc.verifyExtracted({ payload: dir, files: bad, hash })).length === 1);
   });
 
-  console.log('\n[ · check ]');
-  await atest('check() ，', async () => {
+  console.log('\n[  -  check ]');
+  await atest('check() , ', async () => {
     const exe = path.join(TMP, 'check', 'ApkStart.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
     fs.writeFileSync(exe, 'x');
@@ -114,8 +114,8 @@ console.log('\n[ · ]');
     assert(info.hasUpdate);
   });
 
-  console.log('\n[ · apply ]');
-  test('app resources/app、', () => {
+  console.log('\n[  -  apply ]');
+  test('app resources/app, ', () => {
     const dataDir = path.join(TMP, 'apply');
     const exe = path.join(dataDir, 'ApkStart.exe');
     fs.mkdirSync(dataDir, { recursive: true });
@@ -132,7 +132,7 @@ console.log('\n[ · ]');
     assert(!/Join-Path \$src '\*'\) -Destination \$dst -Recurse/.test(script), 'assertion failed');
   });
 
-  test('，', () => {
+  test(', ', () => {
     const dataDir = path.join(TMP, 'forcefull');
     const exe = path.join(dataDir, 'ApkStart.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
@@ -149,7 +149,7 @@ console.log('\n[ · ]');
     assert(/\.apkstart-force-full/.test(script), 'apply');
   });
 
-  test('findResumableJob ，', () => {
+  test('findResumableJob , ', () => {
     const dataDir = path.join(TMP, 'resume');
     const exe = path.join(dataDir, 'ApkStart.exe');
     fs.mkdirSync(path.dirname(exe), { recursive: true });
@@ -160,7 +160,7 @@ console.log('\n[ · ]');
     fs.writeFileSync(path.join(appPayload, 'resources', 'app', 'package.json'), '{}');
     u._markPayloadReady(appPayload, '0.6.3', 'app');
     const job = u.findResumableJob();
-    assert(job && job.mode === 'app' && job.version === '0.6.3', ` app ， ${JSON.stringify(job)}`);
+    assert(job && job.mode === 'app' && job.version === '0.6.3', ` app ,  ${JSON.stringify(job)}`);
 
     const zipPayload = path.join(dataDir, 'update', '0.6.4', 'payload');
     fs.mkdirSync(zipPayload, { recursive: true });
@@ -171,7 +171,7 @@ console.log('\n[ · ]');
     assert(job2 && job2.mode === 'zip' && job2.version === '0.6.4', 'assertion failed');
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
   test('build/incremental.js', async () => {
     const fixture = path.join(TMP, 'portable');
     fs.mkdirSync(path.join(fixture, 'resources', 'app', 'src'), { recursive: true });
@@ -188,15 +188,15 @@ console.log('\n[ · ]');
     assert(!m.app.files['ApkStart.exe'], 'assertion failed');
     const zf = new ZipFile(r.appZip);
     const names = zf.names();
-    assert(names.some((n) => /resources\/app\/package\.json/.test(n)), ` package.json：${names}`);
+    assert(names.some((n) => /resources\/app\/package\.json/.test(n)), ` package.json: ${names}`);
     assert(!names.some((n) => /ApkStart\.exe/.test(n)), 'exe');
     zf.close();
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   fs.rmSync(TMP, { recursive: true, force: true });
   process.exit(failed ? 1 : 0);
 })().catch((e) => {
-  console.error('：', e);
+  console.error(': ', e);
   process.exit(1);
 });

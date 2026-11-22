@@ -1,8 +1,8 @@
 'use strict';
 /**
- * （， Electron / adb）。
- * - ：Android ，；
- * - window：portrait，window Qt ，app。
+ * (,  Electron / adb). 
+ * - : Android , ; 
+ * - window: portrait, window Qt , app. 
  */
 function densityFor(w, h, manual) {
   if (manual > 0) return Math.max(120, Math.min(640, Math.round(manual)));
@@ -28,10 +28,10 @@ function defaultBounds(area) {
 }
 
 /**
- * = 。
- * emulatorwindowboot LCD （9:16）， SW_MAXIMIZE 
- * 、window；、，
- * 「app」，。
+ * = . 
+ * emulatorwindowboot LCD (9:16),  SW_MAXIMIZE 
+ * , window; , , 
+ * "app", . 
  */
 function fullscreenBounds(portrait, area) {
   const p = portraitSize(portrait);
@@ -46,11 +46,11 @@ function fullscreenBounds(portrait, area) {
 }
 
 /**
- * Android ：portrait。
- * ：emulatorwindowboot LCD （ 1920x1080 
- * window 9:16，）。「」= window
- * ，「window」= portrait， Android ，
- * restartruntime，app。
+ * Android : portrait. 
+ * : emulatorwindowboot LCD ( 1920x1080 
+ * window 9:16, ). ""= window
+ * , "window"= portrait,  Android , 
+ * restartruntime, app. 
  */
 function sizeFor(mode, portrait, area) {
   return portraitSize(portrait);

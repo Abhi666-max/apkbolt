@@ -1,7 +1,7 @@
 'use strict';
 /**
- * ：app + settings
- * directory：%APPDATA%\apkstart（MSIX/store version STORE_BUILD ）
+ * : app + settings
+ * directory: %APPDATA%\apkstart(MSIX/store version STORE_BUILD )
  */
 const fs = require('fs');
 const path = require('path');
@@ -9,18 +9,18 @@ const os = require('os');
 const { safeFilePart } = require('./pkgname');
 
 /**
- * Microsoft Store（MSIX / APPX）？
+ * Microsoft Store(MSIX / APPX)?
  *
  * MSIX full-trust app `%APPDATA%` / `%LOCALAPPDATA%` ****
- * `%LOCALAPPDATA%\Packages\<PackageFamilyName>\LocalCache\...`，
- * API 「path」。：
- * 1. %APPDATA%\apkstart spawn emulator/adb/qemu ，
- * path「」；
- * 2. 「directory」directory。
- * store versiondirectory AppData ****（%USERPROFILE%\ApkStart），
- * ，。
+ * `%LOCALAPPDATA%\Packages\<PackageFamilyName>\LocalCache\...`, 
+ * API "path". : 
+ * 1. %APPDATA%\apkstart spawn emulator/adb/qemu , 
+ * path""; 
+ * 2. "directory"directory. 
+ * store versiondirectory AppData ****(%USERPROFILE%\ApkStart), 
+ * , . 
  *
- * process.windowsStore Electron MSIX/APPX （ node undefined）。
+ * process.windowsStore Electron MSIX/APPX ( node undefined). 
  */
 const STORE_BUILD = (() => {
   try { return !!require('electron').app?.isPackaged && !!process.windowsStore; } catch (_) { return false; }
@@ -42,107 +42,107 @@ const DEFAULT_SETTINGS = {
   adbPath: '',
   device: '127.0.0.1:5555',
   /**
- * driver（patch）： JSON patchdirectory drivers/ 。
- * 「 id」——default，，。
+ * driver(patch):  JSON patchdirectory drivers/ . 
+ * " id"--default, , . 
    */
   drivers: { state: {}, disabled: [] },
   engine: {
-    // runtime：runtime（builtin）。 settings.json ，
-    // settings 'builtin'（ getSettings ）。
+    // runtime: runtime(builtin).  settings.json , 
+    // settings 'builtin'( getSettings ). 
     mode: 'builtin',
     qemuPath: '',
     systemImage: '',
     memoryMB: 0,             // 0 = doctor memory
     cores: 0,                // 0 =
-    autoMemory: true,        // configuration：memory//disk/parameters
+    autoMemory: true,        // configuration: memory//disk/parameters
     idleShutdownMinutes: 15,
     startVisible: true,
-    // window： SurfaceFlinger VSYNC，app。
-    // windowemulator 60fps + mouse，ApkStart appwindow。
+    // window:  SurfaceFlinger VSYNC, app. 
+    // windowemulator 60fps + mouse, ApkStart appwindow. 
     headless: false,
     gpuMode: 'auto',         // auto = emulator versionfallback
-    // 「」（ `<emulatorversion>|<gpu>`）；auto ，
-    // boot 20 。upgraderuntime。
+    // ""( `<emulatorversion>|<gpu>`); auto , 
+    // boot 20 . upgraderuntime. 
     badGpu: '',
-    forceTcg: false,         // ；path doctor
-    audio: true,             // Androidapp（hint/）。 CPU
-    // ---- （default，）----
-    liteMode: true,          // vCPU ， qemu Windows
-    // ：save（）/ balanced（）/ smooth（，·）。
-    // ， liteMode / priorityMode / renderSize，
-    // 。
+    forceTcg: false,         // ; path doctor
+    audio: true,             // Androidapp(hint/).  CPU
+    // ---- (default, )----
+    liteMode: true,          // vCPU ,  qemu Windows
+    // : save()/ balanced()/ smooth(,  - ). 
+    // ,  liteMode / priorityMode / renderSize, 
+    // . 
     resourceMode: 'balanced',
-    // data partitioncapacity（GB）：app、cacheupdate。
-    // 0 = （disk 6/8GB）。Android****，app。
+    // data partitioncapacity(GB): app, cacheupdate. 
+    // 0 = (disk 6/8GB). Android****, app. 
     dataPartitionGB: 0,
-    // ：、；auto = 720x1280 / 540x960
+    // : , ; auto = 720x1280 / 540x960
     renderSize: 'auto',
-    // network：emulator DNS。Androiddefault 10.0.2.3 DNS，
-    // VPN / / ，app。
+    // network: emulator DNS. Androiddefault 10.0.2.3 DNS, 
+    // VPN / / , app. 
     fastDns: true,
-    // ：boot emulator -prop （guest setprop SELinux ）。
-    // default。 zh-CN 。
+    // : boot emulator -prop (guest setprop SELinux ). 
+    // default.  zh-CN . 
     locale: 'en-US',
     chineseIme: false,
     chineseImeDefault: false,
-    // snapshot：quickboot memorysnapshotlaunch，disk 2~3GB
-    // ram.bin。disk（launch，app）。
+    // snapshot: quickboot memorysnapshotlaunch, disk 2~3GB
+    // ram.bin. disk(launch, app). 
     keepSnapshot: true,
-    // log（KB）：，disk
+    // log(KB): , disk
     logLimitKB: 2048,
-    // mousekeymap：emulator「/」，。
-    // wheelhook，appwindow，uninstall。
-    mouseRightBack: true,    // = Android（ Qt default「」）
+    // mousekeymap: emulator"/", . 
+    // wheelhook, appwindow, uninstall. 
+    mouseRightBack: true,    // = Android( Qt default"")
     mouseWheelMode: 'smooth', // smooth = | native = Qt | off =
-    mouseSideButtons: false, // side buttons/：default，
-    deepTrim: false,         // （Play /），default
+    mouseSideButtons: false, // side buttons/: default, 
+    deepTrim: false,         // (Play /), default
     // balanced= | performance=qemu Normal | game=qemu High +
   priorityMode: 'balanced',
-    // ：launch ApkStart Android，app。
-    // resident 1GB memory（ WSA / app），。
+    // : launch ApkStart Android, app. 
+    // resident 1GB memory( WSA / app), . 
     prewarm: true,
-    // window（B ）：app、window。default，
-    // 「」window；reclaim，。
+    // window(B ): app, window. default, 
+    // ""window; reclaim, . 
     multiWindow: false,
-    // windowapp（、）。
-    // 0 = memory（），default 1。
+    // windowapp(, ). 
+    // 0 = memory(), default 1. 
     keepBackground: 1,
-    // key（→）：default，settings
+    // key(→): default, settings
     keymapEnabled: true,
-    // appkey：{ "com.example.game": [{key:'w',action:'tap',x:0.15,y:0.75}, ...] }
+    // appkey: { "com.example.game": [{key:'w',action:'tap',x:0.15,y:0.75}, ...] }
     keymaps: {},
   },
   runtime: {
     dir: '',                 // = %APPDATA%\apkstart\runtime
     qemuUrl: '',             // QEMU install
     isoUrl: '',              // system image
-    isoPath: '',             // system image（ISO）path
+    isoPath: '',             // system image(ISO)path
     diskPath: '',            // installdisk
     diskSizeGB: 24,
-    headless: false,         // window（）
-    installMode: 'guided',   // guided（install） | auto（install）
-    emulatorUrl: '',         // emulator （ = SDK ）
+    headless: false,         // window()
+    installMode: 'guided',   // guided(install) | auto(install)
+    emulatorUrl: '',         // emulator ( = SDK )
     sysimgUrl: '',           // system image
-    compatImage: false,      // ARM ： Google Play system image（ native bridge， ARM-only app）
-    deployFailedAt: 0,       // failure（0=failure）。failure 30
-    // runtime：default GitHub Release download（「update」），
-    // dl.google.com download。system image。
+    compatImage: false,      // ARM :  Google Play system image( native bridge,  ARM-only app)
+    deployFailedAt: 0,       // failure(0=failure). failure 30
+    // runtime: default GitHub Release download("update"), 
+    // dl.google.com download. system image. 
     preferGithubRuntime: true,
     runtimePackUrl: '',
-    // GitHub system image（）。 GitHub Releases KB/s，
-    // https://ghfast.top/ system image downloads 。
-    // = （ 8 chunk，）。
+    // GitHub system image().  GitHub Releases KB/s, 
+    // https://ghfast.top/ system image downloads . 
+    // = ( 8 chunk, ). 
     mirrorPrefix: '',
-    // download：chunkdownload。default 8，/ 16。
+    // download: chunkdownload. default 8, / 16. 
     downloadConnections: 8,
-    // update/download。auto = GitHub Gitee、download
-    // 128KB ，；（network）。
+    // update/download. auto = GitHub Gitee, download
+    // 128KB , ; (network). 
     sourcePreference: 'auto',
-    // GitHub system image（ghfast / gh-proxy）。 + custom。
-    // ， release ，。
+    // GitHub system image(ghfast / gh-proxy).  + custom. 
+    // ,  release , . 
     autoMirror: true,
-    // Gitee releases access_token（ token 404），
-    // Gitee update token； GitHub + system image。
+    // Gitee releases access_token( token 404), 
+    // Gitee update token;  GitHub + system image. 
     giteeToken: '',
   },
   sharedDir: path.join(os.homedir(), 'ApkStartShared'),
@@ -151,52 +151,52 @@ const DEFAULT_SETTINGS = {
   createShortcutOnInstall: true,
   createStartMenuShortcut: true, // shortcut = Windows app
   shortcutDir: '',           // = desktop
-  freeform: false,           // runtimewindow， Android freeform
-  hideAfterLaunch: false,    // resident，exit Android runtime
+  freeform: false,           // runtimewindow,  Android freeform
+  hideAfterLaunch: false,    // resident, exit Android runtime
   notifyOnInstall: true,
-  autoStart: true,           // boot，default，settings
-  autoDeploy: true,          // complete， 1~5
-  // launch：lastDate （），
-  // disabled = 「」。
+  autoStart: true,           // boot, default, settings
+  autoDeploy: true,          // complete,  1~5
+  // launch: lastDate (), 
+  // disabled = "". 
   welcome: { lastDate: '', disabled: false },
   /**
- * check（ debug）：，。
- * auto = ；intervalMin = （）；
- * notify = 「」（）。
+ * check( debug): , . 
+ * auto = ; intervalMin = (); 
+ * notify = ""(). 
    */
   debug: { auto: true, intervalMin: 10, notify: true },
   display: {
-    mode: 'window',          // window（portraitwindow，） | fullscreen（）
-    portrait: '900x1600',    // windowportrait，settings
+    mode: 'window',          // window(portraitwindow, ) | fullscreen()
+    portrait: '900x1600',    // windowportrait, settings
     density: 0,              // 0 =
     rememberBounds: true,    // appwindow/
     autoFullscreenOnLaunch: false,
-    // landscape = AVD 1280x720 restart（+）。
-    // ，restart ApkStart orientationboot。
+    // landscape = AVD 1280x720 restart(+). 
+    // , restart ApkStart orientationboot. 
     landscape: false,
-    // orientation：
-    // auto = apporientation（recommended，window）
+    // orientation: 
+    // auto = apporientation(recommended, window)
     // landscape = landscape
     // portrait = portrait
-    // landscape auto 「orientation」，
-    // restartForOrientation ，apporientation。
+    // landscape auto "orientation", 
+    // restartForOrientation , apporientation. 
     orientationMode: 'auto',
-    // ： guest 190dpi（720 → sw606dp ≥ 600dp，
-    // Android ）。app，
-    // 「」。system imagedefault（）。
+    // :  guest 190dpi(720 → sw606dp ≥ 600dp, 
+    // Android ). app, 
+    // "". system imagedefault(). 
     tabletMode: true,
-    // window：false=emulatorwindow（Qt ，orientation//
-    // ，）；
-    // true=Android SetParent ApkStart window（，
-    // rotate///）。
-    // 0.6.0 defaultwindow：embedded modewindow，
-    // 、rotate、app，// ——
-    // ，window。
-    // settings（display.windowEmbed）。
+    // window: false=emulatorwindow(Qt , orientation//
+    // , ); 
+    // true=Android SetParent ApkStart window(, 
+    // rotate///). 
+    // 0.6.0 defaultwindow: embedded modewindow, 
+    // , rotate, app, // --
+    // , window. 
+    // settings(display.windowEmbed). 
     windowEmbed: false,
-    // In-guest「rotate」：default（ guest accelerometer_rotation=1），
-    // orientation wm user-rotation lock + set-ignore-orientation-request ，
-    // 。。
+    // In-guest"rotate": default( guest accelerometer_rotation=1), 
+    // orientation wm user-rotation lock + set-ignore-orientation-request , 
+    // . . 
     autoRotate: true,
   },
 };
@@ -231,9 +231,9 @@ function ensureDirs() {
 function readJson(file, fallback) {
   try {
     let text = fs.readFileSync(file, 'utf8');
-    // UTF-8 BOM。 BOM JSON.parse ，configuration
-    // default —— 「settings」，。
-    // settings、、， BOM。
+    // UTF-8 BOM.  BOM JSON.parse , configuration
+    // default -- "settings", . 
+    // settings, , ,  BOM. 
     if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
     return JSON.parse(text);
   } catch (_) {
@@ -261,12 +261,12 @@ function deepMerge(base, patch) {
 }
 
 /**
- * → 。
- * save ：2 vCPU + + 540x960， / ；
- * balanced ：vCPU （2~4）+ + 720x1280；
- * smooth ： vCPU + + 720x1280，。
- * 1080p：quickboot snapshot，cold boot， 720p
- * window，。
+ * → . 
+ * save : 2 vCPU + + 540x960,  / ; 
+ * balanced : vCPU (2~4)+ + 720x1280; 
+ * smooth :  vCPU + + 720x1280, . 
+ * 1080p: quickboot snapshot, cold boot,  720p
+ * window, . 
  */
 function resourcePreset(mode) {
   switch (String(mode || '')) {
@@ -282,44 +282,44 @@ function resourcePreset(mode) {
 
 const store = {
   DATA_DIR, ICON_DIR, APK_DIR,
-  // （MSIX）：main.js update、driverinstall
+  // (MSIX): main.js update, driverinstall
   STORE_BUILD,
 
   getSettings() {
     const s = deepMerge(DEFAULT_SETTINGS, readJson(SETTINGS_FILE, {}));
     /**
- * 0.5.6 ：configuration mode=mumu / fydeos / attach，
- * ， builtin ，。
+ * 0.5.6 : configuration mode=mumu / fydeos / attach, 
+ * ,  builtin , . 
      *
- * memory，disk：settings，
- * settings；「 ApkStart settings.json」。
+ * memory, disk: settings, 
+ * settings; " ApkStart settings.json". 
      */
     s.engine.mode = 'builtin';
     for (const k of ['mumuPath', 'mumuIndex', 'mumuRenderProfile', 'mumuMemoryGB', 'mumuCores', 'fydeosHost']) {
       delete s.engine[k];
     }
-    // versiondefault：appwindow，「」。
-    // window，configuration。
+    // versiondefault: appwindow, "". 
+    // window, configuration. 
     s.engine.headless = false;
-    // versionexit Android runtime，desktop。
+    // versionexit Android runtime, desktop. 
     s.hideAfterLaunch = false;
-    // version Android freeform ，emulatorwindowappwindow，
-    // app，「window」。
+    // version Android freeform , emulatorwindowappwindow, 
+    // app, "window". 
     s.freeform = false;
 
     /**
- * Final decision on window hosting mode：**defaultemulatorwindow**。
+ * Final decision on window hosting mode: **defaultemulatorwindow**. 
      *
- * 0.5.9 embedded mode，（SetParent + 
- * SetWindowPos window）/rotate/app，、
- * 、，。windowemulator
- * ，，default。
+ * 0.5.9 embedded mode, (SetParent + 
+ * SetWindowPos window)/rotate/app, , 
+ * , , . windowemulator
+ * , , default. 
      *
- * 「」：**settings**
- * （windowEmbedChosen settings），，disk。
- * windowEmbedMigrated2 true ，configuration
- * windowEmbed:true —— upgradelaunchwindow，
- * 「defaultsettings」。「」，。
+ * "": **settings**
+ * (windowEmbedChosen settings), , disk. 
+ * windowEmbedMigrated2 true , configuration
+ * windowEmbed:true -- upgradelaunchwindow, 
+ * "defaultsettings". "", . 
      */
     try {
       const raw = readJson(SETTINGS_FILE, {});
@@ -328,20 +328,20 @@ const store = {
       if (d.windowEmbedChosen !== true && d.windowEmbed !== false) {
         s.display.windowEmbed = false;
         s.display.windowEmbedMigrated2 = true;
-        // ，configuration；。
+        // , configuration; . 
         writeJson(SETTINGS_FILE, {
           ...raw,
           display: { ...d, windowEmbed: false, windowEmbedMigrated2: true },
         });
       }
-    } catch (_) { /* failurelaunch， */ }
+    } catch (_) { /* failurelaunch,  */ }
 
     return s;
   },
 
   saveSettings(patch) {
     const next = deepMerge(this.getSettings(), patch);
-    // 「」，，configuration
+    // "", , configuration
     if (patch && patch.engine && patch.engine.resourceMode) {
       Object.assign(next.engine, resourcePreset(next.engine.resourceMode));
     }
@@ -377,8 +377,8 @@ const store = {
   },
 
   iconPath(pkg) {
-    // ：pkg APK / apps.json，directory。
-    // version， ICON_DIR path（issue #2 P0-1）。
+    // : pkg APK / apps.json, directory. 
+    // version,  ICON_DIR path(issue #2 P0-1). 
     return path.join(ICON_DIR, `${safeFilePart(pkg)}.png`);
   },
 

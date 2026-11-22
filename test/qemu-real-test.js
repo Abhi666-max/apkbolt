@@ -1,11 +1,11 @@
 'use strict';
 /**
- *  QEMU （ qemu-system-x86_64.exe）
- * ：
+ *  QEMU ( qemu-system-x86_64.exe)
+ * : 
  *  1. ApkStart  QEMU  QEMU 
  *  2. qemu-img 
- *  3. QEMU monitor（TCP） + sendkey + 
- * ：node test/qemu-real-test.js   （ QEMU ）
+ *  3. QEMU monitor(TCP) + sendkey + 
+ * : node test/qemu-real-test.js   ( QEMU )
  */
 const os = require('os');
 const fs = require('fs');
@@ -32,7 +32,7 @@ function assert(c, m) { if (!c) throw new Error(m || 'Assertion failed'); }
 
 (async () => {
   if (!QEMU) {
-    console.log('（： QEMU，：winget install SoftwareFreedomConservancy.QEMU）');
+    console.log('(:  QEMU, : winget install SoftwareFreedomConservancy.QEMU)');
     process.exit(0);
   }
   const ver = execFileSync(QEMU, ['--version'], { encoding: 'utf8' });
@@ -64,10 +64,10 @@ function assert(c, m) { if (!c) throw new Error(m || 'Assertion failed'); }
     proc.on('exit', (c) => { exited = c; });
 
     await new Promise((r) => setTimeout(r, 4000));
-    assert(exited === null, `QEMU  4s （code=${exited}），`);
+    assert(exited === null, `QEMU  4s (code=${exited}), `);
     assert(!proc.killed, 'assertion failed');
 
-    await test('monitor （ QEMU）', async () => {
+    await test('monitor ( QEMU)', async () => {
       const buf = await rt.monitorCmd('info status', { timeout: 5000 });
       assert(/running|paused/i.test(buf), `monitor : ${buf.slice(-80)}`);
       await rt.monitorCmd('sendkey ctrl-alt-delete');
@@ -82,7 +82,7 @@ function assert(c, m) { if (!c) throw new Error(m || 'Assertion failed'); }
   });
 
   console.log(out.join('\n'));
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   try { fs.rmSync(process.env.APPDATA, { recursive: true, force: true }); } catch (_) { /* ignore */ }
   process.exit(failed ? 1 : 0);
 })();

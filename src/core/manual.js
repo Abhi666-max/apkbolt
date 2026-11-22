@@ -9,7 +9,7 @@
 
 /** Section id to anchor mapping in src/ui/manual.html */
 const TOPICS = Object.freeze({
-  overview: { id: 'overview', anchor: 'apkbolt-user-guide', title: 'ApkBolt User Guide · Table of Contents' },
+  overview: { id: 'overview', anchor: 'apkbolt-user-guide', title: 'ApkBolt User Guide  -  Table of Contents' },
   accel: { id: 'accel', anchor: '6-1-hardware-acceleration-slow-boot', title: 'Hardware Acceleration / Slow Boot' },
   install: { id: 'install', anchor: '6-2-installation-failed-install-failed', title: 'Installation Failed (INSTALL_FAILED_*)' },
   arm: { id: 'arm', anchor: '6-3-arm-translation-layer-issues', title: 'ARM Translation Layer / ARM App Issues' },

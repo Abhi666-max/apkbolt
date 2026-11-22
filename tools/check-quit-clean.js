@@ -1,10 +1,10 @@
 'use strict';
 /**
- * 「」：
- * 1) APPDATA ApkStart（--smoke 6.5 exit）；
- * 2) app，「」——emulatorcold boot；
- * 3) windowwindow：emulator / qemu / netsim ；
- * 4) appexit 8 ：desktop「」 Android Emulator 。
+ * "": 
+ * 1) APPDATA ApkStart(--smoke 6.5 exit); 
+ * 2) app, ""--emulatorcold boot; 
+ * 3) windowwindow: emulator / qemu / netsim ; 
+ * 4) appexit 8 : desktop"" Android Emulator . 
  *
  * : node tools/check-quit-clean.js
  */
@@ -14,8 +14,8 @@ const { spawn } = require('child_process');
 const { WinAgent } = require('../src/core/agent');
 
 const ROOT = path.join(__dirname, '..');
-// runtimeAndroiddirectory，，
-// download 1.4GB runtime、 AVD。
+// runtimeAndroiddirectory, , 
+// download 1.4GB runtime,  AVD. 
 const ENGINE = path.resolve(process.env.APKSTART_RUNTIME || path.join(ROOT, 'engine'));
 const AVD_DIR = process.env.APKSTART_AVD_HOME || '';
 const ELECTRON = path.join(ROOT, 'node_modules', 'electron', 'dist', 'electron.exe');
@@ -46,8 +46,8 @@ const bad = (w) => {
   await agent.scope([ENGINE]);
   console.log('agent ready, port=', agent.port);
 
-  // ELECTRON_RUN_AS_NODE=1（Electron Node），
-  // ；「settings」，。
+  // ELECTRON_RUN_AS_NODE=1(Electron Node), 
+  // ; "settings", . 
   const env = { ...process.env, APPDATA: sandbox };
   delete env.ELECTRON_RUN_AS_NODE;
 
@@ -72,7 +72,7 @@ const bad = (w) => {
     }
     if (!exitedAt && proc.exitCode !== null) {
       exitedAt = i;
-      console.log(`[${((i + 1) * 0.5).toFixed(1)}s] ApkStart ， 8 …`);
+      console.log(`[${((i + 1) * 0.5).toFixed(1)}s] ApkStart ,  8 ...`);
     }
     if (exitedAt && i - exitedAt >= 16) break;
   }
@@ -82,12 +82,12 @@ const bad = (w) => {
   console.log(':', JSON.stringify(left));
   console.log('');
   const ok = leaked === 0 && left.length === 0;
-  console.log(`：${ok ? '（）' : ''}`);
+  console.log(`: ${ok ? '()' : ''}`);
   if (out) console.log('--- app  ---\n' + out.trim().split('\n').slice(-6).join('\n'));
 
   try { proc.kill(); } catch (_) { /* ignore */ }
   agent.dispose();
-  // AVD GB，（emulatorfailure，ignore）
+  // AVD GB, (emulatorfailure, ignore)
   try { fs.rmSync(sandbox, { recursive: true, force: true, maxRetries: 3 }); } catch (_) { /* ignore */ }
   process.exit(ok ? 0 : 1);
 })().catch((e) => { console.error('FATAL', e); process.exit(1); });

@@ -1,21 +1,21 @@
 'use strict';
 /**
- * （MSIX）。
+ * (MSIX). 
  *
- * electron-builder appx ：
- * - 26.x appx（ msix），download Windows SDK
- * （windows-kits-bundle-10_0_26100_0.zip）；
- * - （runFullTrust、、
- * ），。
- * stage + makeappx， Windows SDK exe。
+ * electron-builder appx : 
+ * - 26.x appx( msix), download Windows SDK
+ * (windows-kits-bundle-10_0_26100_0.zip); 
+ * - (runFullTrust, , 
+ * ), . 
+ * stage + makeappx,  Windows SDK exe. 
  *
- * ：
+ * : 
  * node build/msix.js # dist/release/win-unpacked signature
  * node build/msix.js --stage <dir> # directory
- * node build/msix.js --sign # certificatesignature（）
+ * node build/msix.js --sign # certificatesignature()
  * node build/msix.js --identity Name --publisher "CN=..." --display 
  *
- * ：APKSTART_MSIX_IDENTITY / APKSTART_MSIX_PUBLISHER / APKSTART_MSIX_DISPLAY
+ * : APKSTART_MSIX_IDENTITY / APKSTART_MSIX_PUBLISHER / APKSTART_MSIX_DISPLAY
  */
 const fs = require('fs');
 const os = require('os');
@@ -36,16 +36,16 @@ function arg(name, fallback = null) {
 }
 
 const VERSION = String(pkg.version || '0.0.0');
-// MSIX Version ， 0（Store ）
+// MSIX Version ,  0(Store )
 function msixVersion(v) {
   const p = String(v).split(/[.\-+]/).filter((x) => /^\d+$/.test(x)).slice(0, 3);
   while (p.length < 3) p.push('0');
   return `${p[0]}.${p[1]}.${p[2]}.0`;
 }
 
-// Partner Center → Product management → Product identity 。
-// default：default `CN=AbhijeetKangane`，
-// `node build/msix.js` 。
+// Partner Center → Product management → Product identity . 
+// default: default `CN=AbhijeetKangane`, 
+// `node build/msix.js` . 
 const PLACEHOLDER_PUBLISHER = 'CN=AbhijeetKangane';
 const CONFIRMED_IDENTITY = 'AbhijeetKangane.ApkBolt';
 const CONFIRMED_PUBLISHER = 'CN=58CA1DED-8AB3-4D0D-AF50-62C9B781AA4D';
@@ -61,17 +61,17 @@ const STAGE = path.resolve(String(arg('stage')
 const OUT_DIR = path.resolve(String(arg('out') || path.join(ROOT, 'dist', 'store')));
 
 /**
- * 「directory」： MSIX `app\` ApkBolt.exe + resources。
+ * "directory":  MSIX `app\` ApkBolt.exe + resources. 
  *
- * ，：
- * A. dist/ApkBolt-win64-portable —— `node build/pack.js` ，****。
- * ，runtime， build/runtime 
- * resources/runtime（ electron-builder extraResources ）。
- * B. dist/release/win-unpacked —— `electron-builder --win dir` ，
- * resources/runtime。 CDN ，
- * （ electron.exe、runtime ），。
+ * , : 
+ * A. dist/ApkBolt-win64-portable -- `node build/pack.js` , ****. 
+ * , runtime,  build/runtime 
+ * resources/runtime( electron-builder extraResources ). 
+ * B. dist/release/win-unpacked -- `electron-builder --win dir` , 
+ * resources/runtime.  CDN , 
+ * ( electron.exe, runtime ), . 
  *
- * --payload 。
+ * --payload . 
  */
 function resolvePayload() {
   const explicit = arg('payload');
@@ -86,8 +86,8 @@ function resolvePayload() {
 }
 
 // ---------------- ----------------
-// 100% 5 。directory .scale-* / .targetsize-*
-// ， resources.pri（makepri）， —— 。
+// 100% 5 . directory .scale-* / .targetsize-*
+// ,  resources.pri(makepri),  -- . 
 const ASSETS = [
   { file: 'StoreLogo.png', w: 50, h: 50 },
   { file: 'Square44x44Logo.png', w: 44, h: 44 },
@@ -101,7 +101,7 @@ const ASSETS = [
 const BG = [20, 22, 27];        // #14161b
 const ACCENT = [61, 220, 132];  // #3ddc84 Android
 
-/** （） */
+/** () */
 function inRoundRect(px, py, x, y, w, h, r) {
   const cx = Math.min(Math.max(px, x + r), x + w - r);
   const cy = Math.min(Math.max(py, y + r), y + h - r);
@@ -110,7 +110,7 @@ function inRoundRect(px, py, x, y, w, h, r) {
   return dx * dx + dy * dy <= r * r;
 }
 
-/** w×h side （ + ） */
+/** w×h side ( + ) */
 function composeIcon(w, h, side) {
   const rgba = new Uint8Array(w * h * 4);
   const ox = (w - side) / 2;
@@ -138,7 +138,7 @@ function composeIcon(w, h, side) {
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const i = (y * w + x) * 4;
-      // ：（/launch）
+      // : (/launch)
       let r = BG[0];
       let g = BG[1];
       let b = BG[2];
@@ -158,7 +158,7 @@ function composeIcon(w, h, side) {
   return encodePng(w, h, rgba);
 }
 
-/** ：build/build-icons.js */
+/** : build/build-icons.js */
 const STORE_ASSETS = path.join(ROOT, 'build', 'store-assets');
 
 function writeAssets(dir) {
@@ -170,11 +170,11 @@ function writeAssets(dir) {
     if (fs.existsSync(pre)) {
       buf = fs.readFileSync(pre);
     } else {
-      // ： build-icons ，
+      // :  build-icons , 
       buf = (a.w === a.h)
         ? drawAppIcon(a.w)
         : composeIcon(a.w, a.h, Math.min(a.h * 0.72, a.w * 0.42));
-      console.warn(`  [] ${a.file}  build/store-assets ，`);
+      console.warn(`  [] ${a.file}  build/store-assets , `);
     }
     fs.writeFileSync(path.join(dir, a.file), buf);
     made.push(`${a.file} ${a.w}x${a.h}`);
@@ -187,13 +187,13 @@ function writeAssets(dir) {
 function manifest() {
   return `<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ApkBolt · Microsoft Store (MSIX) 
-   build/msix.js ，； build/msix.js。
+  ApkBolt  -  Microsoft Store (MSIX) 
+   build/msix.js , ;  build/msix.js. 
 
-   Partner Center ：
+   Partner Center : 
     Identity/@Name          ← Product identity → Package/Identity/Name
     Identity/@Publisher     ← Product identity → Package/Identity/Publisher
-  ，Publisher  Subject。
+  , Publisher  Subject. 
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -224,14 +224,14 @@ function manifest() {
   </Resources>
 
   <Capabilities>
-    <!-- （Desktop Bridge）。 -->
+    <!-- (Desktop Bridge).  -->
     <rescap:Capability Name="runFullTrust" />
     <!--
-       unvirtualizedResources / broadFileSystemAccess：
-       PC ，Store ；
-      AppContainer ，full-trust 。
-       AppData ， %USERPROFILE%\\ApkBolt，
-      （ src/core/store.js  STORE_BUILD）。
+       unvirtualizedResources / broadFileSystemAccess: 
+       PC , Store ; 
+      AppContainer , full-trust . 
+       AppData ,  %USERPROFILE%\\ApkBolt, 
+      ( src/core/store.js  STORE_BUILD). 
     -->
   </Capabilities>
 
@@ -244,10 +244,10 @@ function manifest() {
         Square150x150Logo="Assets\\Square150x150Logo.png"
         Square44x44Logo="Assets\\Square44x44Logo.png">
         <!--
-          / logo  uap:DefaultTile ，
-          uap:VisualElements  ——  MakeAppx ：
+          / logo  uap:DefaultTile , 
+          uap:VisualElements  --  MakeAppx : 
           "?? DTD/??????? 'VisualElements' ??? 'Square71x71Logo'?"
-          （0x80080204 The package manifest is not valid）
+          (0x80080204 The package manifest is not valid)
         -->
         <uap:DefaultTile Wide310x150Logo="Assets\\Wide310x150Logo.png"
           Square71x71Logo="Assets\\Square71x71Logo.png"
@@ -272,7 +272,7 @@ function which(exe) {
     const p = path.join(dir, exe);
     try { if (fs.statSync(p).isFile()) push(p); } catch (_) { /* next */ }
   }
-  // 2) Windows SDK（10.0.x version， x64）
+  // 2) Windows SDK(10.0.x version,  x64)
   const kits = [
     path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'Windows Kits', '10', 'bin'),
     path.join(process.env['ProgramFiles'] || 'C:\\Program Files', 'Windows Kits', '10', 'bin'),
@@ -288,7 +288,7 @@ function which(exe) {
       }
     }
   }
-  // 3) electron-builder downloadcache（ --win appx ）
+  // 3) electron-builder downloadcache( --win appx )
   const cacheRoot = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'electron-builder', 'Cache');
   const stack = [cacheRoot];
   let guard = 0;
@@ -306,12 +306,12 @@ function which(exe) {
   if (!cands.length) return null;
 
   /**
- * 。
+ * . 
    *
- * ：winCodeSign windows-6 / windows-8 /
- * windows-10 signtool.exe。windows-6 MSIX 
- * `0x80080209 (SignerSign failed)` —— MSIX SIP 。
- * windows-10\x64，「」。
+ * : winCodeSign windows-6 / windows-8 /
+ * windows-10 signtool.exe. windows-6 MSIX 
+ * `0x80080209 (SignerSign failed)` -- MSIX SIP . 
+ * windows-10\x64, "". 
    */
   const score = (p) => {
     const l = p.toLowerCase();
@@ -331,7 +331,7 @@ function run(exe, args, opts = {}) {
   return execFileSync(exe, args, { stdio: 'inherit', windowsHide: true, ...opts });
 }
 
-// ：MSIX MuMu emulator（runtime）
+// : MSIX MuMu emulator(runtime)
 const { assertStandalone } = require('./guard-standalone');
 
 // ---------------- ----------------
@@ -340,54 +340,54 @@ function stagePackage() {
   const pick = resolvePayload();
   const appSrc = pick.dir;
   if (!fs.existsSync(path.join(appSrc, 'ApkBolt.exe'))) {
-    console.error(`\n ${path.join(appSrc, 'ApkBolt.exe')}。`);
-    console.error('：');
-    console.error('  A) node build/pack.js          （，； build/runtime ）');
+    console.error(`\n ${path.join(appSrc, 'ApkBolt.exe')}. `);
+    console.error(': ');
+    console.error('  A) node build/pack.js          (, ;  build/runtime )');
     console.error('  B) npx electron-builder --win dir --x64 --config electron-builder.yml');
-    console.error('     ——  CDN ，， Win-unpacked 。\n');
+    console.error('     --  CDN , ,  Win-unpacked . \n');
     process.exit(1);
   }
   const work = path.join(OUT_DIR, '.stage');
   fs.rmSync(work, { recursive: true, force: true });
   const appDir = path.join(work, 'app');
   fs.mkdirSync(appDir, { recursive: true });
-  console.log(`（ ${appSrc}）…`);
+  console.log(`( ${appSrc})...`);
   fs.cpSync(appSrc, appDir, { recursive: true });
-  // Electron/electron-builder ，
+  // Electron/electron-builder , 
   for (const junk of ['builder-debug.yml', 'builder-effective-config.yaml', '.icon-ico', 'VERSION.txt']) {
     fs.rmSync(path.join(appDir, junk), { force: true, recursive: true });
   }
-  // portable versionruntime： build/runtime （ electron-builder extraResources）
+  // portable versionruntime:  build/runtime ( electron-builder extraResources)
   if (pick.addRuntime) {
-    console.log(` ${pick.runtime} → app/resources/runtime（ 1 GB，）…`);
+    console.log(` ${pick.runtime} → app/resources/runtime( 1 GB, )...`);
     fs.cpSync(pick.runtime, path.join(appDir, 'resources', 'runtime'), { recursive: true });
   }
   const rtExe = path.join(appDir, 'resources', 'runtime', 'emulator', 'emulator.exe');
   if (!fs.existsSync(rtExe)) {
-    console.error(`\n：${rtExe}  —— 。`);
-    console.error(' node build/prepare-runtime.js  build/runtime。\n');
+    console.error(`\n: ${rtExe}  -- . `);
+    console.error(' node build/prepare-runtime.js  build/runtime. \n');
   } else {
-    console.log('（emulator / platform-tools / system-images）');
+    console.log('(emulator / platform-tools / system-images)');
   }
-  // ：runtime、，emulator
+  // : runtime, , emulator
   assertStandalone(appDir, { label: 'MSIX  app/' });
-  console.log('…');
+  console.log('...');
   const made = writeAssets(path.join(work, 'Assets'));
   for (const m of made) console.log(`  ${m}`);
   fs.writeFileSync(path.join(work, 'AppxManifest.xml'), manifest(), 'utf8');
-  console.log(`：Identity=${IDENTITY} Publisher=${PUBLISHER} Version=${msixVersion(VERSION)}`);
+  console.log(`: Identity=${IDENTITY} Publisher=${PUBLISHER} Version=${msixVersion(VERSION)}`);
   return work;
 }
 
 function main() {
   console.log(`ApkBolt MSIX    ${VERSION} → ${msixVersion(VERSION)}`);
-  // ： Publisher （0x800B0109 / ）。
-  // —— default，。
+  // :  Publisher (0x800B0109 / ). 
+  // -- default, . 
   if (!String(PUBLISHER).toUpperCase().includes('58CA1DED') && !process.argv.includes('--allow-placeholder')) {
-    console.error(`\nPublisher  Partner Center ：${PUBLISHER}`);
-    console.error(` ${CONFIRMED_PUBLISHER}（Identity ${CONFIRMED_IDENTITY}）。`);
-    console.error(' Publisher 。');
-    console.error('（，） --allow-placeholder。\n');
+    console.error(`\nPublisher  Partner Center : ${PUBLISHER}`);
+    console.error(` ${CONFIRMED_PUBLISHER}(Identity ${CONFIRMED_IDENTITY}). `);
+    console.error(' Publisher . ');
+    console.error('(, ) --allow-placeholder. \n');
     process.exit(3);
   }
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -395,25 +395,25 @@ function main() {
 
   const makeappx = which('makeappx.exe');
   if (!makeappx) {
-    console.error('\n makeappx.exe。：');
-    console.error('  A.  Windows SDK（ Windows SDK ， Visual Studio）：');
+    console.error('\n makeappx.exe. : ');
+    console.error('  A.  Windows SDK( Windows SDK ,  Visual Studio): ');
     console.error('     https://developer.microsoft.com/windows/downloads/windows-sdk/');
-    console.error('  B.  npx electron-builder --win appx， windows-kits-bundle ，');
-    console.error('      electron-builder 。');
-    console.error(`\nstage ，：\n  "${'<makeappx.exe>'}" pack /d "${work}" /p "${path.join(OUT_DIR, artifactName())}" /o\n`);
+    console.error('  B.  npx electron-builder --win appx,  windows-kits-bundle , ');
+    console.error('      electron-builder . ');
+    console.error(`\nstage , : \n  "${'<makeappx.exe>'}" pack /d "${work}" /p "${path.join(OUT_DIR, artifactName())}" /o\n`);
     process.exit(2);
   }
   const out = path.join(OUT_DIR, artifactName());
-  console.log(`\n ${makeappx} …`);
-  // makeappx /o overwrite； fs.rmSync 。
-  // rmSync reclaim shim，1.5GB ETIMEDOUT，
-  // （0.6.2 ）。
+  console.log(`\n ${makeappx} ...`);
+  // makeappx /o overwrite;  fs.rmSync . 
+  // rmSync reclaim shim, 1.5GB ETIMEDOUT, 
+  // (0.6.2 ). 
   run(makeappx, ['pack', '/d', work, '/p', out, '/o', '/v']);
 
   const mb = fs.statSync(out).size / 1048576;
-  console.log(`\n：${out}  (${mb.toFixed(0)} MB)`);
+  console.log(`\n: ${out}  (${mb.toFixed(0)} MB)`);
 
-  // .NET ZipFile ： + +
+  // .NET ZipFile :  + +
   try {
     const { execFileSync: ex } = require('child_process');
     const ps = [
@@ -430,18 +430,18 @@ function main() {
 
   if (DO_SIGN) sign(out);
   else {
-    console.log('\n（Store ，）。');
-    console.log(' --sign 。');
+    console.log('\n(Store , ). ');
+    console.log(' --sign . ');
   }
-  // stage 1.3 GB ，「」，
-  // success（ --keep-stage）。
+  // stage 1.3 GB , "", 
+  // success( --keep-stage). 
   if (!process.argv.includes('--keep-stage')) {
     try {
       fs.rmSync(work, { recursive: true, force: true });
       console.log(' dist/store/.stage');
-    } catch (_) { /* ， */ }
+    } catch (_) { /* ,  */ }
   }
-  console.log(`\n docs/store-msix.md。`);
+  console.log(`\n docs/store-msix.md. `);
 }
 
 function artifactName() {
@@ -451,14 +451,14 @@ function artifactName() {
 function sign(file) {
   const signtool = which('signtool.exe');
   if (!signtool) {
-    console.error('\n signtool.exe，。');
+    console.error('\n signtool.exe, . ');
     return;
   }
   const pfx = path.join(OUT_DIR, 'ApkBolt-test.pfx');
   const pwd = process.env.APKSTART_MSIX_PFX_PASSWORD || 'ApkBolt!test';
   const subject = PUBLISHER;   // Publisher
   if (!fs.existsSync(pfx)) {
-    console.log(`\n（Subject=${subject}）…`);
+    console.log(`\n(Subject=${subject})...`);
     const ps = [
       '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command',
       `$c = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature`
@@ -469,22 +469,22 @@ function sign(file) {
       + `Export-PfxCertificate -Cert ("Cert:\\CurrentUser\\My\\" + $c.Thumbprint) -FilePath '${pfx}' -Password $p | Out-Null;`
       + `"thumbprint=" + $c.Thumbprint`,
     ];
-    try { run('powershell.exe', ps); } catch (e) { console.error(`：${e.message}`); return; }
+    try { run('powershell.exe', ps); } catch (e) { console.error(`: ${e.message}`); return; }
   }
-  console.log('…');
+  console.log('...');
   try {
     run(signtool, ['sign', '/a', '/v', '/fd', 'SHA256', '/f', pfx, '/p', pwd, file]);
   } catch (e) {
-    console.error(`：${e.message}`);
-    console.error('\n：electron-builder  winCodeSign ，');
-    console.error(' signtool.exe  MSIX 「A required function is not present」');
-    console.error('（ MSIX  SIP ）。， Windows SDK  signtool：');
+    console.error(`: ${e.message}`);
+    console.error('\n: electron-builder  winCodeSign , ');
+    console.error(' signtool.exe  MSIX "A required function is not present"');
+    console.error('( MSIX  SIP ). ,  Windows SDK  signtool: ');
     console.error('  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\signtool.exe" \\');
     console.error(`    sign /fd SHA256 /a /f "${pfx}" /p "${pwd}" "${file}"`);
-    console.error('\n****：Microsoft Store 。');
+    console.error('\n****: Microsoft Store . ');
     return;
   }
-  console.log('\n（ PowerShell ， Add-AppxPackage）：');
+  console.log('\n( PowerShell ,  Add-AppxPackage): ');
   console.log(`  Import-PfxCertificate -CertStoreLocation 'Cert:\\LocalMachine\\TrustedPeople' -FilePath '${pfx}' -Password (ConvertTo-SecureString '${pwd}' -Force -AsPlainText)`);
   console.log(`  Add-AppxPackage -Path '${file}'`);
 }

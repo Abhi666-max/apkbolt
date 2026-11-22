@@ -1,18 +1,18 @@
 'use strict';
 /**
- * incrementalupdate（）：、、/verify。
+ * incrementalupdate(): , , /verify. 
  *
- * ： ~99MB， Electron （ApkStart.exe 180MB compress、
- * dll、locales），upgrade Electron ；
- * `resources/app/**`（ JS / / node_modules）。upgrade
- * 99MB 。 tiny ：
- * - `ApkStart-vX-manifest.json`： app sha256 / size，
- * Electron version；
- * - `ApkStart-vX-app.zip`： app （ MB）。
- * Electron version，，verify
- * `resources/app`；full package，update。
+ * :  ~99MB,  Electron (ApkStart.exe 180MB compress, 
+ * dll, locales), upgrade Electron ; 
+ * `resources/app/**`( JS / / node_modules). upgrade
+ * 99MB .  tiny : 
+ * - `ApkStart-vX-manifest.json`:  app sha256 / size, 
+ * Electron version; 
+ * - `ApkStart-vX-app.zip`:  app ( MB). 
+ * Electron version, , verify
+ * `resources/app`; full package, update. 
  *
- * require electron，CI require 。
+ * require electron, CI require . 
  */
 const path = require('path');
 const { sha256File } = require('./download');
@@ -21,12 +21,12 @@ const APP_DIR = 'resources/app';
 const MANIFEST_RE = /-manifest\.json$/i;
 const APP_PACK_RE = /-app\.zip$/i;
 
-/** 、 ./ ， zip */
+/** ,  ./ ,  zip */
 function norm(p) {
   return String(p || '').replace(/\\/g, '/').replace(/^\.\//, '');
 }
 
-/** verify。「」full package，。 */
+/** verify. ""full package, .  */
 function parseManifest(text) {
   let m;
   try { m = JSON.parse(text); } catch (_) { throw new Error('Incremental manifest is not valid JSON'); }
@@ -39,15 +39,15 @@ function parseManifest(text) {
   return m;
 }
 
-/** 「」，installextractdirectory */
+/** "", installextractdirectory */
 function isAuxAsset(name) {
   const s = String(name || '');
   return /runtime/i.test(s) || APP_PACK_RE.test(s) || MANIFEST_RE.test(s);
 }
 
 /**
- * updateincrementalfull package。
- * network：install、Electron version、。
+ * updateincrementalfull package. 
+ * network: install, Electron version, . 
  */
 function chooseMode({ flavor, electronVersion, manifest, assets = [], current = '' }) {
   if (flavor !== 'portable') return { mode: 'full', reason: 'Installed version uses full installer' };
@@ -61,10 +61,10 @@ function chooseMode({ flavor, electronVersion, manifest, assets = [], current = 
 }
 
 /**
- * app ： / 。
- * @param {string} installDir portable versiondirectory（ resources/app）
- * @param {object} files app.files（installdirectorypath → {sha256,size}）
- * @param {function} hash ，
+ * app :  / . 
+ * @param {string} installDir portable versiondirectory( resources/app)
+ * @param {object} files app.files(installdirectorypath → {sha256,size})
+ * @param {function} hash , 
  */
 async function inspectLocal({ installDir, files, hash = sha256File }) {
   const changed = [];
@@ -80,8 +80,8 @@ async function inspectLocal({ installDir, files, hash = sha256File }) {
 }
 
 /**
- * verifyextractincremental： sha256 。
- * 「download / system image」。
+ * verifyextractincremental:  sha256 . 
+ * "download / system image". 
  */
 async function verifyExtracted({ payload, files, hash = sha256File }) {
   const bad = [];

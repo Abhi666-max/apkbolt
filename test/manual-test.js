@@ -1,9 +1,9 @@
 'use strict';
 /**
  * Built-in manual mapping tests
- * ：
- *  1)  src/ui/manual.html；
- *  2)  /  / 。
+ * : 
+ *  1)  src/ui/manual.html; 
+ *  2)  /  / . 
  */
 const fs = require('fs');
 const path = require('path');
@@ -30,7 +30,7 @@ const ROOT = path.join(__dirname, '..');
 const manual = require(path.join(ROOT, 'src/core/manual'));
 const html = fs.readFileSync(path.join(ROOT, 'src/ui/manual.html'), 'utf8');
 
-console.log('\n[ · ]');
+console.log('\n[  -  ]');
 test('Every topic anchor exists in manual.html', () => {
   for (const topic of Object.values(manual.TOPICS)) {
     assert(html.includes(`id="${topic.anchor}"`), `${topic.id}  ${topic.anchor} `);
@@ -47,15 +47,15 @@ test('Manual contains section 6.8 for DLL load failures', () => {
   assert(html.includes('0xC0000135'), '6.8');
 });
 
-console.log('\n[ ·  → ]');
+console.log('\n[  -   → ]');
 test('Hardware acceleration issues route to 6.1', () => {
   const t = manual.topicForIssue({ code: 'accel.softwareEmulation', title: '' });
-  assert(t.id === 'accel', ` accel， ${t.id}`);
+  assert(t.id === 'accel', ` accel,  ${t.id}`);
 });
 
 test('adb unauthorized issues route to 6.4', () => {
   const t = manual.topicForIssue({ code: 'device.unauthorized', title: '' });
-  assert(t.id === 'adb', ` adb， ${t.id}`);
+  assert(t.id === 'adb', ` adb,  ${t.id}`);
 });
 
 test('Sound issues route to 6.7', () => {
@@ -67,7 +67,7 @@ test('DLL / VC++ issues route to 6.8', () => {
   assert(manual.topicForIssue({ code: 'DLL', title: ' DLL ' }).id === 'dll', 'DLL 6.8');
   assert(manual.topicForIssue({ code: 'vcRedist', title: ' VC++ ' }).id === 'dll', 'VC++ 6.8');
   const t = manual.topicForIssue({ code: 'runtime.bootFailed', title: '', detail: '0xC0000135 emulator exit' });
-  assert(t.id === 'dll', ` 0xC0000135  6.8， ${t.id}`);
+  assert(t.id === 'dll', ` 0xC0000135  6.8,  ${t.id}`);
 });
 
 test('Startup failure with ARM logs routes to 6.3', () => {
@@ -76,15 +76,15 @@ test('Startup failure with ARM logs routes to 6.3', () => {
     title: '',
     detail: 'DoBadTrampoline libndk_translation',
   });
-  assert(t.id === 'arm', ` arm， ${t.id}`);
+  assert(t.id === 'arm', ` arm,  ${t.id}`);
 });
 
 test('Generic startup failure routes to 6.5', () => {
   const t = manual.topicForIssue({ code: 'runtime.bootFailed', title: '', detail: 'cannot lock AVD' });
-  assert(t.id === 'startup', ` startup， ${t.id}`);
+  assert(t.id === 'startup', ` startup,  ${t.id}`);
 });
 
-console.log('\n[ ·  → ]');
+console.log('\n[  -   → ]');
 test('NO_MATCHING_ABIS routes to ARM section', () => {
   assert(manual.topicForError('INSTALL_FAILED_NO_MATCHING_ABIS').id === 'arm', 'ARM');
 });
@@ -103,20 +103,20 @@ test('0xC0000135 6.8', () => {
   assert(manual.topicForError('0xC0000135 STATUS_DLL_NOT_FOUND').id === 'dll', '6.8');
 });
 
-console.log('\n[ · ]');
+console.log('\n[  -  ]');
 test('resolve / issue / topic', () => {
   assert(manual.resolve('INSTALL_FAILED_NO_MATCHING_ABIS').id === 'arm', 'assertion failed');
   assert(manual.resolve({ issue: 'audio.disabled' }).id === 'sound', 'issue code');
   assert(manual.resolve({ topic: 'overview', reason: 'toolbar' }).anchor, 'topic');
 });
 
-test('，', () => {
+test(', ', () => {
   const r = manual.resolve({});
   assert(r.id === 'overview' && r.anchor, 'assertion failed');
 });
 
-console.log('\n[ · ]');
-test('manual:open，preload openManual', () => {
+console.log('\n[  -  ]');
+test('manual:open, preload openManual', () => {
   const main = fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8');
   const preload = fs.readFileSync(path.join(ROOT, 'src', 'preload.js'), 'utf8');
   assert(/ipcMain\.handle\('manual:open'/.test(main), 'manual:open');
@@ -150,9 +150,9 @@ test('0xC0000135 DLL / VC++', () => {
   const doctor = fs.readFileSync(path.join(ROOT, 'src', 'core', 'doctor.js'), 'utf8');
   const emu = fs.readFileSync(path.join(ROOT, 'src', 'core', 'emulator.js'), 'utf8');
   assert(!/title: ' VC\+\+ '/.test(doctor), 'doctor /VC++');
-  assert(!/ DLL（VC\+\+  \/ ）/.test(emu), 'emulator');
+  assert(!/ DLL(VC\+\+  \/ )/.test(emu), 'emulator');
   assert(/0xC0000135|Dependent DLL/i.test(emu), '0xC0000135');
 });
 
-console.log(`\n：${passed} ，${failed} \n`);
+console.log(`\n: ${passed} , ${failed} \n`);
 process.exitCode = failed ? 1 : 0;

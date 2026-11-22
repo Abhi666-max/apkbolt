@@ -1,13 +1,13 @@
 'use strict';
 /**
- *  /  Node （、）。
- *  0.5.3 ：
- *  1) 「 USB 」 →  device unauthorized →
- *      240s×4 。： unauthorized、、
- *     。
- *  2) PackageManager  installed=true， /data/app / →
- *     am start 。：isInstalled  APK 。
- * ：node test/boot-auth-test.js
+ *  /  Node (, ). 
+ *  0.5.3 : 
+ *  1) " USB " →  device unauthorized →
+ *      240s×4 . :  unauthorized, , 
+ *     . 
+ *  2) PackageManager  installed=true,  /data/app / →
+ *     am start . : isInstalled  APK . 
+ * : node test/boot-auth-test.js
  */
 const assert = require('assert/strict');
 const fs = require('fs');
@@ -31,7 +31,7 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
 
 (async () => {
   console.log('\n[adb ]');
-  test('unauthorized authorized （get-state ）', () => {
+  test('unauthorized authorized (get-state )', () => {
     assert.equal(parseDeviceState(adbDevices('emulator-5554\tunauthorized'), 'emulator-5554'), 'unauthorized');
     assert.equal(parseDeviceState(adbDevices('emulator-5554\tdevice'), 'emulator-5554'), 'device');
   });
@@ -40,11 +40,11 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
     assert.equal(parseDeviceState(adbDevices('emulator-5554\tno permissions'), 'emulator-5554'), 'unauthorized');
     assert.equal(parseDeviceState(adbDevices(''), 'emulator-5554'), 'no-device');
   });
-  test('serial ，', () => {
+  test('serial , ', () => {
     const out = adbDevices('emulator-5556\tdevice\nemulator-5554\tunauthorized');
     assert.equal(parseDeviceState(out, 'emulator-5554'), 'unauthorized');
   });
-  test('unauthorized（ ADB_VENDOR_KEYS ）', () => {
+  test('unauthorized( ADB_VENDOR_KEYS )', () => {
     assert.equal(isUnauthorizedError('error: device unauthorized.'), true);
     assert.equal(isUnauthorizedError("This adb server's $ADB_VENDOR_KEYS is not set. error: device unauthorized"), true);
     assert.equal(isUnauthorizedError('error: device offline'), false);
@@ -52,7 +52,7 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
   });
 
   console.log('\n[pm path  + ]');
-  test('pm path （split APK）', () => {
+  test('pm path (split APK)', () => {
     const out = 'package:/data/app/~~x/com.foo-1/base.apk\npackage:/data/app/~~x/com.foo-1/split_arm64.apk\n';
     assert.deepEqual(parsePmPaths(out), [
       '/data/app/~~x/com.foo-1/base.apk',
@@ -68,7 +68,7 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
     const c = Object.create(AdbClient.prototype);
     c.shell = async (cmd) => {
       if (cmd.startsWith('pm path')) return 'package:/data/app/~~x/com.foo-1/base.apk';
-      // ：， PRESENT
+      // : ,  PRESENT
       return '';
     };
     assert.equal(await c.isInstalled('com.foo'), false);
@@ -81,7 +81,7 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
     };
     assert.equal(await c.isInstalled('com.foo'), true);
   });
-  await atest('→ （ ）', async () => {
+  await atest('→ ( )', async () => {
     const c = Object.create(AdbClient.prototype);
     const seen = [];
     c.shell = async (cmd) => {
@@ -98,13 +98,13 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
   console.log('\n[]');
   await atest('adb unauthorized →', async () => {
     const emu = Object.create(require('../src/core/emulator').EmulatorEngine.prototype);
-    emu.port = 5554; // serial  getter：emulator-${port}
+    emu.port = 5554; // serial  getter: emulator-${port}
     emu._log = [];   // log()  push
     emu._adbGuestHealthy = async () => false;
     const ok = await emu._saveViaAdb('adb');
     assert.equal(ok, false, 'assertion failed');
   });
-  await atest('：', () => {
+  await atest(': ', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'emulator.js'), 'utf8');
     const fn = src.slice(src.indexOf('async _saveViaAdb('), src.indexOf('async _saveViaAdb(') + 700);
     assert.ok(/_adbGuestHealthy/.test(fn), '_saveViaAdb guest');
@@ -112,23 +112,23 @@ const adbDevices = (line) => `List of devices attached\n${line}\n`;
     assert.ok(/_adbGuestHealthy/.test(stopFn), 'stop()');
     assert.ok(/invalidateSnapshot\(\)/.test(stopFn), 'assertion failed');
   });
-  await atest('： unauthorized', () => {
+  await atest(':  unauthorized', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'engine.js'), 'utf8');
     const boot = src.slice(src.indexOf('async bootEmulator('), src.indexOf('async bootEmulator(') + 4200);
     assert.ok(/isUnauthorizedError/.test(boot), 'unauthorized');
     assert.ok(/deviceState\(\)/.test(boot), 'devices state');
     assert.ok(/invalidateSnapshot\(\)/.test(boot), 'assertion failed');
     assert.ok(/_coldBoot = true/.test(boot), 'adb');
-    assert.ok(/ADB_UNAUTHORIZED/.test(boot), '，');
+    assert.ok(/ADB_UNAUTHORIZED/.test(boot), ', ');
   });
   await atest('adb server ADB_VENDOR_KEYS host/guest', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'adb.js'), 'utf8');
     assert.ok(/ADB_VENDOR_KEYS/.test(src), 'adb');
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })().catch((e) => {
-  console.error('  ：', e.stack || e.message);
+  console.error('  : ', e.stack || e.message);
   process.exit(1);
 });

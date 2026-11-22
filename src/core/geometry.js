@@ -2,11 +2,11 @@
 /**
  * Pure coordinate geometry calculations (zero external dependencies).
  *
- * Electron screen / BrowserWindow DIP（）；window
- * agent.ps1 per-monitor v2 DPI ， Win32 SetWindowPos 
- * 。， 125% / 150% 「window / /
- * 」（issue #99）。embedded mode _rect() scaleFactor，
- * ，window。
+ * Electron screen / BrowserWindow DIP(); window
+ * agent.ps1 per-monitor v2 DPI ,  Win32 SetWindowPos 
+ * . ,  125% / 150% "window / /
+ * "(issue #99). embedded mode _rect() scaleFactor, 
+ * , window. 
  */
 
 /**

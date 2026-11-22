@@ -1,28 +1,28 @@
 'use strict';
 /**
- * **** ext4 system image， Android Emulator userdata 。
+ * **** ext4 system image,  Android Emulator userdata . 
  *
- * （，）：
- * 1. system image（system-images/.../userdata.img） 1MB 
- * ， avdmanager SDK mke2fs complete。ApkStart 
- * config.ini emulator ， —— /data ，
- * "Invalid ext4 superblock on /dev/block/vdc"，guest 
- * recovery restart，adbd 。「appfailure」。
- * （emulator e2fsck/resize2fs/tune2fs，** mke2fs**，。）
+ * (, ): 
+ * 1. system image(system-images/.../userdata.img) 1MB 
+ * ,  avdmanager SDK mke2fs complete. ApkStart 
+ * config.ini emulator ,  -- /data , 
+ * "Invalid ext4 superblock on /dev/block/vdc", guest 
+ * recovery restart, adbd . "appfailure". 
+ * (emulator e2fsck/resize2fs/tune2fs, ** mke2fs**, . )
  *
- * 2. 4096。Android 13 /data metadata encryption，
- * vold userdata dm-default-key。 dm 
- * 4096， sb_set_blocksize() fs block size >= ，
- * 1KB block system image mount() = EINVAL，log：
+ * 2. 4096. Android 13 /data metadata encryption, 
+ * vold userdata dm-default-key.  dm 
+ * 4096,  sb_set_blocksize() fs block size >= , 
+ * 1KB block system image mount() = EINVAL, log: 
  *      vold: [libfs_mgr] Cannot mount filesystem on /dev/block/dm-40 at /data: Invalid argument
  *      vold: fs_mgr_do_mount failed with rc -1
- * 4KB block 。
+ * 4KB block . 
  *
- * 3. EXT4_FEATURE_INCOMPAT_ENCRYPT(0x10000)， vold 
- * `cryptfs init_user0` failure（exit 25）→ recovery restart。
+ * 3. EXT4_FEATURE_INCOMPAT_ENCRYPT(0x10000),  vold 
+ * `cryptfs init_user0` failure(exit 25)→ recovery restart. 
  *
- * system image 64MB，emulator launch resize AVD configuration dataPartition ，
- * guest e2fsck/resize2fs ，。
+ * system image 64MB, emulator launch resize AVD configuration dataPartition , 
+ * guest e2fsck/resize2fs , . 
  */
 
 const BLOCK = 4096;
@@ -30,7 +30,7 @@ const INODE_SIZE = 128;
 const FIRST_INO = 11;
 
 // ext4 feature
-const COMPAT_EXT_ATTR = 0x8;    // setxattr EOPNOTSUPP：SELinux ，
+const COMPAT_EXT_ATTR = 0x8;    // setxattr EOPNOTSUPP: SELinux , 
                                 // netd / media / tombstoned exit status 1
 const COMPAT_DIR_INDEX = 0x20;
 const INCOMPAT_FILETYPE = 0x2;
@@ -40,15 +40,15 @@ const RO_COMPAT_LARGE_FILE = 0x2;
 
 /**
  * @param {{sizeMB?: number, encrypt?: boolean}} [opts]
- * encrypt=false ENCRYPT —— 「 emulator 
- * e2fsck/resize2fs（1.42.12， encrypt）」，
- * 。
+ * encrypt=false ENCRYPT -- " emulator 
+ * e2fsck/resize2fs(1.42.12,  encrypt)", 
+ * . 
  * @returns {Buffer} userdata system image
  */
 function buildEmptyExt4(opts = {}) {
   const sizeMB = Math.max(8, Math.min(96, Math.round(opts.sizeMB || 64)));
   const blocks = Math.floor((sizeMB * 1024 * 1024) / BLOCK);
-  // block group：4KB block 8*4096 = 32768 （128MB）
+  // block group: 4KB block 8*4096 = 32768 (128MB)
   const blocksPerGroup = Math.min(blocks, 8 * BLOCK);
 
   let inodes = Math.max(256, Math.round(blocks / 4));
@@ -60,7 +60,7 @@ function buildEmptyExt4(opts = {}) {
   const IB_BLOCK = 3;
   const ITABLE_BLOCK = 4;
   const DIR_BLOCK = ITABLE_BLOCK + inodeTableBlocks;
-  const usedBlocks = DIR_BLOCK + 1; // （0..DIR_BLOCK）
+  const usedBlocks = DIR_BLOCK + 1; // (0..DIR_BLOCK)
 
   const buf = Buffer.alloc(blocks * BLOCK, 0);
   const now = Math.floor(Date.now() / 1000);
@@ -72,10 +72,10 @@ function buildEmptyExt4(opts = {}) {
   buf.writeUInt32LE(blocks, sb + 0x04);                       // s_blocks_count_lo
   buf.writeUInt32LE(reserved, sb + 0x08);                     // s_r_blocks_count
   buf.writeUInt32LE(blocks - usedBlocks, sb + 0x0C);          // s_free_blocks_count
-  buf.writeUInt32LE(inodes - (FIRST_INO - 1), sb + 0x10);     // s_free_inodes_count（ 1~10 ）
-  buf.writeUInt32LE(0, sb + 0x14);                            // s_first_data_block（4K 0）
+  buf.writeUInt32LE(inodes - (FIRST_INO - 1), sb + 0x10);     // s_free_inodes_count( 1~10 )
+  buf.writeUInt32LE(0, sb + 0x14);                            // s_first_data_block(4K 0)
   buf.writeUInt32LE(2, sb + 0x18);                            // s_log_block_size = 2 → 4096
-  buf.writeUInt32LE(2, sb + 0x1C);                            // s_log_cluster_size（ block size， EINVAL）
+  buf.writeUInt32LE(2, sb + 0x1C);                            // s_log_cluster_size( block size,  EINVAL)
   buf.writeUInt32LE(blocksPerGroup, sb + 0x20);               // s_blocks_per_group
   buf.writeUInt32LE(blocksPerGroup, sb + 0x24);               // s_clusters_per_group
   buf.writeUInt32LE(inodes, sb + 0x28);                       // s_inodes_per_group
@@ -85,7 +85,7 @@ function buildEmptyExt4(opts = {}) {
   buf.writeUInt16LE(0xFFFF, sb + 0x36);                       // s_max_mnt_count
   buf.writeUInt16LE(0xEF53, sb + 0x38);                       // magic
   buf.writeUInt16LE(1, sb + 0x3A);                            // s_state = clean
-  buf.writeUInt16LE(1, sb + 0x3C);                            // s_errors = continue（ 0）
+  buf.writeUInt16LE(1, sb + 0x3C);                            // s_errors = continue( 0)
   buf.writeUInt16LE(0, sb + 0x3E);                            // s_minor_rev_level
   buf.writeUInt32LE(now, sb + 0x40);                          // s_lastcheck
   buf.writeUInt32LE(0, sb + 0x44);                            // s_checkinterval
@@ -105,13 +105,13 @@ function buildEmptyExt4(opts = {}) {
   buf.writeUInt32LE(0, sb + 0xC8);                             // s_algorithm_usage_bitmap
   buf.writeUInt8(0, sb + 0xCC + 1);                            // s_prealloc_blocks
   buf.writeUInt8(0, sb + 0xCE);
-  // ：1 = AES-256-XTS，2 = AES-256-CTS（Android default）
+  // : 1 = AES-256-XTS, 2 = AES-256-CTS(Android default)
   buf.writeUInt32LE(1, sb + 0x274);
   buf.writeUInt32LE(2, sb + 0x278);
   buf.writeUInt8(2, sb + 0xFC);                                // s_def_hash_version = half_md4
-  buf.writeUInt16LE(0, sb + 0xFE);                             // s_desc_size（ 64bit 0）
+  buf.writeUInt16LE(0, sb + 0xFE);                             // s_desc_size( 64bit 0)
 
-  // ---------- group descriptor（block 1）----------
+  // ---------- group descriptor(block 1)----------
   const gd = GD_BLOCK * BLOCK;
   buf.writeUInt32LE(BB_BLOCK, gd + 0x00);                      // bg_block_bitmap
   buf.writeUInt32LE(IB_BLOCK, gd + 0x04);                      // bg_inode_bitmap
@@ -121,23 +121,23 @@ function buildEmptyExt4(opts = {}) {
   buf.writeUInt16LE(1, gd + 0x10);                             // bg_used_dirs_count
   buf.writeUInt16LE(0, gd + 0x12);                             // bg_flags
 
-  // ---------- block bitmap（block 2）：bit i ↔ block i ----------
+  // ---------- block bitmap(block 2): bit i ↔ block i ----------
   const bb = BB_BLOCK * BLOCK;
   for (let blk = 0; blk < usedBlocks; blk += 1) {
     buf[bb + (blk >> 3)] |= 1 << (blk & 7);
   }
-  // padding bit 1（ blocks_per_group ）
+  // padding bit 1( blocks_per_group )
   for (let bit = blocks; bit < blocksPerGroup; bit += 1) {
     buf[bb + (bit >> 3)] |= 1 << (bit & 7);
   }
 
-  // ---------- inode bitmap（block 3）：1..10 ----------
+  // ---------- inode bitmap(block 3): 1..10 ----------
   const ib = IB_BLOCK * BLOCK;
   for (let i = 0; i < FIRST_INO - 1; i += 1) {
     buf[ib + (i >> 3)] |= 1 << (i & 7);
   }
 
-  // ---------- root inode（inode 2）----------
+  // ---------- root inode(inode 2)----------
   const rootOff = ITABLE_BLOCK * BLOCK + (2 - 1) * INODE_SIZE;
   buf.writeUInt16LE(0x41ED, rootOff + 0x00);        // S_IFDIR | 0755
   buf.writeUInt16LE(0, rootOff + 0x02);             // i_uid
@@ -148,9 +148,9 @@ function buildEmptyExt4(opts = {}) {
   buf.writeUInt32LE(0, rootOff + 0x14);             // i_dtime
   buf.writeUInt16LE(0, rootOff + 0x18);             // i_gid
   buf.writeUInt16LE(2, rootOff + 0x1A);             // i_links_count
-  buf.writeUInt32LE(BLOCK / 512, rootOff + 0x1C);   // i_blocks（512B ）
+  buf.writeUInt32LE(BLOCK / 512, rootOff + 0x1C);   // i_blocks(512B )
   buf.writeUInt32LE(0, rootOff + 0x20);             // i_flags
-  buf.writeUInt32LE(DIR_BLOCK, rootOff + 0x28);     // i_block[0]（ extents，）
+  buf.writeUInt32LE(DIR_BLOCK, rootOff + 0x28);     // i_block[0]( extents, )
 
   // ---------- root directory ----------
   const dir = DIR_BLOCK * BLOCK;
@@ -169,7 +169,7 @@ function buildEmptyExt4(opts = {}) {
   return buf;
 }
 
-/** system image ext4 （self-healing：/） */
+/** system image ext4 (self-healing: /) */
 function hasExt4Superblock(file) {
   let fd;
   try {
@@ -188,10 +188,10 @@ function hasExt4Superblock(file) {
 }
 
 /**
- * ENCRYPT（fscrypt）。
- * ： emulator resize2fs ，
- * —— cygwin e2fsprogs 1.42.12， encrypt，
- * e2fsck/resize2fs 。
+ * ENCRYPT(fscrypt). 
+ * :  emulator resize2fs , 
+ * -- cygwin e2fsprogs 1.42.12,  encrypt, 
+ * e2fsck/resize2fs . 
  */
 function setEncryptFlag(file) {
   const fs = require('fs');
@@ -207,7 +207,7 @@ function setEncryptFlag(file) {
   }
 }
 
-/** resize2fs ENCRYPT （version e2fsprogs ） */
+/** resize2fs ENCRYPT (version e2fsprogs ) */
 function clearEncryptFlag(file) {
   const fs = require('fs');
   const fd = fs.openSync(file, 'r+');
@@ -223,11 +223,11 @@ function clearEncryptFlag(file) {
 }
 
 /**
- * ****capacity（）。
- * ：system image qemu-img 8GB， ext4 8GB。
- * resize2fs success（version qemu-img parameters），
- * 6GB、Android 64MB —— 「/updatespace」。
- * ， resize2fs。
+ * ****capacity(). 
+ * : system image qemu-img 8GB,  ext4 8GB. 
+ * resize2fs success(version qemu-img parameters), 
+ * 6GB, Android 64MB -- "/updatespace". 
+ * ,  resize2fs. 
  */
 function fsBytes(file) {
   let fd;

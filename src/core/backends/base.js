@@ -1,109 +1,109 @@
 'use strict';
 /**
- * （backend driver）—— 「Android」 Runtime 。
+ * (backend driver)-- "Android" Runtime . 
  *
- * ：ApkStart （ Google Android Emulator / QEMU），
- * （boot、snapshot、reclaim、system imagedownload） core/engine.js 。
- * 「 APK 、、appwindow」，
- * ：
+ * : ApkStart ( Google Android Emulator / QEMU), 
+ * (boot, snapshot, reclaim, system imagedownload) core/engine.js . 
+ * " APK , , appwindow", 
+ * : 
  *
- * 1. adb （ / launch / / ）；
- * 2. HWND Androidwindow（ SetParent window）；
- * 3. launch / 。
+ * 1. adb ( / launch / / ); 
+ * 2. HWND Androidwindow( SetParent window); 
+ * 3. launch / . 
  *
- * 0.5.6 ：builtin（ emulator + system image）。
- * ， engine.js 「Android」，
- * runtime；
- * **emulator / runtime**（MuMu / / / WSA ）。
+ * 0.5.6 : builtin( emulator + system image). 
+ * ,  engine.js "Android", 
+ * runtime; 
+ * **emulator / runtime**(MuMu / / / WSA ). 
  *
- * （）：
- * - ，； ensure() 。
- * - failure { ok:false, error }，（hint）。
- * - adb server： adb ， connect。
+ * (): 
+ * - , ;  ensure() . 
+ * - failure { ok:false, error }, (hint). 
+ * - adb server:  adb ,  connect. 
  */
 
-/** ：/ */
+/** : / */
 const CAPS = {
- /** download/runtime（system image、emulator、adb） */
+ /** download/runtime(system image, emulator, adb) */
   provision: 'provision',
- /** launchsnapshot（boot） */
+ /** launchsnapshot(boot) */
   snapshot: 'snapshot',
  /** data partition */
   resizeData: 'resizeData',
- /** Android（/data） */
+ /** Android(/data) */
   resetData: 'resetData',
- /** orientation（landscape，restart） */
+ /** orientation(landscape, restart) */
   rotatePanel: 'rotatePanel',
- /** （app） */
+ /** (app) */
   priority: 'priority',
- /** （uninstall/exit） */
+ /** (uninstall/exit) */
   shutdown: 'shutdown',
- /** window，「」window（emulator） */
+ /** window, ""window(emulator) */
   sharedHost: 'sharedHost',
 };
 
 class Backend {
   /**
- * @param {object} appRoot directory（ resources/app）
- * @param {object} deps ：{ store, log }
+ * @param {object} appRoot directory( resources/app)
+ * @param {object} deps : { store, log }
    */
   constructor(appRoot, deps = {}) {
     this.appRoot = appRoot || '';
     this.deps = deps || {};
- /** adb serial（ emulator-5554 / 127.0.0.1:16384） */
+ /** adb serial( emulator-5554 / 127.0.0.1:16384) */
     this.serial = '';
  /** adb.exe path */
     this.adbPath = '';
- /** error，diagnose */
+ /** error, diagnose */
     this.lastError = '';
   }
 
- /** id（settings，） */
+ /** id(settings, ) */
   static get id() { return 'base'; }
 
  /** */
   static get label() { return 'Unnamed Backend'; }
 
- /** ，settings */
+ /** , settings */
   static get summary() { return ''; }
 
- /** 「window」（ attach ） */
+ /** "window"( attach ) */
   static get embedCapable() { return false; }
 
   get id() { return this.constructor.id; }
 
   get label() { return this.constructor.label; }
 
- /** ， CAPS */
+ /** ,  CAPS */
   get caps() {
     return new Set();
   }
 
   has(cap) { return this.caps.has(cap); }
 
- /** （ adb） */
+ /** ( adb) */
   running() { return false; }
 
   /**
- * probe：。
- * 「」，（<1.5s）。
+ * probe: . 
+ * "", (<1.5s). 
    * @returns {Promise<{ok:boolean, found:boolean, path?:string, detail?:string}>}
    */
   // eslint-disable-next-line class-methods-use-this
   async probe() { return { ok: true, found: false }; }
 
   /**
- * ：app。
+ * : app. 
    * @returns {Promise<{ok:boolean, reason?:string, needs?:string}>}
    */
   // eslint-disable-next-line class-methods-use-this
   async check() { return { ok: false, reason: 'Not implemented' }; }
 
- /** adb path（，， PATH） */
+ /** adb path(, ,  PATH) */
   async resolveAdb() { return ''; }
 
   /**
- * runtime：bootboot、 connect。
+ * runtime: bootboot,  connect. 
    * @param {object} o { onLog }
    * @returns {Promise<{ok:boolean, serial?:string, adbPath?:string, reused?:boolean, error?:string}>}
    */
@@ -111,17 +111,17 @@ class Backend {
   async ensure(o = {}) { return { ok: false, error: 'Not implemented' }; }
 
   /**
- * Androidwindow HWND（，）。
- * （WinAgent） SetParent，success。
+ * Androidwindow HWND(, ). 
+ * (WinAgent) SetParent, success. 
    * @returns {Promise<string[]>}
    */
   // eslint-disable-next-line class-methods-use-this
   async windowTargets() { return []; }
 
   /**
- * window（/）。
- * default：window。 emulator window，
- * default；hookruntime。
+ * window(/). 
+ * default: window.  emulator window, 
+ * default; hookruntime. 
    *
    * @param {object} o { isEmbedded?: () => boolean }
    * @returns {Promise<{ok:boolean, reason?:string}>}
@@ -132,8 +132,8 @@ class Backend {
   }
 
   /**
- * window（boot / ，emulator）。
- * window null。
+ * window(boot / , emulator). 
+ * window null. 
  * @returns {Promise<string|null>} HWND
    */
   async hideWindow() { return null; }
@@ -142,11 +142,11 @@ class Backend {
   // eslint-disable-next-line class-methods-use-this
   async stop(o = {}) { return { ok: false, error: 'Not implemented' }; }
 
- /** download/（ CAPS.provision ） */
+ /** download/( CAPS.provision ) */
   // eslint-disable-next-line class-methods-use-this
   async install(component, onProgress) { return { ok: false, error: 'This backend does not support automatic provisioning' }; }
 
- /** （settings「runtime」） */
+ /** (settings"runtime") */
   // eslint-disable-next-line class-methods-use-this
   usage() { return { total: 0, items: [] }; }
 
@@ -162,11 +162,11 @@ class Backend {
   // eslint-disable-next-line class-methods-use-this
   async resetData() { return { ok: false, error: 'This backend does not support resetting data' }; }
 
- /** （ApkStart exit；default） */
+ /** (ApkStart exit; default) */
   // eslint-disable-next-line class-methods-use-this
   dispose() {}
 
- /** diagnose（） */
+ /** diagnose() */
   // eslint-disable-next-line class-methods-use-this
   diagnose() { return {}; }
 }

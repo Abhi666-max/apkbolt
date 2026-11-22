@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 /**
- * .apk （launch）
+ * .apk (launch)
  * node scripts/assoc.js on → APK install
  * node scripts/assoc.js off → 
  */
@@ -20,12 +20,12 @@ if (action === 'on') {
   const iconPath = path.join(__dirname, '..', 'build', 'apkstart.ico');
   const r = registerAssociation(exe, fs.existsSync(iconPath) ? iconPath : undefined,
     isDev ? `"${appDir}"` : undefined);
-  console.log(' .apk ：', r.progId);
-  console.log(' .apk  ApkStart。');
+  console.log(' .apk : ', r.progId);
+  console.log(' .apk  ApkStart. ');
 } else if (action === 'off') {
   unregisterAssociation();
-  console.log(' .apk 。');
+  console.log(' .apk . ');
 } else {
-  console.log('：node scripts/assoc.js [on|off]');
+  console.log(': node scripts/assoc.js [on|off]');
   process.exit(1);
 }

@@ -1,12 +1,12 @@
 'use strict';
 /**
- * dual source：「version」「download」。
+ * dual source: "version""download". 
  *
  * node tools/check-sources.js # update
  * node tools/check-sources.js runtime # runtime
  *
- * 256KB，；
- * 「」。
+ * 256KB, ; 
+ * "". 
  */
 const fs = require('fs');
 const os = require('os');
@@ -33,24 +33,24 @@ const host = (u) => { try { return new URL(u).host; } catch (_) { return u.slice
       const assets = (r.rel.assets || []).length;
       console.log(`  ${r.name.padEnd(7)} ${String(r.rel.tag_name || r.rel.name || '').padEnd(10)}  ${assets} `);
     } else {
-      console.log(`  ${r.name.padEnd(7)} ：${r.error}`);
+      console.log(`  ${r.name.padEnd(7)} : ${r.error}`);
     }
   }
 
   console.log('\n=== 2)  ===');
   const merged = await sources.latest();
-  console.log(`   ${merged.tag}（${merged.assets.length} ）`);
+  console.log(`   ${merged.tag}(${merged.assets.length} )`);
   for (const a of merged.assets) {
-    console.log(`    · ${a.name}  ${(a.size / 1048576).toFixed(0)}MB  [${a.source}]`);
+    console.log(`     -  ${a.name}  ${(a.size / 1048576).toFixed(0)}MB  [${a.source}]`);
   }
 
   console.log('\n=== 3)  ===');
   let target = null;
   if (which === 'runtime') {
     const p = new Provisioner(path.resolve(__dirname, '..'));
-    const pack = await p.resolveRuntimePack().catch((e) => { console.log('  ：', e.message); return null; });
+    const pack = await p.resolveRuntimePack().catch((e) => { console.log('  : ', e.message); return null; });
     if (pack) {
-      console.log(`   ${pack.name}（${pack.tag} · ${pack.from || '?'}）`);
+      console.log(`   ${pack.name}(${pack.tag}  -  ${pack.from || '?'})`);
       target = pack.url;
     }
   } else {
@@ -66,8 +66,8 @@ const host = (u) => { try { return new URL(u).host; } catch (_) { return u.slice
     const cands = sources.candidates(target);
     for (const c of cands) console.log(`  ${host(c).padEnd(22)} ${c === target ? '()' : '()'}`);
     const t0 = Date.now();
-    const ranked = await sources.rank(cands, { onProgress: (p) => console.log('  ·', p.message) });
-    console.log(`   ${Date.now() - t0}ms，：`);
+    const ranked = await sources.rank(cands, { onProgress: (p) => console.log('   - ', p.message) });
+    console.log(`   ${Date.now() - t0}ms, : `);
     ranked.forEach((u, i) => {
       const c = sources._rankCache.get(u) || {};
       console.log(`    ${i + 1}. ${host(u).padEnd(22)} ${c.ok ? `${mb(c.speed)} MB/s` : ''}`);
@@ -76,6 +76,6 @@ const host = (u) => { try { return new URL(u).host; } catch (_) { return u.slice
 
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (_) { /* ignore */ }
 })().catch((e) => {
-  console.error('：', e.message);
+  console.error(': ', e.message);
   process.exit(1);
 });

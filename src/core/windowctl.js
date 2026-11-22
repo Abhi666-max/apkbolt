@@ -1,14 +1,14 @@
 'use strict';
 /**
- * Android Emulator Qt window「appwindow」。
+ * Android Emulator Qt window"appwindow". 
  *
- * ： SurfaceFlinger VSYNC（ screenrecord 3 2 ），
- * CPU。windowemulator 60fps + mouse，
- * 「 / / / 」 Win32 ，。
+ * :  SurfaceFlinger VSYNC( screenrecord 3 2 ), 
+ * CPU. windowemulator 60fps + mouse, 
+ * " / / / " Win32 , . 
  *
- * PowerShell Windows ， ASCII， UTF-8 JSON ，
- * Windows PowerShell 5.1 ANSI .ps1 。
- * failurefallback：window，/。
+ * PowerShell Windows ,  ASCII,  UTF-8 JSON , 
+ * Windows PowerShell 5.1 ANSI .ps1 . 
+ * failurefallback: window, /. 
  */
 const fs = require('fs');
 const os = require('os');
@@ -53,7 +53,7 @@ function call(params) {
   });
 }
 
-/** window，「appwindow」 */
+/** window, "appwindow" */
 async function getBounds(pid) {
   const r = await call({ pid, action: 'get' });
   if (!r || !Number(r.W) || !Number(r.H)) return null;
@@ -65,12 +65,12 @@ async function getBounds(pid) {
 }
 
 /**
- * runtimewindowapp。
+ * runtimewindowapp. 
  * @param {object} o { pid, label, icon, mode:'window'|'fullscreen', bounds, screen }
  */
 async function present(o) {
   const { pid, label, icon, mode, bounds, screen } = o || {};
-  // pid=0 ：emulator，window
+  // pid=0 : emulator, window
   if (pid === undefined || pid === null) return null;
   return call({
     pid,
@@ -84,7 +84,7 @@ async function present(o) {
 
 async function focus(pid) { return call({ pid, action: 'focus' }); }
 
-/** /shortcut，desktop F5 */
+/** /shortcut, desktop F5 */
 async function refreshShell() { return call({ pid: 0, action: 'refresh' }); }
 
 module.exports = { call, getBounds, present, focus, refreshShell, SCRIPT };

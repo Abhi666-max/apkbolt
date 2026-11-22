@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-""" docs/USER-MANUAL.md 、 HTML（）。
-，：python docs/build-manual-html.py
+""" docs/USER-MANUAL.md ,  HTML(). 
+, : python docs/build-manual-html.py
 """
 import html
 import os
@@ -10,8 +10,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(HERE, 'USER-MANUAL.md')
 OUT = os.path.join(HERE, 'ApkStart- .html')
-#  0.6.2 ： HTML  src/ui，。
-#  ， docs/ 。
+#  0.6.2 :  HTML  src/ui, . 
+#  ,  docs/ . 
 APP_OUT = os.path.join(ROOT, 'src', 'ui', 'manual.html')
 
 with open(SRC, encoding='utf-8') as f:
@@ -134,7 +134,7 @@ while i < n:
         i += 1
         continue
 
-    #  （）
+    #  ()
     para = [line.strip()]
     i += 1
     while i < n and lines[i].strip() and not re.match(r'^(#{1,4})\s|^\s*[-*]\s+|^\d+\.\s+|^>|^\s*\||^```|^---+\s*$', lines[i]):
@@ -198,7 +198,7 @@ tbody tr:nth-child(even){background:#fbfcfd}
 <body>
 <div class="wrap">
 <aside><h2></h2>
-<input id="tocSearch" type="search" placeholder="（Ctrl+F ）" autocomplete="off" />
+<input id="tocSearch" type="search" placeholder="(Ctrl+F )" autocomplete="off" />
 <div id="tocList">__TOC__</div>
 </aside>
 <main>
@@ -215,7 +215,7 @@ __BODY__
     var q = input.value.trim().toLowerCase();
     links.forEach(function (a) { a.hidden = !!q && a.textContent.toLowerCase().indexOf(q) < 0; });
   });
-  // ，
+  // , 
   if (location.hash) {
     var hit = document.getElementById(decodeURIComponent(location.hash.slice(1)));
     if (hit) setTimeout(function () { hit.scrollIntoView({ block: 'start' }); }, 80);

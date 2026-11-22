@@ -42,13 +42,13 @@ public class ApkAgent
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetClassNameW(IntPtr h, StringBuilder s, int n);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetWindowTextW(IntPtr h, StringBuilder s, int n);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern bool SetWindowTextW(IntPtr h, string s);
-    // emulatorwindow（windowtaskbar/Alt+Tab app）
+    // emulatorwindow(windowtaskbar/Alt+Tab app)
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr LoadImageW(IntPtr inst, string file, uint type, int w, int h, uint flags);
     [DllImport("user32.dll")] static extern IntPtr SendMessageW(IntPtr h, uint msg, IntPtr wp, IntPtr lp);
     [DllImport("user32.dll")] static extern bool DestroyIcon(IntPtr h);
     [DllImport("user32.dll")] static extern IntPtr SetParent(IntPtr c, IntPtr p);
-    // DPI：appwin.js 。 DPI Windows ，
-    // emulatorwindow（150% 1.5 ）→ /、（issue #40）。
+    // DPI: appwin.js .  DPI Windows , 
+    // emulatorwindow(150% 1.5 )→ /, (issue #40). 
     [DllImport("user32.dll")] static extern bool SetProcessDpiAwarenessContext(IntPtr ctx);
     [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
     [DllImport("user32.dll")] static extern IntPtr GetParent(IntPtr c);
@@ -56,7 +56,7 @@ public class ApkAgent
     [DllImport("user32.dll")] static extern int SetWindowLong(IntPtr h, int i, int v);
     [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int w, int hh, uint f);
     [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int c);
-    // window：
+    // window: 
     [DllImport("user32.dll")] static extern int SetWindowRgn(IntPtr h, IntPtr rgn, bool redraw);
     [DllImport("gdi32.dll")] static extern IntPtr CreateRectRgn(int l, int t, int r, int b);
     [DllImport("gdi32.dll")] static extern bool DeleteObject(IntPtr o);
@@ -121,22 +121,22 @@ public class ApkAgent
     static readonly ConcurrentQueue<string> _events = new ConcurrentQueue<string>();
     static long _lastToolSweep = 0;
     static long _embedAt = 0;
-    // resident：defaultboot，emulator + + 。
-    // 「embed complete」，**resident** —— sweep
-    // windowwindow，（ ApkStart exitdesktop）。
+    // resident: defaultboot, emulator + + . 
+    // "embed complete", **resident** -- sweep
+    // windowwindow, ( ApkStart exitdesktop). 
     static volatile bool _quiet = true;
     static volatile bool _perfMode = false;
     static volatile bool _detachedMode = false;
     static long _bootHideSweep = 0;
-    // 。emulator qemu Windows
-    // window（Win11 Windows Terminal）， 200~300ms；
-    // 250ms ， 15 window。
+    // . emulator qemu Windows
+    // window(Win11 Windows Terminal),  200~300ms; 
+    // 250ms ,  15 window. 
     static long _consoleSweep = 0;
-    // fallbacktimeout： embed （ ApkStart app），
-    // 120ms CPU。window。
+    // fallbacktimeout:  embed ( ApkStart app), 
+    // 120ms CPU. window. 
     static long _bootHideUntil = 0;
     static long _bootHideStart = Environment.TickCount;
-    // 「」（TickCount）。 Serve() sock == null 。
+    // ""(TickCount).  Serve() sock == null . 
     static long _lingerUntil = 0;
 
     // Which windows count as "ours": only those created by a process whose exe lives
@@ -280,15 +280,15 @@ public class ApkAgent
     // "Android Emulator - <avd>:<port>"; the volume/rotate rail lives in a separate
     // small "QWindowTool*" window we hide.
     //
-    // note：emulatorboot（resident）window****，
-    // IsWindowVisible —— window，
-    // appwindow。「 Android Emulator ，
-    // window」。 / hint（QWindowTool），。
+    // note: emulatorboot(resident)window****, 
+    // IsWindowVisible -- window, 
+    // appwindow. " Android Emulator , 
+    // window".  / hint(QWindowTool), . 
     //
-    // ApkStart windowapp（ "title" ），
-    // 「」。 volatile 。
+    // ApkStart windowapp( "title" ), 
+    // "".  volatile . 
     public static string _ourTitle = "";
-    // apppath：Qt windowdefault，。
+    // apppath: Qt windowdefault, . 
     public static string _ourIconFile = "";
     public static IntPtr _ourIconSmall = IntPtr.Zero;
     public static IntPtr _ourIconBig = IntPtr.Zero;
@@ -319,7 +319,7 @@ public class ApkAgent
             if (!GetWindowRect(h, out r)) return true;
             long area = (long)(r.R - r.L) * (r.B - r.T);
             if (area < 200 * 200) return true;   // / hintwindow
-            // window，
+            // window, 
             long score = area + (IsWindowVisible(h) ? 1000000000L : 0);
             if (score > bestScore) { bestScore = score; best = h; }
             return true;
@@ -327,8 +327,8 @@ public class ApkAgent
         return best;
     }
 
-    // diagnose：window（ / / pid / / ）。
-    // 「」——emulator、netsim 。
+    // diagnose: window( / / pid / / ). 
+    // ""--emulator, netsim . 
     static string ListWindows(bool includeHidden)
     {
         var sb = new StringBuilder();
@@ -338,7 +338,7 @@ public class ApkAgent
             if (!vis && !includeHidden) return true;
             string cls = ClassOf(h);
             string title = TitleOf(h);
-            // window（），emulator/Qt
+            // window(), emulator/Qt
             if (!vis && cls.IndexOf("QWindow", StringComparison.Ordinal) < 0
                 && title.IndexOf("Android Emulator", StringComparison.OrdinalIgnoreCase) < 0) return true;
             RECT r;
@@ -380,18 +380,18 @@ public class ApkAgent
         }, IntPtr.Zero);
     }
 
-    // boot： qemu / emulator window，「window」。
-    // console ，Node windowsHide ， Win32 。
+    // boot:  qemu / emulator window, "window". 
+    // console , Node windowsHide ,  Win32 . 
     //
-    // ：Windows 10 window conhost.exe，GetWindowThreadProcessId
-    // conhost pid， emulator pid —— pid whitelist，
-    // （"， cmd "）。
-    // 「pid window（launch exe path）」，。
+    // : Windows 10 window conhost.exe, GetWindowThreadProcessId
+    // conhost pid,  emulator pid -- pid whitelist, 
+    // (",  cmd "). 
+    // "pid window(launch exe path)", . 
     static void HideConsoleWindows()
     {
         if (_scopeDirs.Count == 0) return;   // no scope: never touch anybody's terminal
 
-        // window；（GetProcessesByName ）
+        // window; (GetProcessesByName )
         var consoles = new System.Collections.Generic.List<IntPtr>();
         EnumWindows(delegate(IntPtr h, IntPtr p)
         {
@@ -404,31 +404,31 @@ public class ApkAgent
         }, IntPtr.Zero);
         if (consoles.Count == 0) return;
 
-        // 「 emulator / qemu / netsim 」，
-        // （path， D://Android//emulator）。
-        // ：conhost runtimedirectory，
-        // runtimedirectorypath（Windows system imagepath）。
+        // " emulator / qemu / netsim ", 
+        // (path,  D://Android//emulator). 
+        // : conhost runtimedirectory, 
+        // runtimedirectorypath(Windows system imagepath). 
         long now = Environment.TickCount;
         foreach (IntPtr h in consoles)
         {
             if (IsOurConsole(h)) { ShowWindow(h, 0); continue; }
-            // （Windows 11 ）：default Windows Terminal ，
-            // emulator qemu window WindowsTerminal.exe ——
-            // pid 、、 "Terminal"，
-            // ，boot 200~300ms 。
-            // 「boot + boot 20 + / Terminal」
-            // 。（PowerShell、path），
-            // ；，，。
+            // (Windows 11 ): default Windows Terminal , 
+            // emulator qemu window WindowsTerminal.exe --
+            // pid , ,  "Terminal", 
+            // , boot 200~300ms . 
+            // "boot + boot 20 + / Terminal"
+            // . (PowerShell, path), 
+            // ; , , . 
             if (_bootHideStart != 0 && now - _bootHideStart < 20000
                 && !_consolesBeforeBoot.Contains(h.ToInt64()))
             {
                 string t = TitleOf(h);
                 string tl = t.ToLowerInvariant();
-                // ：、 "Terminal"、 "Windows Terminal"
-                // （ WT version shell ）。「
-                // 」——， terminal。
-                // _consolesBeforeBoot ，；
-                // ，。
+                // : ,  "Terminal",  "Windows Terminal"
+                // ( WT version shell ). "
+                // "--,  terminal. 
+                // _consolesBeforeBoot , ; 
+                // , . 
                 bool plain = t.Length == 0 || tl.IndexOf("terminal", StringComparison.Ordinal) >= 0;
                 if (plain)
                 {
@@ -438,9 +438,9 @@ public class ApkAgent
         }
     }
 
-    // 「boot（boothide）window」。
-    // Windows Terminal qemu window，window pid /
-    // / ；「boot、boot」。
+    // "boot(boothide)window". 
+    // Windows Terminal qemu window, window pid /
+    // / ; "boot, boot". 
     static System.Collections.Generic.HashSet<long> _consolesBeforeBoot =
         new System.Collections.Generic.HashSet<long>();
 
@@ -458,8 +458,8 @@ public class ApkAgent
         }, IntPtr.Zero);
     }
 
-    // diagnose：「」window（）， tools 。
-    // ours=true emulator/qemu window。
+    // diagnose: ""window(),  tools . 
+    // ours=true emulator/qemu window. 
     static string ListConsoles()
     {
         var sb = new StringBuilder();
@@ -497,11 +497,11 @@ public class ApkAgent
         return b.ToString();
     }
 
-    // fallback：「runtime」**window**。
-    // emulatorwindow（），emulator / qemu / netsimd / adb
-    // （Qt hint、、、log…）。
-    // ，；「runtimedirectory」
-    // ，。windowemulatorwindow，。
+    // fallback: "runtime"**window**. 
+    // emulatorwindow(), emulator / qemu / netsimd / adb
+    // (Qt hint, , , log...). 
+    // , ; "runtimedirectory"
+    // , . windowemulatorwindow, . 
     static void HideStrayWindows()
     {
         if (_scopeDirs.Count == 0) return;
@@ -514,8 +514,8 @@ public class ApkAgent
             GetWindowThreadProcessId(h, out pid);
             if (!IsOurs(pid)) return true;
             string cls = ClassOf(h);
-            // ：Qt hint / / 。
-            // QWindowIcon / subWin —— LCD，。
+            // : Qt hint / / . 
+            // QWindowIcon / subWin -- LCD, . 
             bool safe = cls.IndexOf("QWindowTool", StringComparison.Ordinal) >= 0
                      || cls.IndexOf("ConsoleWindowClass", StringComparison.Ordinal) >= 0
                      || cls.IndexOf("CASCADIA_HOSTING_WINDOW_CLASS", StringComparison.Ordinal) >= 0
@@ -529,14 +529,14 @@ public class ApkAgent
         }, IntPtr.Zero);
     }
 
-    // resident：emulatorwindow「windowwindow」，。
-    // emulatorboot、， ApkStart exit（windowdesktop，
-    // window）， "Android Emulator - apkstart5554" 。
-    // （QWindowTool）window（qemu / netsimd / emulator）。
+    // resident: emulatorwindow"windowwindow", . 
+    // emulatorboot, ,  ApkStart exit(windowdesktop, 
+    // window),  "Android Emulator - apkstart5554" . 
+    // (QWindowTool)window(qemu / netsimd / emulator). 
 
-    // embed Electron window，FindChromeRender 0，
-    // simulator window（）——
-    // mouse。resident：，。
+    // embed Electron window, FindChromeRender 0, 
+    // simulator window()--
+    // mouse. resident: , . 
     static void EnsureReparent()
     {
         if (_emu == IntPtr.Zero || _host == IntPtr.Zero) return;
@@ -545,30 +545,30 @@ public class ApkAgent
         if (_chromeRender == IntPtr.Zero) return;
         IntPtr ep = GetParent(_emu);
         if (ep == _chromeRender) return;
-        if (ep != _host && ep != IntPtr.Zero) return;   // ，
+        if (ep != _host && ep != IntPtr.Zero) return;   // , 
         RECT r;
         if (!GetWindowRect(_emu, out r)) return;
         RECT hr;
         if (!GetWindowRect(_host, out hr)) return;
         SetParent(_emu, _chromeRender);
-        // （），
+        // (), 
         SetWindowPos(_emu, IntPtr.Zero, r.L - hr.L, r.T - hr.T,
                      r.R - r.L, r.B - r.T, 0x0004 | 0x0010 | 0x0040);
     }
 
     static void QuietSweep()
     {
-        // window：emulatorwindow「」，，
-        // Fit。。
+        // window: emulatorwindow"", , 
+        // Fit. . 
         if (_detachedMode)
         {
-            // Qt /window "Android Emulator - ..."。
-            // ，taskbar ApkStart（app）。
+            // Qt /window "Android Emulator - ...". 
+            // , taskbar ApkStart(app). 
             if (_ourTitle.Length > 0 && _emu != IntPtr.Zero
                 && !String.Equals(TitleOf(_emu), _ourTitle, StringComparison.Ordinal))
                 SetWindowTextW(_emu, _ourTitle);
-            // Qt /windowdefault，。
-            // WM_GETICON window，；cache。
+            // Qt /windowdefault, . 
+            // WM_GETICON window, ; cache. 
             if (_emu != IntPtr.Zero && (_ourIconSmall != IntPtr.Zero || _ourIconBig != IntPtr.Zero)
                 && SendMessageW(_emu, 0x007F, new IntPtr(1), IntPtr.Zero) == IntPtr.Zero)
             {
@@ -580,9 +580,9 @@ public class ApkAgent
             return;
         }
         EnsureReparent();
-        // self-healing：/，Electron chrome ，
-        // 。（Fit ，
-        // SetWindowPos ）。
+        // self-healing: /, Electron chrome , 
+        // . (Fit , 
+        // SetWindowPos ). 
         if (_emu != IntPtr.Zero && _host != IntPtr.Zero) Fit(-8, 30, 640, 480, false, 0);
         IntPtr ep = _emu != IntPtr.Zero ? GetParent(_emu) : IntPtr.Zero;
         bool embedded = _emu != IntPtr.Zero && ep != IntPtr.Zero
@@ -616,12 +616,12 @@ public class ApkAgent
 
     // ------------------------------------------------------------------ embed / detach
 
-    // window Chromium window。
-    // Electron （Chrome_RenderWidgetHostHWND）emulatorwindow
-    // window，「」， Electron ——
-    // Android、mouse（「 /
-    // / / 」）。
-    // emulator**window**，Z mouseemulator。
+    // window Chromium window. 
+    // Electron (Chrome_RenderWidgetHostHWND)emulatorwindow
+    // window, "",  Electron --
+    // Android, mouse(" /
+    // / / "). 
+    // emulator**window**, Z mouseemulator. 
     static IntPtr FindChromeRender(IntPtr host)
     {
         IntPtr found = IntPtr.Zero;
@@ -641,9 +641,9 @@ public class ApkAgent
     {
         if (host == IntPtr.Zero || emu == IntPtr.Zero) return false;
         HideToolWindows();
-        // window，， Fit 。
+        // window, ,  Fit . 
         IntPtr parent = FindChromeRender(host);
-        if (parent == IntPtr.Zero) parent = host;   // ，app
+        if (parent == IntPtr.Zero) parent = host;   // , app
         SetParent(emu, parent);
         uint style = (uint)GetWindowLong(emu, GWL_STYLE);
         style &= ~WS_POPUP;
@@ -653,19 +653,19 @@ public class ApkAgent
         int ex = GetWindowLong(emu, GWL_EXSTYLE);
         ex &= ~(WS_EX_APPWINDOW | WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE);
         SetWindowLong(emu, GWL_EXSTYLE, ex);
-        // versionwindow window region；，
+        // versionwindow window region; , 
         SetWindowRgn(emu, IntPtr.Zero, false);
         return true;
     }
 
-    // HWND_TOP: Chromium windowemulatorwindow，
-    // Chromium （black screen）。
+    // HWND_TOP: Chromium windowemulatorwindow, 
+    // Chromium (black screen). 
     static readonly IntPtr HWND_TOP = new IntPtr(1);
     static void Fit(int x, int y, int w, int h, bool frame, int clipTop)
     {
         if (_emu == IntPtr.Zero) return;
-        // Fit JS resize ，。
-        // emulator（mouse）。
+        // Fit JS resize , . 
+        // emulator(mouse). 
         if (_host != IntPtr.Zero)
         {
             IntPtr cr = FindChromeRender(_host);
@@ -676,18 +676,18 @@ public class ApkAgent
                 if (cur != cr && (cur == _host || cur == IntPtr.Zero))
                 {
                     SetParent(_emu, cr);
-                    // ，， x/y
+                    // , ,  x/y
                 }
             }
         }
-        // **window** ， JS w/h、
-        // Chrome 。
+        // **window** ,  JS w/h, 
+        // Chrome . 
         //
-        // ：Electron window 1936x1048，
-        // Chrome_RenderWidgetHostHWND （ 532x984）—— emulator
-        // window chrome ，window，、
-        // （「/」）。
-        // chrome ， emu 。
+        // : Electron window 1936x1048, 
+        // Chrome_RenderWidgetHostHWND ( 532x984)-- emulator
+        // window chrome , window, , 
+        // ("/"). 
+        // chrome ,  emu . 
         if (_host != IntPtr.Zero)
         {
             RECT hc;
@@ -709,8 +709,8 @@ public class ApkAgent
                             }
                         }
                     }
-                    // x/y -8 （ Qt 8px ），
-                    // + 2*8； 38px 。
+                    // x/y -8 ( Qt 8px ), 
+                    // + 2*8;  38px . 
                     x = -8;
                     y = 38 - 8;
                     w = cw + 16;
@@ -720,9 +720,9 @@ public class ApkAgent
         }
         if (w < 16) w = 16;
         if (h < 16) h = 16;
-        // 「window」。
-        // embed failure（emulatorwindow / ），Fit window
-        // desktop —— "Android Emulator - apkstart5554" 。
+        // "window". 
+        // embed failure(emulatorwindow / ), Fit window
+        // desktop -- "Android Emulator - apkstart5554" . 
         IntPtr ep = GetParent(_emu);
         bool embedded = ep != IntPtr.Zero
                      && (ep == _host || ep == _chromeRender);
@@ -736,9 +736,9 @@ public class ApkAgent
         // on every periodic sweep caused visible stutter and wasted GPU/CPU.
         uint flags = SWP_NOACTIVATE | SWP_SHOWWINDOW | (frame ? SWP_FRAMECHANGED : 0u);
         SetWindowPos(_emu, HWND_TOP, x, y, w, h, flags);
-        // window window region：Qt/GL window region，
-        // （ / ），rotate region
-        // 。 8px 。
+        // window window region: Qt/GL window region, 
+        // ( / ), rotate region
+        // .  8px . 
     }
 
     static void Raise()
@@ -759,14 +759,14 @@ public class ApkAgent
         ex |= WS_EX_APPWINDOW;
         SetWindowLong(_emu, GWL_EXSTYLE, ex);
         SetWindowPos(_emu, IntPtr.Zero, 60, 40, 480, 853, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-        // window：show / layout window。
-        // embedded mode（default），。
+        // window: show / layout window. 
+        // embedded mode(default), . 
         if (!_detachedMode) _emu = IntPtr.Zero;
     }
 
-    // Detach ，****window：window。
-    // ，Windows windowdesktop，
-    // "Android Emulator - apkstart5554" 。
+    // Detach , ****window: window. 
+    // , Windows windowdesktop, 
+    // "Android Emulator - apkstart5554" . 
     static void ParkEmulator()
     {
         if (_emu == IntPtr.Zero) _emu = FindEmulator();
@@ -776,8 +776,8 @@ public class ApkAgent
         SetParent(e, IntPtr.Zero);
         uint style = (uint)GetWindowLong(e, GWL_STYLE);
         style &= ~WS_CHILD;
-        // WS_VISIBLE(0x10000000) ：「SetParent 」，
-        // （MuMu），appwindowemulator。
+        // WS_VISIBLE(0x10000000) : "SetParent ", 
+        // (MuMu), appwindowemulator. 
         style |= (uint)(WS_CAPTION | WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | 0x10000000);
         SetWindowLong(e, GWL_STYLE, (int)style);
         int ex = GetWindowLong(e, GWL_EXSTYLE);
@@ -789,11 +789,11 @@ public class ApkAgent
     }
 
     // ------------------------------------------------------------------ rotation
-    // emulator「orientation」， Qt Ctrl+←/→ ；
-    // adb emu rotate 90°，portrait（）。
-    // emulatorwindow，windowwindow、
-    // 。，temporaryemulator，
-    // 。
+    // emulator"orientation",  Qt Ctrl+←/→ ; 
+    // adb emu rotate 90°, portrait(). 
+    // emulatorwindow, windowwindow, 
+    // . , temporaryemulator, 
+    // . 
     static void Rotate(string dir)
     {
         if (_emu == IntPtr.Zero) _emu = FindEmulator();
@@ -1000,8 +1000,8 @@ public class ApkAgent
         if (_hook != IntPtr.Zero) { UnhookWindowsHookEx(_hook); _hook = IntPtr.Zero; }
         if (_hookTid != 0) PostThreadMessage(_hookTid, 0x0012, IntPtr.Zero, IntPtr.Zero); // WM_QUIT
         _hookThread = null;
-        // _hookProc ：hook， null
-        // GC reclaim。exit。
+        // _hookProc : hook,  null
+        // GC reclaim. exit. 
     }
 
     // ------------------------------------------------------------------ plumbing
@@ -1040,8 +1040,8 @@ public class ApkAgent
         return j < 0 ? "" : line.Substring(i, j - i);
     }
 
-    // "0x1A2B3C" / "17158972" HWND。（MuMu），
-    // ，。
+    // "0x1A2B3C" / "17158972" HWND. (MuMu), 
+    // , . 
     static IntPtr ParseHwnd(string raw)
     {
         if (string.IsNullOrEmpty(raw)) return IntPtr.Zero;
@@ -1079,7 +1079,7 @@ public class ApkAgent
 
     public static void Serve(int port)
     {
-        // per-monitor v2（Win10 1703+），failure system-aware
+        // per-monitor v2(Win10 1703+), failure system-aware
         try { if (!SetProcessDpiAwarenessContext(new IntPtr(-4))) SetProcessDPIAware(); } catch { try { SetProcessDPIAware(); } catch { } }
         TcpListener l = new TcpListener(IPAddress.Loopback, port);
         l.Start();
@@ -1115,11 +1115,11 @@ public class ApkAgent
             }
             if (_embedAt != 0 && now - _embedAt >= 8000) _embedAt = 0;
 
-            // resident：emulator / / qemu·netsimd 。
-            // desktopwindow， —— 120ms 90 ，
-            // （「stutter」）。window
-            // ：boot 10 250ms ， 1500ms fallback。
-            // game （_perfMode） 3000ms， CPU Android。
+            // resident: emulator / / qemu - netsimd . 
+            // desktopwindow,  -- 120ms 90 , 
+            // ("stutter"). window
+            // : boot 10 250ms ,  1500ms fallback. 
+            // game (_perfMode) 3000ms,  CPU Android. 
             long sweepGap;
             if (_perfMode) sweepGap = (now - _bootHideStart < 10000) ? 300 : 3000;
             else sweepGap = (now - _bootHideStart < 10000) ? 250 : 1500;
@@ -1129,12 +1129,12 @@ public class ApkAgent
                 QuietSweep();
             }
 
-            // （ 15 、window）。
-            // ：emulator launch qemu Windows window，
-            // conhost / WindowsTerminal，IsOurs false，
-            // IsOurConsole 「 = runtimepath」。window
-            // 200~300ms，250ms —— boot
-            // 。 100ms ，。
+            // ( 15 , window). 
+            // : emulator launch qemu Windows window, 
+            // conhost / WindowsTerminal, IsOurs false, 
+            // IsOurConsole " = runtimepath". window
+            // 200~300ms, 250ms -- boot
+            // .  100ms , . 
             if (_quiet && now - _bootHideStart < 15000
                 && now - _consoleSweep > (_perfMode ? 200 : 100))
             {
@@ -1144,10 +1144,10 @@ public class ApkAgent
 
             try
             {
-                // （ApkStart exit / ）：。
-                // emulatorboot， Qt window ——
-                // ，desktop Android Emulator 。
-                // 「」，emulator。
+                // (ApkStart exit / ): . 
+                // emulatorboot,  Qt window --
+                // , desktop Android Emulator . 
+                // "", emulator. 
                 if (sock == null)
                 {
                     if (Environment.TickCount > _lingerUntil) break;
@@ -1190,12 +1190,12 @@ public class ApkAgent
                     }
                     else if (cmd == "embed")
                     {
-                        // window：，resident，
-                        // emulatorwindow「」 Fit。
+                        // window: , resident, 
+                        // emulatorwindow"" Fit. 
                         _detachedMode = false;
-                        // 「」。（window
-                        // ），window SetParent，
-                        // Fit SWP_SHOWWINDOW 。
+                        // "". (window
+                        // ), window SetParent, 
+                        // Fit SWP_SHOWWINDOW . 
                         IntPtr want = new IntPtr(L(line, "host"));
                         uint wantPid = 0;
                         if (want != IntPtr.Zero) GetWindowThreadProcessId(want, out wantPid);
@@ -1212,9 +1212,9 @@ public class ApkAgent
                             _host = want;
                             _hostPid = wantPid;
                             _chromeRender = FindChromeRender(want);
-                            // （MuMu ）window；
-                            // "target" ， SetParent，
-                            // window。
+                            // (MuMu )window; 
+                            // "target" ,  SetParent, 
+                            // window. 
                             string targets = S(line, "target");
                             _emu = IntPtr.Zero;
                             if (_quiet) { _quiet = false; _bootHideUntil = 0; }   // window
@@ -1225,7 +1225,7 @@ public class ApkAgent
                                 {
                                     IntPtr cand = ParseHwnd(pieces[i]);
                                     if (cand == IntPtr.Zero || !IsWindow(cand)) continue;
-                                    // window（ embed / ）：
+                                    // window( embed / ): 
                                     if (GetParent(cand) == want || GetParent(cand) == _chromeRender)
                                     {
                                         _emu = cand;
@@ -1250,8 +1250,8 @@ public class ApkAgent
                             _lastToolSweep = 0;
                             Fit((int)L(line, "x"), (int)L(line, "y"), (int)L(line, "w"), (int)L(line, "h"), true, (int)L(line, "clipTop"));
                             Reply(sock, "{\"ok\":" + (ok ? "true" : "false") + ",\"emu\":" + _emu.ToInt64() + "}");
-                            // window、：
-                            // WS_VISIBLE， SetParent 。
+                            // window, : 
+                            // WS_VISIBLE,  SetParent . 
                             if (ok && !string.IsNullOrEmpty(targets)) ShowWindow(_emu, 5);
                         }
                     }
@@ -1274,27 +1274,27 @@ public class ApkAgent
                     }
                     else if (cmd == "perf")
                     {
-                        // JS priorityMode ：game window
+                        // JS priorityMode : game window
                         _perfMode = L(line, "on") != 0;
                         Reply(sock, "{\"ok\":true}");
                     }
                     else if (cmd == "show")
                     {
-                        // window Detach() _emu （「」），
-                        // ， show/layout ，
-                        // 「windowemulatorwindow」。
+                        // window Detach() _emu (""), 
+                        // ,  show/layout , 
+                        // "windowemulatorwindow". 
                         if (_emu == IntPtr.Zero) _emu = FindEmulator();
                         if (_emu != IntPtr.Zero) ShowWindow(_emu, 5);
                         Reply(sock, "{\"ok\":" + (_emu != IntPtr.Zero ? "true" : "false") + "}");
                     }
                     else if (cmd == "detach")
                     {
-                        // keep=1 「window」：
-                        // 「、emulator」， QuietSweep
-                        // window。
+                        // keep=1 "window": 
+                        // ", emulator",  QuietSweep
+                        // window. 
                         _detachedMode = L(line, "keep") == 1;
-                        // embed （_emu 0），，
-                        // Detach return， show/layout 。
+                        // embed (_emu 0), , 
+                        // Detach return,  show/layout . 
                         if (_emu == IntPtr.Zero) _emu = FindEmulator();
                         Detach();
                         Reply(sock, "{\"ok\":true,\"emu\":" + _emu.ToInt64() + "}");
@@ -1302,8 +1302,8 @@ public class ApkAgent
                     else if (cmd == "title")
                     {
                         // emulatorwindow "Android Emulator - apkstart:5554"
-                        // （default "ApkStart"）。Qt window
-                        // ， QuietSweep （）。
+                        // (default "ApkStart"). Qt window
+                        // ,  QuietSweep (). 
                         string t = S(line, "text");
                         if (t.Length == 0) t = "ApkStart";
                         _ourTitle = t;
@@ -1313,15 +1313,15 @@ public class ApkAgent
                     }
                     else if (cmd == "icon")
                     {
-                        // emulatorwindow（windowtaskbar/Alt+Tab app，
-                        // Google emulatordefault）。 ICO/PNG path。
+                        // emulatorwindow(windowtaskbar/Alt+Tab app, 
+                        // Google emulatordefault).  ICO/PNG path. 
                         string f = S(line, "file");
                         if (_emu == IntPtr.Zero) _emu = FindEmulator();
                         bool ok = false;
                         if (f.Length > 0 && System.IO.File.Exists(f))
                         {
-                            // cache：app、；cache，
-                            // LoadImage（disk IO + GDI ）。
+                            // cache: app, ; cache, 
+                            // LoadImage(disk IO + GDI ). 
                             if (!String.Equals(f, _ourIconFile, StringComparison.OrdinalIgnoreCase))
                             {
                                 if (_ourIconSmall != IntPtr.Zero) DestroyIcon(_ourIconSmall);
@@ -1343,9 +1343,9 @@ public class ApkAgent
                     }
                     else if (cmd == "layout")
                     {
-                        // window：emulatorwindowwindow，
-                        // （ SetParent）。orientation//，
-                        // embedded mode、、。
+                        // window: emulatorwindowwindow, 
+                        // ( SetParent). orientation//, 
+                        // embedded mode, , . 
                         if (_emu == IntPtr.Zero) _emu = FindEmulator();
                         if (_emu == IntPtr.Zero)
                         {
@@ -1353,7 +1353,7 @@ public class ApkAgent
                         }
                         else
                         {
-                            // window（WS_CHILD Detach ）
+                            // window(WS_CHILD Detach )
                             ShowWindow(_emu, 5);
                             SetWindowPos(_emu, HWND_TOP,
                                 (int)L(line, "x"), (int)L(line, "y"),
@@ -1383,8 +1383,8 @@ public class ApkAgent
                     }
                     else if (cmd == "winready")
                     {
-                        // ： + 「」。
-                        // JS （ backends/mumu.js windowReady）。
+                        // :  + "". 
+                        // JS ( backends/mumu.js windowReady). 
                         string list = S(line, "target");
                         int alive = 0;
                         string first = "";
@@ -1422,8 +1422,8 @@ public class ApkAgent
                         }
                         else
                         {
-                            // window，（ quiet
-                            // emulatorwindow，settings startVisible）。
+                            // window, ( quiet
+                            // emulatorwindow, settings startVisible). 
                             _quiet = false;
                             HideConsoleWindows();
                         }
@@ -1431,9 +1431,9 @@ public class ApkAgent
                     }
                     else if (cmd == "park")
                     {
-                        // appwindow：emulatorwindow，
-                        // Windows desktop、window
-                        // （「 Android Emulator 」）。
+                        // appwindow: emulatorwindow, 
+                        // Windows desktop, window
+                        // (" Android Emulator "). 
                         _quiet = true;
                         _bootHideStart = Environment.TickCount;
                         _bootHideSweep = 0;

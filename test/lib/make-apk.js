@@ -1,10 +1,10 @@
 'use strict';
 /**
- * 「 APK」（ test/ ，）。
- * ： APK 、， axml.js / apk.js
- *  CI 。**** AXML  +
- *  ZIP，。
- * ：
+ * " APK"( test/ , ). 
+ * :  APK , ,  axml.js / apk.js
+ *  CI . **** AXML  +
+ *  ZIP, . 
+ * : 
  *   <manifest package="com.example.test" android:versionCode="7" android:versionName="1.2.3">
  *     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34"/>
  *     <application android:label="TestApp" android:icon="res/mipmap-hdpi/ic_launcher.png">
@@ -113,7 +113,7 @@ function buildManifestAxml() {
   return Buffer.concat([u16(0x0003), u16(8), u32(8 + all.length), all]);
 }
 
-/**  ZIP（stored，） */
+/**  ZIP(stored, ) */
 function buildStoredZip(entries) {
   const locals = [];
   const centrals = [];

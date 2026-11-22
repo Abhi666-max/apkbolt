@@ -1,27 +1,27 @@
 'use strict';
 /**
- * ：install****emulator。
+ * : install****emulator. 
  *
- * ：
- * ApkStart install（NSIS / portable version / MSIX） —— emulator +
- * platform-tools + system image，， MuMu / / 。
- * 0.5.6 ：****，install「runtime + 」，
- * 「runtime」。，
- * （backends/mumu.js / backends/fydeos.js / mumu-compat.js）—— ，
- * failure，「emulator」。
+ * : 
+ * ApkStart install(NSIS / portable version / MSIX) -- emulator +
+ * platform-tools + system image, ,  MuMu / / . 
+ * 0.5.6 : ****, install"runtime + ", 
+ * "runtime". , 
+ * (backends/mumu.js / backends/fydeos.js / mumu-compat.js)-- , 
+ * failure, "emulator". 
  *
- * ： MuMu directoryruntime build/runtime，
- * emulatordirectory resources 。app，
- * 「emulator」——。
- * ，failure。
+ * :  MuMu directoryruntime build/runtime, 
+ * emulatordirectory resources . app, 
+ * "emulator"--. 
+ * , failure. 
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /**
- * ，「emulator」。
- * emulator， /android/ ，。
+ * , "emulator". 
+ * emulator,  /android/ , . 
  */
 const BANNED = [
   { re: /^mumu/i, vendor: 'MuMu Emulator' },          // MuMuManager.exe / MuMuPlayer.exe / MuMuVMMVbox
@@ -36,13 +36,13 @@ const BANNED = [
   { re: /^mgalaxy/i, vendor: 'MEmu ' },
 ];
 
-/** 「emulator」；.js/.md/.json configuration， */
+/** "emulator"; .js/.md/.json configuration,  */
 const BINARY_EXT = /\.(exe|dll|sys|nemu|vdi|vmdk|vbox|iso|msi|bin|dat|db|img)$/i;
 
 /**
- * /directory。
- * @param {string} dir directory（ resources/runtime app directory）
- * @param {object} [opts] { limit } （default 20，hint）
+ * /directory. 
+ * @param {string} dir directory( resources/runtime app directory)
+ * @param {object} [opts] { limit } (default 20, hint)
  * @returns {Array<{path: string, name: string, vendor: string}>}
  */
 function findBundled(dir, { limit = 20 } = {}) {
@@ -53,15 +53,15 @@ function findBundled(dir, { limit = 20 } = {}) {
     try {
       entries = fs.readdirSync(d, { withFileTypes: true });
     } catch (_) {
-      return; // / ：
+      return; // / : 
     }
     for (const e of entries) {
       if (hits.length >= limit) return;
       const hit = BANNED.find((b) => b.re.test(e.name));
-      // directory；（ backends/mumu.js MuMu ）
+      // directory; ( backends/mumu.js MuMu )
       if (hit && (e.isDirectory() || BINARY_EXT.test(e.name))) {
         hits.push({ path: path.join(d, e.name), name: e.name, vendor: hit.vendor });
-        continue; // directory，
+        continue; // directory, 
       }
       if (e.isDirectory()) walk(path.join(d, e.name));
     }
@@ -71,8 +71,8 @@ function findBundled(dir, { limit = 20 } = {}) {
 }
 
 /**
- * （「emulator」）。
- * .js， BINARY_EXT ，。
+ * ("emulator"). 
+ * .js,  BINARY_EXT , . 
  */
 const BANNED_SOURCE = [
   { re: /^mumu\.js$/i, what: 'MuMu ' },
@@ -82,8 +82,8 @@ const BANNED_SOURCE = [
 ];
 
 /**
- * 。
- * 「backends/xxx.js」 src/core ， frame.js。
+ * . 
+ * "backends/xxx.js" src/core ,  frame.js. 
  * @param {string} dir
  * @returns {Array<{path: string, name: string, vendor: string}>}
  */
@@ -101,8 +101,8 @@ function findForbiddenSource(dir) {
       if (e.isDirectory()) { walk(path.join(d, e.name)); continue; }
       const hit = BANNED_SOURCE.find((b) => b.re.test(e.name));
       if (!hit) continue;
-      // ：backends/ mumu|fydeos、core/ mumu-compat / frame。
-      // （ frame.js），。
+      // : backends/ mumu|fydeos, core/ mumu-compat / frame. 
+      // ( frame.js), . 
       const suspicious = dirName === 'backends' || (dirName === 'core' && !/^builtin\.js$/i.test(e.name));
       if (suspicious) hits.push({ path: path.join(d, e.name), name: e.name, vendor: hit.what });
     }
@@ -112,9 +112,9 @@ function findForbiddenSource(dir) {
 }
 
 /**
- * directoryemulator。
+ * directoryemulator. 
  * @param {string} dir
- * @param {object} [opts] { label, exit } label hint；exit=false 
+ * @param {object} [opts] { label, exit } label hint; exit=false 
  * @returns {{ok: boolean, skipped?: boolean, hits: Array}}
  */
 function assertStandalone(dir, { label = '', exit = true } = {}) {
@@ -123,12 +123,12 @@ function assertStandalone(dir, { label = '', exit = true } = {}) {
   if (!hits.length) return { ok: true, hits: [] };
 
   const vendors = [...new Set(hits.map((h) => h.vendor))].join(' / ');
-  console.error(`\n[] ${label} （${vendors}）：`);
+  console.error(`\n[] ${label} (${vendors}): `);
   for (const h of hits) console.error(`  - ${h.path}`);
   console.error('');
-  console.error('ApkStart 、：、，');
-  console.error('「」。');
-  console.error('。\n');
+  console.error('ApkStart , : , , ');
+  console.error('"". ');
+  console.error('. \n');
   if (exit) process.exit(4);
   return { ok: false, hits };
 }

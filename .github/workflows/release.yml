@@ -35,7 +35,7 @@ jobs:
         run: |
           $tag = "${{ github.ref_name }}"
           if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
-          node build/zip.js dist/ApkStart-win64-portable "ApkBolt-$tag-win64-portable.zip" --limit-mb 100
+          node build/zip.js dist/ApkBolt-win64-portable "ApkBolt-$tag-win64-portable.zip" --limit-mb 100
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-Item "ApkBolt-$tag-win64-portable.zip" | Select-Object Name, Length
 
@@ -44,7 +44,7 @@ jobs:
         run: |
           $tag = "${{ github.ref_name }}"
           if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
-          node build/incremental.js dist/ApkStart-win64-portable $tag
+          node build/incremental.js dist/ApkBolt-win64-portable $tag
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Create Release and upload assets

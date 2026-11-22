@@ -28,7 +28,7 @@ function assert(cond, msg) {
 console.log('\n[zip.js]');
 const { ZipArchive } = require('../src/core/zip');
 test('package.json', () => {
-  // zip（stored ）
+  // zip(stored )
   const header = Buffer.alloc(30);
   header.writeUInt32LE(0x04034b50, 0);
   header.writeUInt16LE(20, 4);
@@ -72,7 +72,7 @@ test('unit test verification', () => {
   for (const s of [16, 32, 64, 256]) {
     const png = drawAppIcon(s);
     const w = png.readUInt32BE(16);
-    assert(w === s, ` ${s}， ${w}`);
+    assert(w === s, ` ${s},  ${w}`);
   }
 });
 
@@ -81,8 +81,8 @@ const { parseAxml } = require('../src/core/axml');
 const { ResTable } = require('../src/core/arsc');
 const { parseApk, quickCheck } = require('../src/core/apk');
 
-// ： APKSTART_TEST_APK ，
-// APK （，）
+// :  APKSTART_TEST_APK , 
+// APK (, )
 function findFixture() {
   const candidates = [
     process.env.APKSTART_TEST_APK,
@@ -99,7 +99,7 @@ function findFixture() {
 
 const fixture = findFixture();
 if (fixture) {
-  console.log(`  （：${fixture}）`);
+  console.log(`  (: ${fixture})`);
   test('quickCheck PK', () => {
     assert(quickCheck(fixture) === true);
   });
@@ -128,24 +128,24 @@ if (fixture) {
     }
   });
 } else {
-  console.log('  （： APK ， APKSTART_TEST_APK）');
+  console.log('  (:  APK ,  APKSTART_TEST_APK)');
 }
 
-// APK  test/lib/make-apk.js：，
-// run-tests / auto-test （）。
+// APK  test/lib/make-apk.js: , 
+// run-tests / auto-test (). 
 const { buildApkBytes } = require('./lib/make-apk');
 
-console.log('\n[ APK：axml + apk ]');
+console.log('\n[ APK: axml + apk ]');
 {
   const { attrValue, ANDROID_NS } = require('../src/core/axml');
-  test('attrValue ： null = ， android', () => {
+  test('attrValue :  null = ,  android', () => {
     const node = {
       attrs: [
         { ns: '', name: 'package', typed: 'com.a.b' },
         { ns: ANDROID_NS, name: 'label', typed: '' },
       ],
     };
-    // （ package） null ； parseApk
+    // ( package) null ;  parseApk
     assert(attrValue(node, 'package', null) === 'com.a.b', 'package ns=null');
     assert(attrValue(node, 'package') === null, 'android');
     assert(attrValue(node, 'label') === '', 'android');
@@ -157,7 +157,7 @@ console.log('\n[ APK：axml + apk ]');
   fs.writeFileSync(tmp, buildApkBytes());
   try {
     const meta = parseApk(tmp);
-    test('：manifest package', () => {
+    test(': manifest package', () => {
       assert(meta.package === 'com.example.test', ` ${meta.package}`);
     });
     test('/ / SDK', () => {
@@ -190,8 +190,8 @@ console.log('\n[ APK：axml + apk ]');
       ...(ori == null ? [] : [{ ns: ANDROID_NS, name: 'screenOrientation', typed: ori }]),
     ],
   });
-  test('： Activity', () => {
-    // 「 portrait +  sensor 」→ portrait
+  test(':  Activity', () => {
+    // " portrait +  sensor "→ portrait
     const hongguo = [
       act('SplashActivity', 3), act('MainActivity', 1), act('ReaderActivity', 3),
       act('WebActivity', 1), act('DetailActivity', 1),
@@ -200,11 +200,11 @@ console.log('\n[ APK：axml + apk ]');
     // Activity  landscape
     const modu = [act('MainActivity', 2)];
     assert(detectOrientation(modu, modu[0]) === 'landscape', 'landscape');
-    // sensor /  unspecified → ，
+    // sensor /  unspecified → , 
     const sensorOnly = [act('A', 3), act('B', 11), act('C', 0), act('D', 14)];
     assert(detectOrientation(sensorOnly, sensorOnly[0]) === null, 'null');
     assert(detectOrientation([act('A', null)], null) === null, 'null');
-    // Activity ：
+    // Activity : 
     const launcherWins = [act('Launcher', 2), act('P1', 1), act('P2', 1), act('P3', 1)];
     assert(detectOrientation(launcherWins, launcherWins[0]) === 'landscape', 'Activity');
     // reversePortrait / userLandscape
@@ -213,5 +213,5 @@ console.log('\n[ APK：axml + apk ]');
   });
 }
 
-console.log(`\n：${passed} ，${failed} \n`);
+console.log(`\n: ${passed} , ${failed} \n`);
 process.exit(failed ? 1 : 0);

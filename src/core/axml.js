@@ -42,7 +42,7 @@ function readStringPool(buf, start) {
   for (let i = 0; i < count; i++) {
     let p = base + offsets[i];
     if (isUtf8) {
-      // utf16 （1~2 ）
+      // utf16 (1~2 )
       let len = buf[p++];
       if (len & 0x80) { len = ((len & 0x7f) << 8) | buf[p++]; }
       // utf8
@@ -101,7 +101,7 @@ function parseAxml(buffer) {
       const attrCount = buf.readUInt16LE(pos + 28);
 
       const node = { name: pool[nameIdx], attrs: [], children: [], parent: stack[stack.length - 1] };
-      // attributeStart ResXMLTree_attrExt（chunk + 16）
+      // attributeStart ResXMLTree_attrExt(chunk + 16)
       const attrBase = pos + 16 + attrStart;
       for (let i = 0; i < attrCount; i++) {
         const a = attrBase + i * attrSize;

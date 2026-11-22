@@ -1,8 +1,8 @@
 'use strict';
 /**
- * Androidsettings：Androiddesktop，，
- * adb ApkStart settings。
- * shell ， root。
+ * Androidsettings: Androiddesktop, , 
+ * adb ApkStart settings. 
+ * shell ,  root. 
  */
 const ACTIONS = {
   settings: 'android.settings.SETTINGS',
@@ -19,15 +19,15 @@ const ACTIONS = {
 };
 
 /**
- * （STREAM_MUSIC = 3）。Android 11 `media` 
- * （ media: inaccessible or not found）， `cmd media_session volume` ；
- * system image `media volume`。
+ * (STREAM_MUSIC = 3). Android 11 `media` 
+ * ( media: inaccessible or not found),  `cmd media_session volume` ; 
+ * system image `media volume`. 
  */
 function volumeCmd(args) {
   return `(cmd media_session volume --stream 3 ${args} || media volume --stream 3 ${args})`;
 }
 
-/** `volume --get` ， `volume is 5 in range [0..15]` */
+/** `volume --get` ,  `volume is 5 in range [0..15]` */
 function parseVolume(out) {
   const m = /volume is (\d+) in range \[(\d+)\.\.(\d+)\]/.exec(String(out || ''));
   if (!m) return null;
@@ -55,7 +55,7 @@ class AndroidSettings {
     return c.shell(script, { timeout: 20000 });
   }
 
- /** ，settings */
+ /** , settings */
   async status() {
     const out = await this._sh([
       'echo "wifi=$(settings get global wifi_on)"',
@@ -99,8 +99,8 @@ class AndroidSettings {
   }
 
   /**
- * ： 0~100 ，（ 0~15，system image），
- * 。
+ * :  0~100 , ( 0~15, system image), 
+ * . 
    */
   async setVolume(percent) {
     const p = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
@@ -110,7 +110,7 @@ class AndroidSettings {
     return { ok: true, volume: volumePercent({ ...range, index }) };
   }
 
- /** = 「」， */
+ /** = "",  */
   async setAnimations(on) {
     const v = on ? '1' : '0';
     await this._sh([
@@ -127,7 +127,7 @@ class AndroidSettings {
     return { ok: true, fontScale: Number(v) };
   }
 
- /** ： dpi，（「」） */
+ /** :  dpi, ("") */
   async setDensity(dpi) {
     const v = Math.max(120, Math.min(640, Math.round(Number(dpi) || 0)));
     if (!v) return { ok: false };
@@ -135,7 +135,7 @@ class AndroidSettings {
     return { ok: true, density: v };
   }
 
- /** ： + + whitelist，app */
+ /** :  + + whitelist, app */
   async tune({ pkg } = {}) {
     const cmds = [
       'settings put global window_animation_scale 0',

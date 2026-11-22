@@ -1,23 +1,23 @@
 'use strict';
 /**
- * check（ debug）
+ * check( debug)
  *
- * ，：
- * 1) （src/core/autodebug-probe.js，）：snapshot obs；
- * 2) （，）：evaluate(obs) → issues[]。
+ * , : 
+ * 1) (src/core/autodebug-probe.js, ): snapshot obs; 
+ * 2) (, ): evaluate(obs) → issues[]. 
  *
- * fs / child_process / electron，CI require 
- * （ 2026-11-17：CI require electron ）。
- * directory manual.js（），guide。
+ * fs / child_process / electron, CI require 
+ * ( 2026-11-17: CI require electron ). 
+ * directory manual.js(), guide. 
  *
- * ：obs 「」，probefailure。
- * —— 「check」，
- * check。
+ * : obs "", probefailure. 
+ * -- "check", 
+ * check. 
  */
 
 const manual = require('./manual');
 
-/** （settings） */
+/** (settings) */
 const CATEGORIES = [
   { id: 'runtime', name: 'Runtime', hint: 'Android VM process, boot phase, snapshots and residual locks' },
   { id: 'device', name: 'Device Connection', hint: 'adb authorization status, online state' },
@@ -29,10 +29,10 @@ const CATEGORIES = [
 
 const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
 
-/** ： */
+/** :  */
 const SEVERITY_RANK = { error: 3, warn: 2, info: 1 };
 
-/** ， UI */
+/** ,  UI */
 function normalise(raw) {
   if (!raw || !raw.code) return null;
   const severity = SEVERITY_RANK[raw.severity] ? raw.severity : 'info';
@@ -42,19 +42,19 @@ function normalise(raw) {
     severity,
     title: String(raw.title || raw.code),
     hint: String(raw.hint || ''),
-    // fix 「repair」，；
+    // fix "repair", ; 
     fix: raw.fix || '',
-    // detail （path、），
+    // detail (path, ), 
     detail: raw.detail === undefined || raw.detail === null ? '' : String(raw.detail),
   };
-  // 0.6.2：「guide」，
+  // 0.6.2: "guide", 
   item.help = manual.topicForIssue(item);
   return item;
 }
 
 /**
- * ：snapshot
- * @param {object} obs snapshot（）
+ * : snapshot
+ * @param {object} obs snapshot()
  * @returns {Array<object>} 
  */
 function evaluate(obs) {
@@ -75,7 +75,7 @@ function evaluate(obs) {
 
  /* ---------------- runtime ---------------- */
 
-  // bootfailure：，
+  // bootfailure: , 
   const bootError = runtime.error || (runtime.lastFailure && runtime.lastFailure.error) || '';
   if (bootError) {
     push({
@@ -89,7 +89,7 @@ function evaluate(obs) {
     });
   }
 
-  // ： ready，snapshotsystem image
+  // :  ready, snapshotsystem image
   if (runtime.running && runtime.phase && runtime.phase !== 'ready' && runtime.bootMs > 150000) {
     push({
       code: 'runtime.stuckBoot',
@@ -102,7 +102,7 @@ function evaluate(obs) {
     });
   }
 
-  // lock file：launch「AVD 」 FATAL
+  // lock file: launch"AVD " FATAL
   if (Number(runtime.locks) > 0) {
     push({
       code: 'runtime.staleLocks',
@@ -114,8 +114,8 @@ function evaluate(obs) {
     });
   }
 
-  // ：emulator.exe launch，qemu detached ，
-  // launch multiinstance.lock（ 2026-11-13）。
+  // : emulator.exe launch, qemu detached , 
+  // launch multiinstance.lock( 2026-11-13). 
   if (Number(runtime.orphans) > 0) {
     push({
       code: 'runtime.orphanProcesses',
@@ -127,7 +127,7 @@ function evaluate(obs) {
     });
   }
 
-  // snapshot：verify，boot「failurecold boot」， GB
+  // snapshot: verify, boot"failurecold boot",  GB
   if (runtime.snapshotStale) {
     push({
       code: 'runtime.staleSnapshot',
@@ -141,7 +141,7 @@ function evaluate(obs) {
 
  /* ---------------- ---------------- */
 
-  // unauthorized：Android「 USB 」（ 2026-11-17 ）
+  // unauthorized: Android" USB "( 2026-11-17 )
   if (device.state === 'unauthorized') {
     push({
       code: 'device.unauthorized',
@@ -196,7 +196,7 @@ function evaluate(obs) {
     });
   }
 
-  // data partitioncapacityconfiguration → hint「space」
+  // data partitioncapacityconfiguration → hint"space"
   if (storage.needsReset) {
     push({
       code: 'storage.dataNeedsReset',
@@ -204,7 +204,7 @@ function evaluate(obs) {
       severity: 'warn',
       title: 'Data partition resize not applied',
       hint: 'Overlay disk prevented in-place expansion. Reset Android Data to recreate the partition with full capacity.', 
-      detail: `Configured ${storage.configuredGB} GB · Actual ${storage.actualGB} GB`, 
+      detail: `Configured ${storage.configuredGB} GB  -  Actual ${storage.actualGB} GB`, 
       fix: 'dataReset',
     });
   } else if (Number(storage.configuredGB) > 0 && Number(storage.actualGB) > 0
@@ -215,7 +215,7 @@ function evaluate(obs) {
       severity: 'error',
       title: 'Android data partition smaller than configured',
       hint: 'Actual available storage is less than configured. Expand partition size in Settings if needed.', 
-      detail: `Configured ${storage.configuredGB} GB · Actual ${storage.actualGB} GB`, 
+      detail: `Configured ${storage.configuredGB} GB  -  Actual ${storage.actualGB} GB`, 
       fix: 'dataReset',
     });
   }
@@ -234,7 +234,7 @@ function evaluate(obs) {
 
  /* ---------------- settings ---------------- */
 
-  // orientation → Androidapp（ 2026-11-18 ）
+  // orientation → Androidapp( 2026-11-18 )
   const mode = String(settings.orientationMode || 'auto');
   if (mode === 'portrait' && settings.landscape === true) {
     push({
@@ -279,8 +279,8 @@ function evaluate(obs) {
 
  /* ---------------- ---------------- */
 
-  // 0.6.2 ：「app」，，
-  // （-no-audio） Windows Audio 。
+  // 0.6.2 : "app", , 
+  // (-no-audio) Windows Audio . 
   const audio = o.audio || {};
   if (audio.checked && audio.enabled === false) {
     push({
@@ -325,7 +325,7 @@ function evaluate(obs) {
       severity: 'warn',
       title: `${badSources.length} download source(s) unreachable`,
       hint: 'Update checks query multiple sources simultaneously. One failure is fine; if all fail, check your network or proxy settings.',
-      detail: badSources.map((s) => s.name).join('、'),
+      detail: badSources.map((s) => s.name).join(', '),
       fix: 'settings',
     });
   }
@@ -362,7 +362,7 @@ function evaluate(obs) {
   return dedupe(out);
 }
 
-/** code （check） */
+/** code (check) */
 function dedupe(issues) {
   const map = new Map();
   for (const raw of issues || []) {
@@ -380,7 +380,7 @@ function bySeverity(a, b) {
   return String(a.code).localeCompare(String(b.code));
 }
 
-/** ：、settings */
+/** : , settings */
 function summarize(issues) {
   const list = dedupe(issues).sort(bySeverity);
   const errors = list.filter((i) => i.severity === 'error').length;
@@ -401,12 +401,12 @@ function summarize(issues) {
     warns,
     infos,
     byCategory,
-    // 「」
+    // ""
     health: errors ? 'error' : (warns ? 'warn' : (infos ? 'info' : 'ok')),
   };
 }
 
-/** ，settings */
+/** , settings */
 function groupByCategory(issues) {
   const list = dedupe(issues).sort(bySeverity);
   return CATEGORIES.map((c) => ({
@@ -416,9 +416,9 @@ function groupByCategory(issues) {
 }
 
 /**
- * check：「」「」。
- * check， ——
- * 「 3 」。
+ * check: """". 
+ * check,  --
+ * " 3 ". 
  */
 function diff(prevIssues, nextIssues) {
   const prev = new Map((prevIssues || []).map((i) => [i.code, i]));

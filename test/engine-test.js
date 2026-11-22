@@ -1,7 +1,7 @@
 'use strict';
 /**
- * （ QEMU / adb / Android）
- * ：（）、ZIP 、、QEMU 、monitor 
+ * ( QEMU / adb / Android)
+ * : (), ZIP , , QEMU , monitor 
  */
 const os = require('os');
 const fs = require('fs');
@@ -9,7 +9,7 @@ const path = require('path');
 const http = require('http');
 const net = require('net');
 
-// ，
+// , 
 const TMP = path.join(os.tmpdir(), `apkstart-test-${Date.now()}`);
 process.env.APPDATA = TMP;
 fs.mkdirSync(path.join(TMP, 'apkstart'), { recursive: true });
@@ -31,7 +31,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
   console.log('\n[download.js]');
   const { download, downloadParallel, head, sha256File } = require('../src/core/download');
 
-  // HTTP （ Range ）
+  // HTTP ( Range )
   const payload = Buffer.alloc(300 * 1024);
   for (let i = 0; i < payload.length; i++) payload[i] = i % 251;
 
@@ -49,7 +49,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
       res.writeHead(200, { 'Content-Length': payload.length });
       return res.end(payload);
     }
-    // start-end  Range（）
+    // start-end  Range()
     if (req.url === '/ranged.bin') {
       server.rangeHits = (server.rangeHits || 0) + 1;
       const range = /^bytes=(\d+)-(\d+)$/.exec(req.headers.range || '');
@@ -86,7 +86,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(fs.statSync(dest).size === payload.length, 'assertion failed');
   });
 
-  await test('（ ）', async () => {
+  await test('( )', async () => {
     const dest = path.join(TMP, 'dl2.bin');
     fs.writeFileSync(dest, payload.subarray(0, 100000));
     let lastPercent = 0;
@@ -115,7 +115,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(!fs.existsSync(dest), 'assertion failed');
   });
 
-  await test('：', async () => {
+  await test(': ', async () => {
     const dest = path.join(TMP, 'dl4.bin');
     server.rangeHits = 0;
     let maxPercent = 0;
@@ -125,8 +125,8 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
       onProgress: (p) => { maxPercent = Math.max(maxPercent, p.percent); },
     });
     assert(fs.readFileSync(dest).equals(payload), 'assertion failed');
-    assert(r.parallel > 1, `：${r.parallel}`);
-    assert(server.rangeHits >= r.parallel, `：${server.rangeHits}`);
+    assert(r.parallel > 1, `: ${r.parallel}`);
+    assert(server.rangeHits >= r.parallel, `: ${server.rangeHits}`);
     assert(maxPercent > 0, 'assertion failed');
   });
 
@@ -153,11 +153,11 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(p.paths().adbExe.endsWith('adb.exe'), 'adb');
   });
 
-  await test('：adb ，', async () => {
+  await test(': adb , ', async () => {
     const p = new Provisioner(path.join(TMP, 'nonexistent'));
     const env = await p.checkEnv();
     assert(env.adb.ok === false, 'adb');
-    // QEMU （ winget  Program Files），
+    // QEMU ( winget  Program Files), 
     if (env.qemu.ok) assert(env.qemu.version, 'qemu');
     assert(env.ready === false, 'assertion failed');
     assert(typeof env.hypervisor.whpx === 'boolean', 'assertion failed');
@@ -196,9 +196,9 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
 
   await test('SDK url', async () => {
     const { absUrl, baseOf, SOURCES } = require('../src/core/provision');
-    // repository2-3.xml（emulator）
+    // repository2-3.xml(emulator)
     assert(absUrl('emulator-windows_x64-16847572.zip') === `${baseOf(SOURCES.sdkIndex)}emulator-windows_x64-16847572.zip`, 'emulator');
-    // sys-img  sys-img/android/，
+    // sys-img  sys-img/android/, 
     const sysBase = baseOf(SOURCES.sysImgIndexes[0]);
     assert(sysBase.endsWith('/sys-img/android/'), `sys-img : ${sysBase}`);
     assert(absUrl('x86_64-30_r11.zip', sysBase) === 'https://dl.google.com/android/repository/sys-img/android/x86_64-30_r11.zip', 'sys-img');
@@ -217,29 +217,29 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(/windows_x64/i.test(emuUrl), `emulator : ${emuUrl}`);
   });
 
-  await test('AVD 64 （x86_64 x86）', async () => {
+  await test('AVD 64 (x86_64 x86)', async () => {
     const { EmulatorEngine } = require('../src/core/emulator');
     const emu = new EmulatorEngine(TMP);
     const r = emu.ensureAvd({ memoryMB: 2048, cores: 2 });
     const cfg = fs.readFileSync(path.join(r.avdDir, 'config.ini'), 'utf8');
-    assert(/^hw\.cpu\.arch=x86_64$/m.test(cfg), `hw.cpu.arch  x86_64，：${cfg.match(/^hw\.cpu\.arch=.*$/m)}`);
+    assert(/^hw\.cpu\.arch=x86_64$/m.test(cfg), `hw.cpu.arch  x86_64, : ${cfg.match(/^hw\.cpu\.arch=.*$/m)}`);
     assert(/^abi\.type=x86_64$/m.test(cfg), 'abi.type x86_64');
     assert(/^image\.sysdir\.1=\S*system-images\//m.test(cfg), 'image.sysdir.1');
   });
 
-  await test('：NO_MATCHING_ABIS', async () => {
+  await test(': NO_MATCHING_ABIS', async () => {
     const { friendlyInstallError } = require('../src/core/adb');
     const out = friendlyInstallError(
       'Performing Streamed Install\nadb.exe: failed to install x.apk: '
       + 'Failure [INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113]',
     );
-    assert(out.includes('ARM ') || out.includes('ARM native libraries'), ` ARM ：${out}`);
+    assert(out.includes('ARM ') || out.includes('ARM native libraries'), ` ARM : ${out}`);
     assert(out.includes('INSTALL_FAILED_NO_MATCHING_ABIS'), 'assertion failed');
     const other = friendlyInstallError('Failure [INSTALL_FAILED_INVALID_APK: x]');
-    assert(other.includes('') || other.includes('') || other.includes('corrupted') || other.includes('incomplete'), `：${other}`);
+    assert(other.includes('') || other.includes('') || other.includes('corrupted') || other.includes('incomplete'), `: ${other}`);
   });
 
-  await test('： ISO9660 / /', async () => {
+  await test(':  ISO9660 / /', async () => {
     const p = new Provisioner(TMP);
     const mk = (file, size, writeMagic) => {
       const fd = fs.openSync(file, 'w');
@@ -254,23 +254,23 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
 
     const good = mk(path.join(TMP, 'good.iso'), 450 * 1024 * 1024, true);
     const a = p.inspectIso(good);
-    assert(a.ok && a.iso9660, ` ISO ：${a.reason}`);
+    assert(a.ok && a.iso9660, ` ISO : ${a.reason}`);
 
     const broken = mk(path.join(TMP, 'broken.iso'), 450 * 1024 * 1024, false);
     const b = p.inspectIso(broken);
-    assert(!b.ok && (/ISO9660|not a valid ISO/i.test(b.reason)), `：${JSON.stringify(b)}`);
+    assert(!b.ok && (/ISO9660|not a valid ISO/i.test(b.reason)), `: ${JSON.stringify(b)}`);
 
     const partial = mk(path.join(TMP, 'partial.iso'), 2 * 1024 * 1024, true);
     const c = p.inspectIso(partial);
-    assert(!c.ok && (/incomplete/i.test(c.reason)), `：${JSON.stringify(c)}`);
+    assert(!c.ok && (/incomplete/i.test(c.reason)), `: ${JSON.stringify(c)}`);
 
     for (const f of [good, broken, partial]) fs.rmSync(f, { force: true });
   });
 
-  await test('stat （ mtime， ）', async () => {
+  await test('stat ( mtime,  )', async () => {
     const { parseStatList } = require('../src/core/adb');
     const rows = parseStatList('1794309868|1234|./a.txt\n1794309900|99|./sub/b.png');
-    assert(rows && rows.length === 2, `：${JSON.stringify(rows)}`);
+    assert(rows && rows.length === 2, `: ${JSON.stringify(rows)}`);
     assert(rows[0].rel === 'a.txt' && rows[0].size === 1234, 'assertion failed');
     assert(rows[1].rel === 'sub/b.png', 'assertion failed');
     assert(rows[1].mtime === 1794309900000, 'mtime');
@@ -281,7 +281,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
   console.log('\n[engine.js]');
   const { Runtime } = require('../src/core/engine');
 
-  await test('QEMU ： ISO', async () => {
+  await test('QEMU :  ISO', async () => {
     const rt = new Runtime(TMP);
     rt._hv = { whpx: true };
     store.saveSettings({
@@ -298,7 +298,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(/-m 4096/.test(args), 'assertion failed');
   });
 
-  await test('QEMU ：', async () => {
+  await test('QEMU : ', async () => {
     const rt = new Runtime(TMP);
     rt._hv = { whpx: false };
     const args = rt.buildArgs({ install: false }).join(' ');
@@ -316,8 +316,8 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(args.includes('-display none'), 'assertion failed');
   });
 
-  await test('QEMU monitor ：', async () => {
-    // QEMU monitor： "(qemu) "， ok
+  await test('QEMU monitor : ', async () => {
+    // QEMU monitor:  "(qemu) ",  ok
     const srv = net.createServer((sock) => {
       sock.write('QEMU 8.2.0 monitor - type \'help\' for more information\r\n(qemu) ');
       sock.on('data', (d) => {
@@ -342,7 +342,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(['provision', 'install'].includes(r.needsSetup), `needsSetup=${r.needsSetup}`);
   });
 
-  await test('（ ， ）', async () => {
+  await test('( ,  )', async () => {
     const rt = new Runtime(TMP);
     rt.provisioner.checkEnv = async () => ({ adb: { ok: true }, emulator: { ok: true }, sysimg: { ok: true } });
     rt.emulator.setPriority = async () => 0;
@@ -352,13 +352,13 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
       await new Promise((r) => setTimeout(r, 60));
       return { ok: true, engine: 'emulator' };
     };
-    // （ 4 ）（ensure）
+    // ( 4 )(ensure)
     const [a, b] = await Promise.all([rt.prewarm({}), rt.ensure({})]);
-    assert(calls === 1, ` ${calls} ，`);
+    assert(calls === 1, ` ${calls} , `);
     assert(a && a.ok && b && b.ok, 'assertion failed');
   });
 
-  await test('： boot_completed +', async () => {
+  await test(':  boot_completed +', async () => {
     const rt = new Runtime(TMP);
     const calls = [];
     const fake = {
@@ -377,11 +377,11 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(calls.some((c) => c.includes('pm path android')), 'assertion failed');
   });
 
-  await test('（kernel）', async () => {
+  await test('(kernel)', async () => {
     const rt = new Runtime(TMP);
     const fake = { isOnline: async () => true, connect: async () => true, shell: async () => '0' };
     const r = await rt.waitAndroidReady(fake, 1200, () => {});
-    assert(!r.ok && r.stage === 'kernel', ` kernel ：${JSON.stringify(r)}`);
+    assert(!r.ok && r.stage === 'kernel', ` kernel : ${JSON.stringify(r)}`);
   });
 
   console.log('\n[provision.js  / ]');
@@ -396,7 +396,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
     assert(!prov.playImageInfo().ok, 'assertion failed');
     fs.writeFileSync(path.join(dir, 'system.img'), Buffer.alloc(301 * 1024 * 1024));
     const info = prov.playImageInfo();
-    assert(info.ok && info.api === '34' && info.tag === 'google_apis_playstore', ` API 34 ：${JSON.stringify(info)}`);
+    assert(info.ok && info.api === '34' && info.tag === 'google_apis_playstore', ` API 34 : ${JSON.stringify(info)}`);
   });
 
   await test('unit test verification', async () => {
@@ -409,7 +409,7 @@ function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed
   });
 
   console.log(results.join('\n'));
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (_) { /* ignore */ }
   process.exit(failed ? 1 : 0);
 })();

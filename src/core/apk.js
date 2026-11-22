@@ -1,7 +1,7 @@
 'use strict';
 /**
- * APK ： / version / app / launch Activity / / ABI
- * complete， aapt、 adb、。
+ * APK :  / version / app / launch Activity / / ABI
+ * complete,  aapt,  adb, . 
  */
 const fs = require('fs');
 const { ZipFile } = require('./zip');
@@ -25,7 +25,7 @@ function isLauncherActivity(node) {
 }
 
 function pickIconFromZip(zip) {
-  // fallback： res/ 、（png / webp / jpg ）
+  // fallback:  res/ , (png / webp / jpg )
   const candidates = zip.names().filter((n) => /^res\/.*\.(png|webp|jpe?g)$/i.test(n));
   const scored = candidates.map((n) => {
     const e = zip.entries.get(n);
@@ -50,32 +50,32 @@ function pickIconFromZip(zip) {
 const IMG_RE = /\.(png|webp|jpe?g)$/i;
 
 // ---- orientation ----
-// AndroidManifest android:screenOrientation ：
+// AndroidManifest android:screenOrientation : 
 //   0 unspecified / 1 portrait / 2 landscape / 3 sensor / 4 sensorLandscape
 //   5 sensorPortrait / 6 reverseLandscape / 7 reversePortrait / 8 behind
 //   9 nosensor / 10 user / 11 fullSensor / 12 userLandscape / 13 userPortrait
 //   14 fullUser / 15 locked
-// 「orientation」；sensor / fullSensor / user / unspecified
-// ，runtime，，app
-// 「orientation」。
+// "orientation"; sensor / fullSensor / user / unspecified
+// , runtime, , app
+// "orientation". 
 const ORI_PORTRAIT = new Set([1, 5, 7, 13]);
 const ORI_LANDSCAPE = new Set([2, 4, 6, 12]);
 
 /**
- * app「」portraitlandscape。
+ * app""portraitlandscape. 
  *
- * ：emulator（hw.lcd）orientationapp
- * screenOrientation ，Android app（letterbox）
- * —— ， wm size / density / letterbox-style 
- * （， docs）。window，
- * orientationapp。installorientation apps.json，
- * launch，。
+ * : emulator(hw.lcd)orientationapp
+ * screenOrientation , Android app(letterbox)
+ * -- ,  wm size / density / letterbox-style 
+ * (,  docs). window, 
+ * orientationapp. installorientation apps.json, 
+ * launch, . 
  *
- * ：orientation Activity （launch Activity ，
- * ）。「 portrait + sensor」
- * portrait； Activity landscape landscape。
+ * : orientation Activity (launch Activity , 
+ * ). " portrait + sensor"
+ * portrait;  Activity landscape landscape. 
  *
- * @returns {'portrait'|'landscape'|null} null = ，settings
+ * @returns {'portrait'|'landscape'|null} null = , settings
  */
 function detectOrientation(acts, launcher) {
   let portrait = 0;
@@ -92,7 +92,7 @@ function detectOrientation(acts, launcher) {
   return portrait > landscape ? 'portrait' : 'landscape';
 }
 
-/** drawable / src ， APK path */
+/** drawable / src ,  APK path */
 function drawableFileOf(node, res) {
   for (const name of ['drawable', 'src']) {
     const a = attr(node, name);
@@ -108,10 +108,10 @@ function drawableFileOf(node, res) {
 }
 
 /**
- * XML 。、XML 3 ：
- * `<adaptive-icon><foreground><inset><drawable/></inset></foreground>`，
- * `<layer-list><item><bitmap android:src="@drawable/x"/></item></layer-list>`，
- * 「」。
+ * XML . , XML 3 : 
+ * `<adaptive-icon><foreground><inset><drawable/></inset></foreground>`, 
+ * `<layer-list><item><bitmap android:src="@drawable/x"/></item></layer-list>`, 
+ * "". 
  */
 function iconFromNode(zip, node, res, depth = 0) {
   const file = drawableFileOf(node, res);
@@ -147,15 +147,15 @@ function iconFromXml(zip, xmlBuffer, res, depth = 0) {
     const hit = iconFromNode(zip, node, res, depth);
     if (hit) return hit;
   }
-  // （layer-list / bitmap / inset ）
+  // (layer-list / bitmap / inset )
   return iconFromNode(zip, root, res, depth);
 }
 
 /**
- * APK 。
- * ZIP （directory + ），** APK memory**：
- * fs.readFileSync 2GB installfailure（Node Buffer ），
- * memory OOM 。
+ * APK . 
+ * ZIP (directory + ), ** APK memory**: 
+ * fs.readFileSync 2GB installfailure(Node Buffer ), 
+ * memory OOM . 
  */
 function parseApk(filePath) {
   const stat = fs.statSync(filePath);
@@ -168,7 +168,7 @@ function parseApk(filePath) {
   }
 }
 
-/** parseApk ： zip */
+/** parseApk :  zip */
 function parseApkZip(zip, filePath, stat) {
   if (!zip.has('AndroidManifest.xml')) {
     throw new Error('Missing AndroidManifest.xml: This is not a single APK (may be a .apks/.xapk split package)');
@@ -177,12 +177,12 @@ function parseApkZip(zip, filePath, stat) {
   const manifestBuf = zip.read('AndroidManifest.xml');
   const manifest = parseAxml(manifestBuf);
 
-  // package manifest **space**（ns=''），「space」：
-  // attrValue default android space， null space。
+  // package manifest **space**(ns=''), "space": 
+  // attrValue default android space,  null space. 
   const packageName = attrValue(manifest, 'package', null);
   if (!packageName) throw new Error('No package name found in manifest');
-  // package path adb shell， Android 。
-  // / "../"、 shell （issue #2 P0-1）。
+  // package path adb shell,  Android . 
+  // / "../",  shell (issue #2 P0-1). 
   if (!validPackageName(packageName)) {
     throw new Error(`Invalid package name in manifest: ${JSON.stringify(String(packageName).slice(0, 80))}`);
   }
@@ -197,7 +197,7 @@ function parseApkZip(zip, filePath, stat) {
 
   const app = children(manifest, 'application')[0] || { children: [], attrs: [] };
 
-  // ---- （ @0x7f ）----
+  // ---- ( @0x7f )----
   let res = null;
   if (zip.has('resources.arsc')) {
     try { res = new ResTable(zip.read('resources.arsc')); } catch (_) { res = null; }
@@ -232,7 +232,7 @@ function parseApkZip(zip, filePath, stat) {
     }
   }
 
-  // ---- orientation（emulatorlandscapeportrait， detectOrientation）----
+  // ---- orientation(emulatorlandscapeportrait,  detectOrientation)----
   const orientation = detectOrientation(acts, launcher);
 
   // ---- ----
@@ -253,7 +253,7 @@ function parseApkZip(zip, filePath, stat) {
   }
   if (!icon) icon = pickIconFromZip(zip);
 
-  // ---- ABI（ x86 runtime ARM ）----
+  // ---- ABI( x86 runtime ARM )----
   const abis = [...new Set(zip.names()
     .filter((n) => n.startsWith('lib/'))
     .map((n) => n.split('/')[1])
@@ -277,7 +277,7 @@ function parseApkZip(zip, filePath, stat) {
   };
 }
 
-/** verify： PK\x03\x04 */
+/** verify:  PK\x03\x04 */
 function quickCheck(filePath) {
   try {
     const fd = fs.openSync(filePath, 'r');

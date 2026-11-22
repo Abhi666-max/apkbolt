@@ -1,12 +1,12 @@
 'use strict';
 /**
- * runtime（）
+ * runtime()
  *
  * npm run selftest # checkupruntime
  * npm run selftest -- --apk a.apk # install → launch → → directory
  *
- * ： Android ，「app、window、sharing」
- * ，。
+ * :  Android , "app, window, sharing"
+ * , . 
  */
 const fs = require('fs');
 const os = require('os');
@@ -23,14 +23,14 @@ const argOf = (name) => {
   return i >= 0 ? argv[i + 1] : '';
 };
 const APK = argOf('--apk');
-// = pathruntime serial；
+// = pathruntime serial; 
 const SERIAL = argOf('--serial') || '';
 
 const results = [];
 function record(name, ok, detail = '') {
   results.push({ name, ok, detail });
   const mark = ok === null ? '○' : ok ? '✓' : '✗';
-  console.log(`  ${mark} ${name}${detail ? `  —  ${detail}` : ''}`);
+  console.log(`  ${mark} ${name}${detail ? `  -  ${detail}` : ''}`);
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -48,7 +48,7 @@ async function step(name, fn) {
 
 (async () => {
   console.log('\nApkStart ');
-  console.log(`：${SERIAL}`);
+  console.log(`: ${SERIAL}`);
   console.log('─'.repeat(64));
 
   console.log('\n[]');
@@ -58,26 +58,26 @@ async function step(name, fn) {
   let env = null;
   await step('adb', async () => {
     env = await prov.checkEnv();
-    if (!env.adb.ok) throw new Error(' adb，「」');
+    if (!env.adb.ok) throw new Error(' adb, ""');
     return `v${env.adb.version}`;
   });
   await step('Android Emulator', async () => {
-    if (!env.emulator.ok) throw new Error('，「」');
+    if (!env.emulator.ok) throw new Error(', ""');
     return `v${env.emulator.version}`;
   });
   await step('unit test verification', async () => {
     if (!env.sysimg.ok) throw new Error(env.sysimg.note || '');
-    return `Android ${env.sysimg.api} · ${(env.sysimg.size / 1073741824).toFixed(2)}GB`;
+    return `Android ${env.sysimg.api}  -  ${(env.sysimg.size / 1073741824).toFixed(2)}GB`;
   });
   record('', env.accel.ok ? true : null,
-    env.accel.ok ? env.accel.note : '（，）');
+    env.accel.ok ? env.accel.note : '(, )');
 
   console.log('\n[]');
   let client = runtime.client(SERIAL || undefined);
   const online = await step('unit test verification', async () => {
     if (SERIAL) {
       await client.connect().catch(() => false);
-      if (!await client.isOnline()) throw new Error(`：${SERIAL}`);
+      if (!await client.isOnline()) throw new Error(`: ${SERIAL}`);
       return SERIAL;
     }
     const r = await runtime.ensure({ onLog: () => {} });
@@ -87,14 +87,14 @@ async function step(name, fn) {
   });
 
   if (!online) {
-    console.log('\n，。');
+    console.log('\n, . ');
   } else {
     await step('Android', async () => {
       const [ver, sdk, abi] = await Promise.all([
         client.androidVersion(), client.sdkInt(), client.shell('getprop ro.product.cpu.abi').catch(() => ''),
       ]);
       if (!ver) throw new Error('');
-      return `Android ${ver} (API ${sdk}) · ${String(abi).trim()}`;
+      return `Android ${ver} (API ${sdk})  -  ${String(abi).trim()}`;
     });
     await step('unit test verification', async () => {
       const s = await client.wmSize();
@@ -103,7 +103,7 @@ async function step(name, fn) {
     });
     await step('freeform', async () => {
       const ok = await client.ensureFreeform();
-      if (!ok) throw new Error(' freeform（）');
+      if (!ok) throw new Error(' freeform()');
       return '';
     });
 
@@ -167,28 +167,28 @@ async function step(name, fn) {
         });
       }
     } else {
-      console.log('\n[]  --apk，');
+      console.log('\n[]  --apk, ');
     }
   }
 
-  // runtime： emulator stdio
-  // Node exit，「」
+  // runtime:  emulator stdio
+  // Node exit, ""
   if (!SERIAL && runtime.emulator.running()) {
     await runtime.stop({}).catch(() => {});
   }
 
   const failed = results.filter((r) => r.ok === false);
   console.log('\n' + '─'.repeat(64));
-  console.log(`：${results.filter((r) => r.ok === true).length} ，${failed.length} ，`
+  console.log(`: ${results.filter((r) => r.ok === true).length} , ${failed.length} , `
     + `${results.filter((r) => r.ok === null).length} `);
   if (failed.length) {
-    console.log('：');
-    failed.forEach((f) => console.log(`  · ${f.name}：${f.detail}`));
+    console.log(': ');
+    failed.forEach((f) => console.log(`   -  ${f.name}: ${f.detail}`));
     process.exit(1);
   }
   console.log(' ✅\n');
   process.exit(0);
 })().catch((e) => {
-  console.error('\n：', e.message);
+  console.error('\n: ', e.message);
   process.exit(1);
 });

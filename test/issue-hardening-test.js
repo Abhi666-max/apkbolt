@@ -1,13 +1,13 @@
 'use strict';
 /**
- * issue  Node （//）。
- *  GitHub issues  5 ：
- *  - #2 P0-1：APK  →  / adb
- *  - #2 P0-4：provision/updater  zip-slip
- *  - #2 P1-1：_fetchText  Promise  settle
- *  - #5 1：（）
- *  - #9 8： → （ + ）
- * ：node test/issue-hardening-test.js
+ * issue  Node (//). 
+ *  GitHub issues  5 : 
+ *  - #2 P0-1: APK  →  / adb
+ *  - #2 P0-4: provision/updater  zip-slip
+ *  - #2 P1-1: _fetchText  Promise  settle
+ *  - #5 1: ()
+ *  - #9 8:  → ( + )
+ * : node test/issue-hardening-test.js
  */
 const assert = require('assert/strict');
 const fs = require('fs');
@@ -35,7 +35,7 @@ async function atest(name, fn) {
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
 
 (async () => {
-  console.log('\n[issue #2 P0-1 · ]');
+  console.log('\n[issue #2 P0-1  -  ]');
   test('Android', () => {
     for (const p of ['com.github.tvbox.osc', 'com.tencent.mm', 'org.example.app_2']) {
       assert.equal(validPackageName(p), true, `${p} `);
@@ -49,18 +49,18 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
   });
   test('unit test verification', () => {
     const safe = safeFilePart('../evil');
-    assert.ok(!safe.includes('/') && !safe.includes('\\') && !safe.includes('..'), `：${safe}`);
+    assert.ok(!safe.includes('/') && !safe.includes('\\') && !safe.includes('..'), `: ${safe}`);
     assert.equal(safeFilePart('com.ok.pkg'), 'com.ok.pkg');
   });
   test('store /APK', () => {
     const icon = store.iconPath('../../Windows/System32/drivers/etc/hosts');
     const apk = store.apkPath('../../evil', '../../x');
-    assert.ok(!icon.includes('..'), ` ..：${icon}`);
-    assert.ok(!apk.includes('..'), `APK  ..：${apk}`);
+    assert.ok(!icon.includes('..'), ` ..: ${icon}`);
+    assert.ok(!apk.includes('..'), `APK  ..: ${apk}`);
     assert.match(path.basename(apk), /\.apk$/);
   });
 
-  console.log('\n[issue #2 P0-4 · zip-slip]');
+  console.log('\n[issue #2 P0-4  -  zip-slip]');
   test('unit test verification', () => {
     const root = path.join(TMP, 'zip-ok');
     assert.equal(resolveZipEntry(root, 'emulator/qemu.exe'), path.join(root, 'emulator', 'qemu.exe'));
@@ -80,8 +80,8 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
     assert.ok(/resolveZipEntry\(/.test(upd), 'updater._extract');
   });
 
-  console.log('\n[issue #2 P1-1 · _fetchText ]');
-  await atest('Promise 、 settle', async () => {
+  console.log('\n[issue #2 P1-1  -  _fetchText ]');
+  await atest('Promise ,  settle', async () => {
     const srv = http.createServer((_req, res) => {
       res.writeHead(200, { 'Content-Length': String(64 * 1024) });
       res.end(Buffer.alloc(64 * 1024, 0x61));
@@ -94,7 +94,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
         p._fetchText(url, 1024),
         new Promise((_, rej) => setTimeout(() => rej(new Error('_fetchText ')), 5000)),
       ]);
-      assert.equal(out, '', '，');
+      assert.equal(out, '', ', ');
     } finally {
       srv.close();
     }
@@ -105,7 +105,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
     assert.ok(/setTimeout/.test(src), 'assertion failed');
   });
 
-  console.log('\n[issue #5 1 · ]');
+  console.log('\n[issue #5 1  -  ]');
   test('electron-builder Uninstall X.exe', () => {
     const dir = path.join(TMP, 'uninst-a');
     fs.mkdirSync(dir, { recursive: true });
@@ -118,14 +118,14 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
     fs.writeFileSync(path.join(dir, 'uninstaller.exe'), 'x');
     assert.equal(findUninstaller(dir), 'uninstaller.exe');
   });
-  test('（ ） null', () => {
+  test('( ) null', () => {
     const dir = path.join(TMP, 'uninst-c');
     fs.mkdirSync(dir, { recursive: true });
     assert.equal(findUninstaller(dir), null);
   });
 
-  console.log('\n[issue #9 8 · ]');
-  await atest('， / exe', async () => {
+  console.log('\n[issue #9 8  -  ]');
+  await atest(',  / exe', async () => {
     const dataDir = path.join(TMP, 'upd-resume');
     const exe = path.join(dataDir, 'ApkStart.exe');
     fs.mkdirSync(dataDir, { recursive: true });
@@ -147,7 +147,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
     fs.writeFileSync(u._readyFile(payload), JSON.stringify({ version: '0.5.2' }));
     assert.equal(u.findResumableJob(), null, 'assertion failed');
   });
-  test('apply ， 、', () => {
+  test('apply ,  , ', () => {
     const dataDir = path.join(TMP, 'upd-apply');
     const exe = path.join(dataDir, 'ApkStart.exe');
     fs.mkdirSync(dataDir, { recursive: true });
@@ -162,10 +162,10 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-hardening-'));
     assert.ok(/Start-Process -FilePath/.test(script) && /cmd\.exe/.test(script), 'assertion failed');
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   fs.rmSync(TMP, { recursive: true, force: true });
   process.exit(failed ? 1 : 0);
 })().catch((e) => {
-  console.error('  ：', e.stack || e.message);
+  console.error('  : ', e.stack || e.message);
   process.exit(1);
 });

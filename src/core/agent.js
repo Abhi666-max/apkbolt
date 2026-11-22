@@ -1,15 +1,15 @@
 'use strict';
 /**
- * Windows window： src/core/win/agent.ps1 resident。
+ * Windows window:  src/core/win/agent.ps1 resident. 
  *
- * spawn PowerShell：windowmouse，
- * powershell.exe 150~300ms，。
- * launch， TCP（ JSON）， <2ms。
+ * spawn PowerShell: windowmouse, 
+ * powershell.exe 150~300ms, . 
+ * launch,  TCP( JSON),  <2ms. 
  *
- * WH_MOUSE_LL mousehook： / wheel / side buttons。
- * hook，mouse，「appwindow」
- * install，uninstall； 7 。
- * setHook(on, opts)。
+ * WH_MOUSE_LL mousehook:  / wheel / side buttons. 
+ * hook, mouse, "appwindow"
+ * install, uninstall;  7 . 
+ * setHook(on, opts). 
  */
 const { spawn } = require('child_process');
 const net = require('net');
@@ -36,7 +36,7 @@ class WinAgent extends EventEmitter {
 
   get available() { return process.platform === 'win32' && fs.existsSync(SCRIPT); }
 
- /** launch TCP （） */
+ /** launch TCP () */
   ensure() {
     if (this.ready) return this.ready;
     this.ready = new Promise((resolve, reject) => {
@@ -108,7 +108,7 @@ class WinAgent extends EventEmitter {
       if (!line) continue;
       let msg = null;
       try { msg = JSON.parse(line); } catch (_) { continue; }
-      // （wheel dx/dy/nx/ny），ignoreparameters
+      // (wheel dx/dy/nx/ny), ignoreparameters
       if (msg.ev) { this.emit(msg.ev, msg); continue; }
       const p = this.pending.shift();
       if (p) { clearTimeout(p.timer); p.resolve(msg); }
@@ -138,25 +138,25 @@ class WinAgent extends EventEmitter {
   // ---------------- ----------------
 
   /**
- * 「directory」。
- * bootHide / embed ：windowwindow。
- * （）window —— ，
- * Qt app（ 4.x Qt6、MuMu、）window。
+ * "directory". 
+ * bootHide / embed : windowwindow. 
+ * ()window -- , 
+ * Qt app( 4.x Qt6, MuMu, )window. 
  * @param {string[]} dirs runtimedirectory / engine directory
- * @param {number} [appPid] pid：windowwindow，
- * 「mousewindow」（reclaim）
+ * @param {number} [appPid] pid: windowwindow, 
+ * "mousewindow"(reclaim)
    */
   async scope(dirs, appPid) {
     /**
- * directory**path**。
+ * directory**path**. 
      *
- * 「path」window， Windows 
- * `Process.MainModule.FileName` junction / path。
- * ApkStart directory（junction）launch（ dist\ApkStart-win64-portable
- * build\_packout\...），path， →
- * 「」→ emulatorwindow（log emu:0）→
- * windowfailure → embedded mode，rotatewindow。
- * path：path，pathpath。
+ * "path"window,  Windows 
+ * `Process.MainModule.FileName` junction / path. 
+ * ApkStart directory(junction)launch( dist\ApkStart-win64-portable
+ * build\_packout\...), path,  →
+ * ""→ emulatorwindow(log emu:0)→
+ * windowfailure → embedded mode, rotatewindow. 
+ * path: path, pathpath. 
      */
     const raw = (Array.isArray(dirs) ? dirs : [dirs]).filter(Boolean);
     const list = [];
@@ -174,13 +174,13 @@ class WinAgent extends EventEmitter {
   }
 
   /**
- * windowwindow， x,y,w,h（）。
+ * windowwindow,  x,y,w,h(). 
    *
  * @param {number|string} hostHwnd window
    * @param {object} rect { x, y, w, h, clipTop }
- * @param {string[]} [targets] （"0x…"）。
- * = ： emulator window。
- * = （MuMu / emulatorwindow）。
+ * @param {string[]} [targets] ("0x..."). 
+ * = :  emulator window. 
+ * = (MuMu / emulatorwindow). 
    */
   async embed(hostHwnd, rect, targets = null) {
     const req = {
@@ -194,7 +194,7 @@ class WinAgent extends EventEmitter {
     return this.call(req, 6000);
   }
 
- /** （） */
+ /** () */
   async windowReady(targets = []) {
     if (!Array.isArray(targets) || !targets.length) return { ok: false, alive: 0 };
     return this.call({ cmd: 'winready', target: targets.join(',') }, 3000)
@@ -206,8 +206,8 @@ class WinAgent extends EventEmitter {
       cmd: 'fit',
       x: Math.round(rect.x), y: Math.round(rect.y),
       w: Math.round(rect.w), h: Math.round(rect.h),
-      // emulator Qt window LCD EMU_PAD ，/
-      // ；（）。
+      // emulator Qt window LCD EMU_PAD , /
+      // ; (). 
       clipTop: Math.round(rect.clipTop || 0),
     }, 3000);
   }
@@ -215,11 +215,11 @@ class WinAgent extends EventEmitter {
   async rotate(dir = 'left') { return this.call({ cmd: 'rotate', dir }, 8000); }
   async hide() { return this.call({ cmd: 'hide' }, 3000); }
   async show() { return this.call({ cmd: 'show' }, 3000); }
- /** ：window， CPU Android */
+ /** : window,  CPU Android */
   async setPerformanceMode(on) { return this.call({ cmd: 'perf', on: on ? 1 : 0 }, 3000); }
- /** @param {boolean} keep true=window（emulatorwindow，） */
+ /** @param {boolean} keep true=window(emulatorwindow, ) */
   async detach(keep = false) { return this.call({ cmd: 'detach', keep: keep ? 1 : 0 }, 5000); }
- /** window：emulatorwindow（） */
+ /** window: emulatorwindow() */
   async layout(rect) {
     return this.call({
       cmd: 'layout',
@@ -228,28 +228,28 @@ class WinAgent extends EventEmitter {
     }, 4000);
   }
   /**
- * emulatorwindow "Android Emulator - apkstart:5554" 。
- * default "ApkStart"。（Qt ）。
+ * emulatorwindow "Android Emulator - apkstart:5554" . 
+ * default "ApkStart". (Qt ). 
    */
   async setTitle(text = 'ApkStart') {
     return this.call({ cmd: 'title', text: String(text || 'ApkStart') }, 4000);
   }
   /**
- * emulatorwindow（windowtaskbar/Alt+Tab app）。
+ * emulatorwindow(windowtaskbar/Alt+Tab app). 
  * @param {string} file PNG/ICO path
    */
   async setIcon(file) {
     return this.call({ cmd: 'icon', file: String(file || '') }, 4000);
   }
   async probe() { return this.call({ cmd: 'probe' }, 4000); }
- /** window（「 / Androidappwindow」） */
+ /** window(" / Androidappwindow") */
   async windows() { return this.call({ cmd: 'windows' }, 4000); }
 
   /**
- * window「 + 」。
- * window：Windows windowwindowdesktop，
- * —— desktop Android Emulator 。
- * （ C#）， 700ms 。
+ * window" + ". 
+ * window: Windows windowwindowdesktop, 
+ * -- desktop Android Emulator . 
+ * ( C#),  700ms . 
    */
   async park(maxWaitMs = 700) {
     const call = this.call({ cmd: 'park' }, 2000).catch(() => ({ ok: false }));
@@ -261,14 +261,14 @@ class WinAgent extends EventEmitter {
   }
 
   /**
- * 「resident」：emulator（QWindowIcon）+ + qemu / netsimd 
- * ， embed window。
- * 「」：emulator detached qemu / netsimd
- * ，Node windowsHide ，window。
- * emulator -qt-hide-window（window），，。
+ * "resident": emulator(QWindowIcon)+ + qemu / netsimd 
+ * ,  embed window. 
+ * "": emulator detached qemu / netsimd
+ * , Node windowsHide , window. 
+ * emulator -qt-hide-window(window), , . 
    *
- * maxWaitMs：launch（，）。
- * 「emulator」，boot，。
+ * maxWaitMs: launch(, ). 
+ * "emulator", boot, . 
    * @param {number} maxWaitMs
    */
   async bootHide(maxWaitMs = 3000) {
@@ -280,15 +280,15 @@ class WinAgent extends EventEmitter {
     ]);
   }
 
- /** resident（：window） */
+ /** resident(: window) */
   async bootShow() {
     return this.call({ cmd: 'boothide', on: 0 }, 4000).catch(() => ({ ok: false }));
   }
 
   /**
- * mousehook（）。
- * appwindow、install；opts ，
- * resident，window focus / settingshook。
+ * mousehook(). 
+ * appwindow, install; opts , 
+ * resident, window focus / settingshook. 
    * @param {boolean} on
    * @param {{rightBack?:boolean, wheel?:boolean, side?:boolean}} opts
    */
@@ -299,7 +299,7 @@ class WinAgent extends EventEmitter {
       wheel: !!(opts && opts.wheel),
       side: !!(opts && opts.side),
     };
-    // default「」 PowerShell （cold boot）
+    // default"" PowerShell (cold boot)
     if (!want && !this.hooked) return { ok: true, hooked: false };
     const sameConf = this.hookConf
       && this.hookConf.right === conf.right
@@ -319,7 +319,7 @@ class WinAgent extends EventEmitter {
   }
 
   dispose() {
-    // uninstallhook：，hook
+    // uninstallhook: , hook
     if (this.hooked && this.sock) {
       try { this.sock.write('{"cmd":"hook","on":0}\n'); } catch (_) { /* ignore */ }
     }
@@ -327,10 +327,10 @@ class WinAgent extends EventEmitter {
     this.hookConf = null;
     try { this.sock?.end(); } catch (_) { /* ignore */ }
     try { this.sock?.destroy(); } catch (_) { /* ignore */ }
-    // kill ：「」（ agent.ps1
-    // _lingerUntil）。emulatorboot，window；
-    // ，desktop Android Emulator 。emulator
-    // exit， 3 。
+    // kill : ""( agent.ps1
+    // _lingerUntil). emulatorboot, window; 
+    // , desktop Android Emulator . emulator
+    // exit,  3 . 
     this.sock = null;
     this.proc = null;
     this.ready = null;

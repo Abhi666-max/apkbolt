@@ -1,5 +1,5 @@
 'use strict';
-// Electron ， tasklist/netstat
+// Electron ,  tasklist/netstat
 const { app } = require('electron');
 const { execFile } = require('child_process');
 

@@ -1,10 +1,10 @@
 'use strict';
 /**
- * update（version、install）。
+ * update(version, install). 
  *
- * 1) GitHub release，；
- * 2) version；
- * 3) 「extract + + restart」：installdirectory，。
+ * 1) GitHub release, ; 
+ * 2) version; 
+ * 3) "extract + + restart": installdirectory, . 
  *
  * : node tools/check-update.js
  */
@@ -24,7 +24,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   // ---- 1. version ----
   check(cmpVer('v0.3.2', '0.3.1') === 1, 'v0.3.2 > 0.3.1');
   check(cmpVer('0.3.1', 'v0.3.1') === 0, 'v');
-  check(cmpVer('v0.10.0', '0.9.9') === 1, '0.10.0 > 0.9.9（ ， ）');
+  check(cmpVer('v0.10.0', '0.9.9') === 1, '0.10.0 > 0.9.9( ,  )');
   check(cmpVer('1.0.0', '1.0.1') === -1, '1.0.0 < 1.0.1');
 
   // ---- 2. GitHub release ----
@@ -45,10 +45,10 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
     check(info.hasUpdate === true, '0.0.0 →');
     check(!!info.asset && /\.(zip|exe)$/i.test(info.asset.name), ` ${info.asset && info.asset.name}`);
   } catch (e) {
-    check(false, `GitHub ：${e.message}`);
+    check(false, `GitHub : ${e.message}`);
   }
 
-  // install（uninstall） Setup.exe
+  // install(uninstall) Setup.exe
   fs.writeFileSync(path.join(install, 'Uninstall ApkStart.exe'), 'stub');
   const u2 = new Updater({
     currentVersion: '0.0.0',
@@ -56,7 +56,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
     isPackaged: true,
     dataDir: sandbox,
   });
-  check(u2.flavor === 'setup', '（ Uninstall ApkStart.exe）');
+  check(u2.flavor === 'setup', '( Uninstall ApkStart.exe)');
 
   // ---- 3. ----
   const payload = path.join(sandbox, 'payload');
@@ -65,7 +65,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   fs.writeFileSync(path.join(payload, 'resources', 'app', 'main.js'), 'new-main');
   fs.writeFileSync(path.join(install, 'ApkStart.exe'), 'old-exe');
 
-  // exit「」
+  // exit""
   const decoy = spawn(process.execPath, ['-e', 'setTimeout(()=>{},1500)'], { stdio: 'ignore' });
 
   const script = u.apply(
@@ -75,7 +75,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   check(/Copy-Item/.test(script) && /Wait-Process/.test(script), 'assertion failed');
 
   const ps = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
-  // Start-Process ApkStart.exe（ exe），
+  // Start-Process ApkStart.exe( exe), 
   const body = script.replace(/if \(Test-Path[^\r\n]*relaunched' \}/, "'skipped relaunch'");
   const b64 = Buffer.from(body, 'utf16le').toString('base64');
   try {
@@ -83,7 +83,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
       stdio: 'ignore', timeout: 60000, windowsHide: true,
     });
   } catch (e) {
-    check(false, `：${e.message}`);
+    check(false, `: ${e.message}`);
   }
   await sleep(600);
   const newExe = fs.readFileSync(path.join(install, 'ApkStart.exe'), 'utf8');
@@ -91,7 +91,7 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
   check(newExe === 'new-exe', 'ApkStart.exe');
   check(newMain === 'new-main', 'assertion failed');
 
-  // ---- 4. apply() （，network）----
+  // ---- 4. apply() (, network)----
   const install2 = path.join(sandbox, 'install2');
   const payload2 = path.join(sandbox, 'payload2');
   fs.mkdirSync(install2, { recursive: true });
@@ -116,13 +116,13 @@ const ok = (c, m) => console.log(`${c ? '✓' : '✗'} ${m}`);
       if (fs.readFileSync(path.join(install2, 'marker.txt'), 'utf8') === 'new') { asyncOk = true; break; }
     } catch (_) { /*  */ }
   }
-  check(asyncOk, 'apply() （ ）');
+  check(asyncOk, 'apply() ( )');
 
   try { decoy.kill(); } catch (_) { /* ignore */ }
   try { decoy2.kill(); } catch (_) { /* ignore */ }
   fs.rmSync(sandbox, { recursive: true, force: true });
 
   console.log('');
-  console.log(pass ? '：' : '：');
+  console.log(pass ? ': ' : ': ');
   process.exit(pass ? 0 : 1);
 })().catch((e) => { console.error('FATAL', e); process.exit(1); });

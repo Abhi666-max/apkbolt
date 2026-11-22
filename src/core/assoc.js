@@ -1,6 +1,6 @@
 'use strict';
 /**
- * .apk （ HKCU，）
+ * .apk ( HKCU, )
  * apk → apkstart.exe "%1" → install → desktopshortcut
  */
 const { execFileSync } = require('child_process');
@@ -8,7 +8,7 @@ const { execFileSync } = require('child_process');
 const PROGID = 'ApkBolt.apk';
 const EXT = '.apk';
 const CLASSES = 'HKCU\\Software\\Classes';
-// 「default」，uninstall，
+// "default", uninstall, 
 const STORE_KEY = 'HKCU\\Software\\ApkBolt';
 const PREV_VALUE = 'assocPrev';
 
@@ -21,7 +21,7 @@ function reg(args) {
   }
 }
 
-/** default（REG_SZ）， */
+/** default(REG_SZ),  */
 function regDefault(key) {
   try {
     const out = execFileSync('reg', ['query', key, '/ve'], { windowsHide: true, encoding: 'utf8' });
@@ -33,7 +33,7 @@ function regDefault(key) {
   }
 }
 
-/** 「default」 */
+/** "default" */
 function readPrev() {
   try {
     const out = execFileSync('reg', ['query', STORE_KEY, '/v', PREV_VALUE], { windowsHide: true, encoding: 'utf8' });
@@ -60,16 +60,16 @@ try {
 }
 
 /**
- * @param {string} exePath apkstart path（ electron.exe）
+ * @param {string} exePath apkstart path( electron.exe)
  * @param {string} [iconPath] ico
- * @param {string} [extraArgs] appdirectory， "\"C:\\path\\apkstart\""
+ * @param {string} [extraArgs] appdirectory,  "\"C:\\path\\apkstart\""
  */
 function registerAssociation(exePath, iconPath, extraArgs) {
   const icon = iconPath || exePath;
   const command = `"${exePath}" ${extraArgs ? extraArgs + ' ' : ''}"%1"`;
 
-  // .apk default：Android，uninstall ApkStart
-  // ， .apk 「default」。
+  // .apk default: Android, uninstall ApkStart
+  // ,  .apk "default". 
   const prev = regDefault(`${CLASSES}\\${EXT}`);
   if (prev && prev !== PROGID) {
     reg(['add', STORE_KEY, '/v', PREV_VALUE, '/d', prev, '/f']);
@@ -91,12 +91,12 @@ function registerAssociation(exePath, iconPath, extraArgs) {
 }
 
 /**
- * 。
- * .apk default（「」，），
- * uninstall ApkStart .apk 。：
- * 1) → ；
- * 2) default → ；
- * 3) default → 。
+ * . 
+ * .apk default("", ), 
+ * uninstall ApkStart .apk . : 
+ * 1) → ; 
+ * 2) default → ; 
+ * 3) default → . 
  */
 function unregisterAssociation() {
   reg(['delete', `${CLASSES}\\${EXT}\\OpenWithProgids`, '/v', PROGID, '/f']);

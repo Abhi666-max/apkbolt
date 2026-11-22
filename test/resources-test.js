@@ -1,10 +1,10 @@
 'use strict';
 /**
- * （ / CPU / ） Node ： Electron、。
- * 「」： 32GB 、128GB ，
- * ， / ，
- * 。
- * ：node test/resources-test.js
+ * ( / CPU / ) Node :  Electron, . 
+ * "":  32GB , 128GB , 
+ * ,  / , 
+ * . 
+ * : node test/resources-test.js
  */
 const assert = require('assert/strict');
 const fs = require('fs');
@@ -24,9 +24,9 @@ function test(name, fn) {
 const GB = 1024 * 1024 * 1024;
 
 (() => {
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
-  test('hostProfile （ ）', () => {
+  test('hostProfile ( )', () => {
     const h = hostProfile({ totalMB: 32768, cores: 16 });
     assert.equal(h.totalMB, 32768);
     assert.equal(h.cores, 16);
@@ -40,7 +40,7 @@ const GB = 1024 * 1024 * 1024;
 
   test('25%', () => {
     const lim = memoryLimits(32768);
-    assert.equal(lim.maxMB, 24576, `32GB  24GB， ${lim.maxMB}`);
+    assert.equal(lim.maxMB, 24576, `32GB  24GB,  ${lim.maxMB}`);
     assert.equal(lim.stepMB, 512);
     assert.equal(lim.minMB, 1024);
   });
@@ -50,9 +50,9 @@ const GB = 1024 * 1024 * 1024;
     assert.ok(lim.maxMB >= 4096 && lim.maxMB <= 16384);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
-  test('0 ， 0', () => {
+  test('0 ,  0', () => {
     const r = clampMemoryMB(0, 32768);
     assert.equal(r.mb, 0);
     assert.equal(r.reason, 'auto');
@@ -77,12 +77,12 @@ const GB = 1024 * 1024 * 1024;
     assert.equal(r.capped, true);
   });
 
-  test('（4GB） 4GB', () => {
+  test('(4GB) 4GB', () => {
     const r = clampMemoryMB(4096, 4096);
     assert.equal(r.mb, 3072);
   });
 
-  console.log('\n[ · CPU ]');
+  console.log('\n[  -  CPU ]');
 
   test('16 15', () => {
     assert.equal(clampCores(16, 16).cores, 15);
@@ -96,7 +96,7 @@ const GB = 1024 * 1024 * 1024;
     assert.equal(clampCores(0, 8).cores, 0);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('Windows', () => {
     const v = memVerdict(28672, 32768);
@@ -113,7 +113,7 @@ const GB = 1024 * 1024 * 1024;
     assert.equal(memVerdict(512, 32768).level, 'insufficient');
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('50GB 1.8 + 2GB', () => {
     const need = diskRequiredMB(50 * GB);
@@ -148,7 +148,7 @@ const GB = 1024 * 1024 * 1024;
     assert.equal(storageVerdict(0, 50 * GB).ok, true);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('diskVerdict', () => {
     const v = diskVerdict(200 * 1024, 100 * 1024);
@@ -156,7 +156,7 @@ const GB = 1024 * 1024 * 1024;
     assert.equal(v.message, '');
   });
 
-  test('diskVerdict （ ）', () => {
+  test('diskVerdict ( )', () => {
     const v = diskVerdict(10 * 1024, 60 * 1024);
     assert.equal(v.ok, false);
     assert.ok(/Insufficient disk space/i.test(v.message), v.message);
@@ -172,7 +172,7 @@ const GB = 1024 * 1024 * 1024;
     assert.ok(need > 85 * 1024 && need < 95 * 1024, ` ${need} MB`);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   const builtinSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'backends', 'builtin.js'), 'utf8');
   test('resources()', () => {
@@ -188,18 +188,18 @@ const GB = 1024 * 1024 * 1024;
   });
 
   const emulatorSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'emulator.js'), 'utf8');
-  test('quickboot ，', () => {
+  test('quickboot , ', () => {
     assert(/_hasDataOverlay/.test(emulatorSrc), 'qcow2');
     assert(/needsReset: true/.test(emulatorSrc), 'needsReset');
     assert(/fsGB/.test(emulatorSrc), 'dataInfo');
   });
 
   const doctorSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'doctor.js'), 'utf8');
-  test('/ ， 8GB/8', () => {
+  test('/ ,  8GB/8', () => {
     assert(/memoryLimits\(host\.totalMB\)/.test(doctorSrc), 'doctor');
     assert(!/1536, 8192/.test(doctorSrc), 'doctor 8192');
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })();

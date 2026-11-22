@@ -1,17 +1,17 @@
 'use strict';
 /**
- * incrementalupdate： + 「」zip。
+ * incrementalupdate:  + ""zip. 
  *
- * 99MB， Electron （exe / dll / locales），upgrade Electron
- * ； resources/app JS / / node_modules。
- * app ， sha256， Electron
- * version， resources/app completeupgrade。
+ * 99MB,  Electron (exe / dll / locales), upgrade Electron
+ * ;  resources/app JS / / node_modules. 
+ * app ,  sha256,  Electron
+ * version,  resources/app completeupgrade. 
  *
- * （ --out directory，defaultdirectory）：
+ * ( --out directory, defaultdirectory): 
  * ApkStart-v<version>-manifest.json
  * ApkStart-v<version>-app.zip
  *
- * ：node build/incremental.js <portable versiondirectory> <tag> [--out directory]
+ * : node build/incremental.js <portable versiondirectory> <tag> [--out directory]
  */
 const fs = require('fs');
 const path = require('path');
@@ -21,7 +21,7 @@ const { find7z } = require('./zip');
 
 const ROOT = path.dirname(__dirname);
 
-/** Electron version： */
+/** Electron version:  */
 function electronVersion(root = ROOT) {
   const candidates = [
     path.join(root, 'node_modules', 'electron', 'package.json'),
@@ -41,7 +41,7 @@ function electronVersion(root = ROOT) {
   return '';
 }
 
-/** directorypath（） */
+/** directorypath() */
 function walk(dir, base = dir) {
   const out = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -53,14 +53,14 @@ function walk(dir, base = dir) {
 }
 
 function zipApp(exe, srcDir, outZip, rootDir) {
-  // cwd portable versiondirectory，path resources/app/...
+  // cwd portable versiondirectory, path resources/app/...
   const r = spawnSync(exe, ['a', '-tzip', '-mm=Deflate', '-mx=9', '-bso0', '-bsp0', '-y', outZip, 'resources\\app'], {
     cwd: rootDir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
   });
   if (r.status !== 0) {
-    throw new Error(`（${r.status}）：${String(r.stderr || r.stdout || '').slice(0, 400)}`);
+    throw new Error(`(${r.status}): ${String(r.stderr || r.stdout || '').slice(0, 400)}`);
   }
-  if (!fs.existsSync(srcDir)) throw new Error(`：${srcDir}`);
+  if (!fs.existsSync(srcDir)) throw new Error(`: ${srcDir}`);
 }
 
 async function build(portableDir, tag, outDir = process.cwd()) {
@@ -80,7 +80,7 @@ async function build(portableDir, tag, outDir = process.cwd()) {
 
   fs.rmSync(appZip, { force: true });
   const exe = find7z();
-  if (!exe) throw new Error(' 7-Zip，（CI  windows-latest ）');
+  if (!exe) throw new Error(' 7-Zip, (CI  windows-latest )');
   zipApp(exe, appDir, appZip, portable);
 
   const files = {};
@@ -109,9 +109,9 @@ async function build(portableDir, tag, outDir = process.cwd()) {
   };
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
-  console.log(`：${manifestPath}`);
-  console.log(`：${appZip}（${(fs.statSync(appZip).size / 1024 / 1024).toFixed(2)} MB，${rels.length} ）`);
-  console.log(`Electron：${manifest.electronVersion || '()'}`);
+  console.log(`: ${manifestPath}`);
+  console.log(`: ${appZip}(${(fs.statSync(appZip).size / 1024 / 1024).toFixed(2)} MB, ${rels.length} )`);
+  console.log(`Electron: ${manifest.electronVersion || '()'}`);
   return { manifestPath, appZip, manifest };
 }
 
@@ -121,10 +121,10 @@ if (require.main === module) {
   const oi = process.argv.indexOf('--out');
   const out = oi > 0 ? process.argv[oi + 1] : process.cwd();
   if (!dir || !tag) {
-    console.error('：node build/incremental.js <> <tag> [--out ]');
+    console.error(': node build/incremental.js <> <tag> [--out ]');
     process.exit(1);
   }
-  build(dir, tag, out).catch((e) => { console.error('：', e.message); process.exit(1); });
+  build(dir, tag, out).catch((e) => { console.error(': ', e.message); process.exit(1); });
 }
 
 module.exports = { build, electronVersion, walk };

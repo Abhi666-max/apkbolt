@@ -1,7 +1,7 @@
 'use strict';
 /**
  * adb 
- * apkstart ：install / launch / / uninstall / / 
+ * apkstart : install / launch / / uninstall / / 
  */
 const { execFile, spawn } = require('child_process');
 const fs = require('fs');
@@ -12,19 +12,19 @@ const store = require('./store');
 const { autoRotateSetting } = require('./orientation');
 
 /**
- * In-guest「rotate」 guest （'1' / '0' ）。
- * orientation —— setOrientation / resetDisplayOverrides 
- * `wm user-rotation lock 0` + `wm set-ignore-orientation-request` orientation。
- * settings「」，app setting 。
+ * In-guest"rotate" guest ('1' / '0' ). 
+ * orientation -- setOrientation / resetDisplayOverrides 
+ * `wm user-rotation lock 0` + `wm set-ignore-orientation-request` orientation. 
+ * settings"", app setting . 
  */
 function guestAutoRotate() {
   try { return autoRotateSetting(store.getSettings()); } catch (_) { return '1'; }
 }
 
 /**
- * 。
- * 720 ÷ (190/160) = 606dp ≥ 600dp， Android ；
- * 320dpi（system imagedefault） 360dp，。
+ * . 
+ * 720 ÷ (190/160) = 606dp ≥ 600dp,  Android ; 
+ * 320dpi(system imagedefault) 360dp, . 
  */
 const TABLET_DENSITY = 190;
 function tabletDensity() {
@@ -36,10 +36,10 @@ function tabletDensity() {
 }
 
 /**
- * adb 。** Android SDK installdirectory**：
- * emulator adb（MuMu / / ） —— adb 
- * server （、、offline ），「」。
- * adb runtimedirectory，（ engine.adbPath）。
+ * adb . ** Android SDK installdirectory**: 
+ * emulator adb(MuMu / / ) -- adb 
+ * server (, , offline ), "". 
+ * adb runtimedirectory, ( engine.adbPath). 
  */
 const COMMON_ADB_PATHS = [
   path.join(process.env.LOCALAPPDATA || '', 'Android', 'Sdk', 'platform-tools', 'adb.exe'),
@@ -96,7 +96,7 @@ function friendlyLaunchError(raw, pkg) {
     return `${pkg || 'App'} crashed after launch: Missing native library (this app may only provide ARM binaries). ` + 'Automatically switching to the compatible image with the ARM translation layer and retrying.';
   }
   if (/ClassNotFoundException|NoClassDefFoundError|AndroidRuntime/i.test(t)) {
-    return `${pkg || 'App'} crashed immediately after launch (internal app exception — may be related to the emulator environment or missing Google services).`;
+    return `${pkg || 'App'} crashed immediately after launch (internal app exception - may be related to the emulator environment or missing Google services).`;
   }
   if (/java\.lang\.SecurityException|Permission Denial/i.test(t)) {
     return `${pkg || 'App'} failed to launch: The system denied the launch request (permission or signature issue).`;
@@ -107,9 +107,9 @@ function friendlyLaunchError(raw, pkg) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * `adb devices` serial state 。
- * ：unauthorized `get-state` 'device'， devices 
- * state authorized / unauthorized / offline —— bootprobeself-healing。
+ * `adb devices` serial state . 
+ * : unauthorized `get-state` 'device',  devices 
+ * state authorized / unauthorized / offline -- bootprobeself-healing. 
  */
 function parseDeviceState(text, serial) {
   const lines = String(text || '').split(/\r?\n/).slice(1);
@@ -125,7 +125,7 @@ function parseDeviceState(text, serial) {
   return 'no-device';
 }
 
-/** 「 USB 」 shell error unauthorized */
+/** " USB " shell error unauthorized */
 function isUnauthorizedError(raw) {
   return /\bunauthorized\b|no permissions|confirm.*(allow|debug)/i.test(String(raw || ''));
 }
@@ -136,12 +136,12 @@ function parsePmPaths(text) {
     .filter((l) => /^package:/.test(l)).map((l) => l.slice(8).trim()).filter(Boolean);
 }
 
-/** launch（adbPath|pkg → activity），10 */
+/** launch(adbPath|pkg → activity), 10 */
 const LAUNCHER_CACHE = new Map();
 
 /**
- * Windows adb ASCII path（/downloaddirectory）。
- * install APK ASCII temporarydirectory，。
+ * Windows adb ASCII path(/downloaddirectory). 
+ * install APK ASCII temporarydirectory, . 
  */
 function stageApk(apkPath) {
   const p = String(apkPath || '');
@@ -160,12 +160,12 @@ function unstage(staged) {
 }
 
 /**
- * 「Activity」 am start -n 。
- * ：
- * - （version apps.json ）：`MainActivity` / `.MainActivity` → `<pkg>/<activity>`
- * - （`cmd package resolve-activity` ）：`com.a.b/.Main` → 
- * `${pkg}/${activity}`， `pkg/pkg/class`，
- * am start （result code=-92），「Androiddesktop」。
+ * "Activity" am start -n . 
+ * : 
+ * - (version apps.json ): `MainActivity` / `.MainActivity` → `<pkg>/<activity>`
+ * - (`cmd package resolve-activity` ): `com.a.b/.Main` → 
+ * `${pkg}/${activity}`,  `pkg/pkg/class`, 
+ * am start (result code=-92), "Androiddesktop". 
  */
 function componentArg(pkg, activity) {
   const a = String(activity || '').trim();
@@ -174,7 +174,7 @@ function componentArg(pkg, activity) {
   return `${pkg}/${a}`;
 }
 
-/** `cmd package resolve-activity --brief` pkg （/priority ） */
+/** `cmd package resolve-activity --brief` pkg (/priority ) */
 function parseResolvedActivity(pkg, out) {
   const lines = String(out || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   for (let i = lines.length - 1; i >= 0; i -= 1) {
@@ -185,9 +185,9 @@ function parseResolvedActivity(pkg, out) {
 }
 
 /**
- * adb install timeout 240s， 2GB+ install
- * 「push + install + dexopt」 4 ：timeoutinstallfailure，
- * 「/failure」。， 20 。
+ * adb install timeout 240s,  2GB+ install
+ * "push + install + dexopt" 4 : timeoutinstallfailure, 
+ * "/failure". ,  20 . 
  */
 function installTimeoutMs(bytes) {
   const mb = Math.max(1, Number(bytes || 0) / 1048576);
@@ -203,8 +203,8 @@ class AdbError extends Error {
 }
 
 /**
- * `find -exec stat -c '%Y|%s|%n'` 。
- * null stat （）。
+ * `find -exec stat -c '%Y|%s|%n'` . 
+ * null stat (). 
  */
 function parseStatList(text) {
   const lines = String(text || '').split('\n').map((l) => l.trim()).filter(Boolean);
@@ -251,11 +251,11 @@ class AdbClient {
 
   _adbEnv() {
     const env = { ...process.env, ANDROID_ADB_SERVER_PORT: process.env.ANDROID_ADB_SERVER_PORT || '5044' };
-    // Play system image ADB ：host adb server guest adbd
-    // adbkey。 adb/emulator %USERPROFILE%\.android\adbkey{,.pub}，
-    // emulator launch adbkey.pub guest /data/misc/adb/adb_keys。
-    // adb server ： ANDROID_SDK_HOME / runtime
-    // adb key，cold boot「 USB 」→ device unauthorized。
+    // Play system image ADB : host adb server guest adbd
+    // adbkey.  adb/emulator %USERPROFILE%\.android\adbkey{,.pub}, 
+    // emulator launch adbkey.pub guest /data/misc/adb/adb_keys. 
+    // adb server :  ANDROID_SDK_HOME / runtime
+    // adb key, cold boot" USB "→ device unauthorized. 
     if (!env.ADB_VENDOR_KEYS) {
       const home = process.env.USERPROFILE || process.env.HOME || '';
       const keyDir = path.join(home, '.android');
@@ -272,13 +272,13 @@ class AdbClient {
         maxBuffer: 64 * 1024 * 1024,
         encoding: binary ? 'buffer' : 'utf8',
         windowsHide: true,
-        // runtimeemulator adb server （default 5044）， 5037
-        // WSA / emulator adb ， offline
+        // runtimeemulator adb server (default 5044),  5037
+        // WSA / emulator adb ,  offline
         env: this._adbEnv(),
       }, (err, stdout, stderr) => {
         if (err) {
-          // adb install failure stdout exit 0；
-          // stderr，「failure」。
+          // adb install failure stdout exit 0; 
+          // stderr, "failure". 
           const text = [stdout, stderr, err.message].filter(Boolean).join('\n').trim();
           const e = new AdbError(`adb ${finalArgs.join(' ')} failed: ${text}`, stderr, err.code);
           e.stdout = stdout;
@@ -296,11 +296,11 @@ class AdbClient {
   }
 
   /**
- * resident。
- * wheel/：wheel execFile adb ，
- * desktop。 `adb shell`，，
- * echo —— ，，
- * shell 。
+ * resident. 
+ * wheel/: wheel execFile adb , 
+ * desktop.  `adb shell`, , 
+ * echo -- , , 
+ * shell . 
    */
   _inputSession() {
     const old = this._input;
@@ -320,8 +320,8 @@ class AdbClient {
         const line = buf.slice(0, i).trim();
         buf = buf.slice(i + 1);
         for (const [id, w] of this._waiters) {
-          // ： shell ，
-          // contains 「」「」，。
+          // :  shell , 
+          // contains """", . 
           if (line === w.token) {
             this._waiters.delete(id);
             clearTimeout(w.timer);
@@ -331,7 +331,7 @@ class AdbClient {
         }
       }
     });
-    p.stderr.on('data', () => { /* ignore：fallback */ });
+    p.stderr.on('data', () => { /* ignore: fallback */ });
     p.stdin.on('error', () => { /* exit clean */ });
     p.on('error', () => { this._failWaiters(new Error('adb shell failed to start')); });
     p.on('exit', () => {
@@ -349,7 +349,7 @@ class AdbClient {
     this._waiters.clear();
   }
 
- /** whitelist input ；failurereclaim， adb */
+ /** whitelist input ; failurereclaim,  adb */
   async input(cmd, { timeout = 4000 } = {}) {
     const { isInputCommand } = require('./pointer');
     if (!isInputCommand(cmd)) throw new Error('Invalid input command');
@@ -406,7 +406,7 @@ class AdbClient {
       const { stdout } = await this.exec(['get-state'], { timeout: 8000 });
       return stdout.trim() === 'device';
     } catch (_) {
-      // get-state serial ， devices
+      // get-state serial ,  devices
       try {
         const { stdout } = await this.exec(['devices'], { withSerial: false, timeout: 8000 });
         return stdout.split('\n').some((l) => l.startsWith(this.serial) && l.includes('device'));
@@ -417,9 +417,9 @@ class AdbClient {
   }
 
   /**
- * serial `adb devices` ：device / unauthorized / offline / no-device。
- * isOnline() get-state authorized unauthorized（ 'device'），
- * bootprobe「」self-healing。
+ * serial `adb devices` : device / unauthorized / offline / no-device. 
+ * isOnline() get-state authorized unauthorized( 'device'), 
+ * bootprobe""self-healing. 
    */
   async deviceState() {
     try {
@@ -443,18 +443,18 @@ class AdbClient {
   }
 
   /**
- * install APK，fallback：
- * - default -g（system image PermissionController ）；
- * - --bypass-low-target-sdk-block， Android 14 install targetSdk app；
- * - adb versionparameters / path / errorretry；
- * - NO_MATCHING_ABIS code error，system image。
+ * install APK, fallback: 
+ * - default -g(system image PermissionController ); 
+ * - --bypass-low-target-sdk-block,  Android 14 install targetSdk app; 
+ * - adb versionparameters / path / errorretry; 
+ * - NO_MATCHING_ABIS code error, system image. 
    */
   async install(apkPath) {
     if (!fs.existsSync(apkPath)) throw new Error(`APK not found: ${apkPath}`);
     const staged = stageApk(apkPath);
     const file = staged.path;
     const variants = [
-      // -g runtime，app；system imagefallback
+      // -g runtime, app; system imagefallback
       ['install', '-r', '-t', '-g', '--bypass-low-target-sdk-block', file],
       ['install', '-r', '-t', '--bypass-low-target-sdk-block', file],
       ['install', '-r', '-t', file],
@@ -486,7 +486,7 @@ class AdbClient {
           // adb parameters / →
           if (/Unknown option|unrecognized option|Unknown command/i.test(raw)) continue;
           if (tag === 'INSTALL_FAILED_TEST_ONLY' || tag === 'INSTALL_FAILED_DEPRECATED_SDK_VERSION') continue;
-          // error（、adb server restart）retry
+          // error(, adb server restart)retry
           if (/device (not found|offline)|closed|protocol fault|no devices/i.test(raw)) {
             // eslint-disable-next-line no-await-in-loop
             await sleep(1500);
@@ -498,7 +498,7 @@ class AdbClient {
             err.raw = raw;
             throw err;
           }
-          // error：
+          // error: 
         }
       }
       const err = new Error(friendlyInstallError(last || 'Install failed (no specific reason provided)'));
@@ -510,7 +510,7 @@ class AdbClient {
     }
   }
 
- /** APK（.apks / .xapk split） install-multiple */
+ /** APK(.apks / .xapk split) install-multiple */
   async installMultiple(apkPaths) {
     if (!apkPaths || !apkPaths.length) throw new Error('No split APKs found to install');
     const staged = apkPaths.map((p) => stageApk(p));
@@ -551,12 +551,12 @@ class AdbClient {
   }
 
   /**
- * —— PackageManager 。
+ * -- PackageManager . 
    *
- * snapshotdata partition，`pm path` packages.xml 
- * `package:/data/app/.../base.apk`（installed=true）， APK 
- * 。 `am start` failure。 `test -f/-s` pm 
- * path，（）「install」，。
+ * snapshotdata partition, `pm path` packages.xml 
+ * `package:/data/app/.../base.apk`(installed=true),  APK 
+ * .  `am start` failure.  `test -f/-s` pm 
+ * path, ()"install", . 
    *
    * @returns {Promise<boolean>}
    */
@@ -564,7 +564,7 @@ class AdbClient {
     const out = await this.shell(`pm path ${pkg}`);
     const paths = parsePmPaths(out);
     if (!paths.length) return false;
-    // split APK ；launch。 shell， adb 。
+    // split APK ; launch.  shell,  adb . 
     const checks = paths.map((p) => `[ -s "${p}" ]`).join(' && ');
     const probe = await this.shell(`${checks} && echo __APKSTART_PRESENT__`, { timeout: 10000 }).catch(() => '');
     return /__APKSTART_PRESENT__/.test(String(probe));
@@ -575,16 +575,16 @@ class AdbClient {
     return out.split('\n').map((l) => l.replace('package:', '').trim()).filter(Boolean);
   }
 
- /** launch Activity（fallback） */
- /** appupgrade，cache */
+ /** launch Activity(fallback) */
+ /** appupgrade, cache */
   clearLauncherCache(pkg) {
     if (!pkg) { LAUNCHER_CACHE.clear(); return; }
     LAUNCHER_CACHE.delete(`${this.adbPath}|${pkg}`);
   }
 
   async resolveLauncher(pkg) {
-    // Activity adb （~200-400ms），launch。
-    // cache，app；10 ，app。
+    // Activity adb (~200-400ms), launch. 
+    // cache, app; 10 , app. 
     const key = `${this.adbPath}|${pkg}`;
     const hit = LAUNCHER_CACHE.get(key);
     if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.value;
@@ -601,15 +601,15 @@ class AdbClient {
     return null;
   }
 
- /** app：am start success ≠ */
+ /** app: am start success ≠ */
   async waitAppAlive(pkg, timeoutMs = 12000) {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       // eslint-disable-next-line no-await-in-loop
       const pid = await this.shell(`pidof ${pkg}`, { timeout: 6000 }).catch(() => '');
       if (String(pid).trim()) return { ok: true };
-      // 350ms （ 1000ms）：、launch。
-      // pidof shell，，「」。
+      // 350ms ( 1000ms): , launch. 
+      // pidof shell, , "". 
       // eslint-disable-next-line no-await-in-loop
       await sleep(350);
     }
@@ -622,23 +622,23 @@ class AdbClient {
       );
     } catch (_) { /* ignore */ }
     const text = String(crash || '').trim();
-    // logfailure：applaunch 20-40
+    // logfailure: applaunch 20-40
     return { ok: false, crash: text, uncertain: !text };
   }
 
   /**
- * launchapp，fallback：
- * freeform window → → monkey fallback；
- * ， logcat code errorsystem image。
+ * launchapp, fallback: 
+ * freeform window → → monkey fallback; 
+ * ,  logcat code errorsystem image. 
    */
   async startApp(pkg, activity, { freeform = true, bounds = null, forceStop = false } = {}) {
     if (forceStop) await this.forceStop(pkg);
-    // LAUNCHER ， APK Activity：
-    // app（）launch， Activity
-    // "had you called RpcService.init"，。
+    // LAUNCHER ,  APK Activity: 
+    // app()launch,  Activity
+    // "had you called RpcService.init", . 
     const resolved = (await this.resolveLauncher(pkg).catch(() => '')) || activity;
-    // resolved （pkg/class），（ apps.json）；
-    // am start -n ， pkg/pkg/class 。
+    // resolved (pkg/class), ( apps.json); 
+    // am start -n ,  pkg/pkg/class . 
     const comp = componentArg(pkg, resolved);
     const intent = comp
       ? ['-n', comp]
@@ -666,7 +666,7 @@ class AdbClient {
       if (alive.ok) return out;
       if (alive.uncertain) return `${out}\n(App is still loading)`;
       lastError = alive.crash || lastError;
-      // log ARM retry，system image
+      // log ARM retry, system image
       if (/DoBadTrampoline|libndk_translation|UnsatisfiedLinkError|dlopen failed/i.test(alive.crash || '')) {
         const err = new Error(friendlyLaunchError(alive.crash, pkg));
         err.code = 'APP_CRASHED';
@@ -675,7 +675,7 @@ class AdbClient {
       }
     }
 
-    // monkey fallback：system image am start -a/-c/-p launcher
+    // monkey fallback: system image am start -a/-c/-p launcher
     try {
       const out = await this.shell(
         `monkey -p ${pkg} -c android.intent.category.LAUNCHER 1`, { timeout: 20000 },
@@ -684,7 +684,7 @@ class AdbClient {
       if (alive.ok || alive.uncertain) return out;
       lastError = alive.crash || lastError;
     } catch (e) {
-      // ，launcherror
+      // , launcherror
       if (!lastError) lastError = String(e.message || e);
     }
 
@@ -729,10 +729,10 @@ class AdbClient {
     return true;
   }
 
- /** freeform（window），failure */
+ /** freeform(window), failure */
   async ensureFreeform() {
-    // adb shell：4 execFile Windows 600ms+，
-    // 「app」。
+    // adb shell: 4 execFile Windows 600ms+, 
+    // "app". 
     const out = await this.shell(
       'settings put global enable_freeform_support 1 ; '
       + 'settings put global force_resizable_activities 1 ; '
@@ -780,16 +780,16 @@ class AdbClient {
     return String(out).split('\n').map((line) => {
       const l = line.trim();
       if (!l || l.startsWith('total ')) return null;
-      // Android ls -l 「 group」「 group」，
-      // "2026-11-12 18:52" "Nov 12 18:52"，。
-      // 2 ，。
+      // Android ls -l " group"" group", 
+      // "2026-11-12 18:52" "Nov 12 18:52", . 
+      // 2 , . 
       const parts = l.split(/\s+/);
       if (parts.length < 6 || !/^[\-dl]/.test(parts[0])) return null;
       const sizeIdx = parts.findIndex((p, i) => i >= 2 && /^\d+$/.test(p)
         && /(\d{4}-\d{2}-\d{2}|^[A-Za-z]{3}$)/.test(parts[i + 1] || ''));
       if (sizeIdx < 0) return null;
       const size = Number(parts[sizeIdx]);
-      // 「:」token （ 2-3 token，）
+      // ":"token ( 2-3 token, )
       const timeIdx = parts.findIndex((p, i) => i > sizeIdx && /^\d{1,2}:\d{2}(:\d{2})?$/.test(p));
       const name = parts.slice((timeIdx >= 0 ? timeIdx : sizeIdx + 2) + 1).join(' ');
       return name ? { isDir: parts[0][0] === 'd', size, name } : null;
@@ -797,9 +797,9 @@ class AdbClient {
   }
 
   /**
- * mtime （toybox stat）。
- * ls -l 「 :」，，「」。
- * null stat， listRemote。
+ * mtime (toybox stat). 
+ * ls -l " :", , "". 
+ * null stat,  listRemote. 
    */
   async listRemoteStat(remote) {
     let out = '';
@@ -816,11 +816,11 @@ class AdbClient {
  /** app */
   async clearData(pkg) {
     await this.shell(`pm clear ${pkg}`);
-    // ，launch， permGranted cache
+    // , launch,  permGranted cache
     try { store.upsertApp({ package: pkg, permGranted: false }); } catch (_) { /* ignore */ }
   }
 
- /** app（Windows/ run-as； adb backup fallback） */
+ /** app(Windows/ run-as;  adb backup fallback) */
   async exportAppData(pkg, localTarPath) {
     const remote = `/sdcard/apkstart-tmp-${pkg}.tar`;
     const cmd = `run-as ${pkg} tar -cf ${remote} . 2>/dev/null || (cd /data/data/${pkg} && tar -cf ${remote} .)`;
@@ -835,15 +835,15 @@ class AdbClient {
   }
 
   /**
- * appruntime。
- * ：① launch，「app」；
- * ② （pm clear），app。
+ * appruntime. 
+ * : ① launch, "app"; 
+ * ② (pm clear), app. 
    *
- * ：`dumpsys package` guest app_process（ 1~3s），
- * `pm grant` / `cmd appops set` 。app，
- * 20 （log permissions granted +18s +42s）。
- * ， pm clear ，
- * apps.json ，launch；/。
+ * : `dumpsys package` guest app_process( 1~3s), 
+ * `pm grant` / `cmd appops set` . app, 
+ * 20 (log permissions granted +18s +42s). 
+ * ,  pm clear , 
+ * apps.json , launch; /. 
    */
   async grantRuntimePermissions(pkg) {
     try {
@@ -867,32 +867,32 @@ class AdbClient {
       if (m && m[2] === 'false') denied.push(m[1]);
     }
     const granted = [];
-    // ：pm grant Windows 150ms+，
-    // 1 ，。
+    // : pm grant Windows 150ms+, 
+    // 1 , . 
     const cmds = [];
     for (const p of denied) cmds.push(`pm grant ${pkg} ${p}`);
-    // appops，
+    // appops, 
     const ops = ['MANAGE_EXTERNAL_STORAGE', 'SYSTEM_ALERT_WINDOW', 'REQUEST_INSTALL_PACKAGES', 'WRITE_SETTINGS'];
     for (const op of ops) cmds.push(`cmd appops set ${pkg} ${op} allow`);
     if (cmds.length) {
       await this.shell(cmds.join(' ; '), { timeout: 20000 }).catch(() => '');
       granted.push(...denied);
     }
-    // ：failureretry，「」
+    // : failureretry, ""
     try { store.upsertApp({ package: pkg, permGranted: true }); } catch (_) { /* ignore */ }
     return granted;
   }
 
   /**
- * 「app」：
- * - ，bootapp；
- * - （，mouse/）；
- * - ，。
- * settings ，，。
+ * "app": 
+ * - , bootapp; 
+ * - (, mouse/); 
+ * - , . 
+ * settings , , . 
    */
   async prepareForeground() {
-    // 7 ， adb （Windows 150~250ms），
-    // 1~1.7 ，「app」。 shell 。
+    // 7 ,  adb (Windows 150~250ms), 
+    // 1~1.7 , "app".  shell . 
     const cmds = [
       'wm dismiss-keyguard',
       'settings put global policy_control immersive.status=*',
@@ -901,32 +901,32 @@ class AdbClient {
       'settings put global transition_animation_scale 0',
       'settings put global animator_duration_scale 0',
       'settings put system screen_off_timeout 2147483647',
-      // taskbar： Pixel Launcher resident Taskbar，
-      // app、key（「key」）。
-      // disableLauncherTaskbar()：launch，。
+      // taskbar:  Pixel Launcher resident Taskbar, 
+      // app, key("key"). 
+      // disableLauncherTaskbar(): launch, . 
       'settings put global enable_taskbar 0',
-      // ：Androiddefault connectivitycheck.gstatic.com 「」，
-      // ，network「!」（），
-      // app、。 204 endpoint。
-      // launch（、 shell ，），snapshot
-      // 、settings，。
+      // : Androiddefault connectivitycheck.gstatic.com "", 
+      // , network"!"(), 
+      // app, .  204 endpoint. 
+      // launch(,  shell , ), snapshot
+      // , settings, . 
       'settings put global captive_portal_http_url http://connect.rom.miui.com/generate_204',
       'settings put global captive_portal_https_url https://connect.rom.miui.com/generate_204',
       'settings put global captive_portal_mode 0',
-      // note： wm user-rotation / accelerometer_rotation。
-      // orientation setOrientation / resetDisplayOverrides portrait，
-      // lock 0 landscapeorientationportrait（）。
+      // note:  wm user-rotation / accelerometer_rotation. 
+      // orientation setOrientation / resetDisplayOverrides portrait, 
+      // lock 0 landscapeorientationportrait(). 
     ];
     await this.shell(cmds.join(' ; '), { timeout: 15000 }).catch(() => {});
     return true;
   }
 
- /** mouse / side buttons / ：resident， 100ms */
+ /** mouse / side buttons / : resident,  100ms */
   async _key(code) {
     try {
       await this.input(`input keyevent ${code}`);
     } catch (_) {
-      // runtimerestart、resident shell ， adb，
+      // runtimerestart, resident shell ,  adb, 
       await this.shell(`input keyevent ${code}`, { timeout: 6000 }).catch(() => {});
     }
   }
@@ -935,39 +935,39 @@ class AdbClient {
   async keyForward() { return this._key(125); }
 
   /**
- * 「 / 」。
+ * " / ". 
    *
- * ：** wm size**。 wm size guest framebuffer 
- * （720x1280 -> 1280x720）， Qt window/orientation，
- * 90°，mouse。 wm size 
- * /data ，restart —— 「 / / 」
- * 。
+ * : ** wm size**.  wm size guest framebuffer 
+ * (720x1280 -> 1280x720),  Qt window/orientation, 
+ * 90°, mouse.  wm size 
+ * /data , restart -- " / / "
+ * . 
    *
- * （wm density），framebuffer 720x1280 ：
+ * (wm density), framebuffer 720x1280 : 
  * - 320dpi -> smallestWidth 360dp -> 
- * - 190dpi -> smallestWidth 606dp（>=600dp）-> / 
- * 、orientation、，、、。
+ * - 190dpi -> smallestWidth 606dp(>=600dp)-> / 
+ * , orientation, , , , . 
    */
   async setOrientation(landscape) {
     try {
-      // rotatedefault（0.5.9）： guest accelerometer_rotation=1，
-      // settings「」。orientation wm user-rotation lock 0
-      // + set-ignore-orientation-request ，，。
-      // settings →「system imagerotate」， 0 。
+      // rotatedefault(0.5.9):  guest accelerometer_rotation=1, 
+      // settings"". orientation wm user-rotation lock 0
+      // + set-ignore-orientation-request , , . 
+      // settings →"system imagerotate",  0 . 
       await this.shell(`settings put system accelerometer_rotation ${guestAutoRotate()}; wm size reset`, { timeout: 15000 });
-      // orientation **0**（ 1）。orientation hw.lcd.width/height
-      // （ doctor.lcdFor）， 1 space，
-      // 90° —— 「landscape」。
+      // orientation **0**( 1). orientation hw.lcd.width/height
+      // ( doctor.lcdFor),  1 space, 
+      // 90° -- "landscape". 
       await this.shell('wm user-rotation lock 0', { timeout: 15000 });
-      // ：app portrait，，
-      // init=1280x720 cur=720x1280 space，。
-      // 「ignoreapporientation」，orientation。
-      // portrait，landscape true portrait
-      // landscape。API < 31 ，failureignore。
+      // : app portrait, , 
+      // init=1280x720 cur=720x1280 space, . 
+      // "ignoreapporientation", orientation. 
+      // portrait, landscape true portrait
+      // landscape. API < 31 , failureignore. 
       await this.shell(`wm set-ignore-orientation-request ${landscape ? 'true' : 'false'}`, { timeout: 15000 });
-      // freeform / ignoreorientation，Android「See and do more」
-      // （"Double-tap outside an app to reposition it…"）。app，
-      // 。，fallback。
+      // freeform / ignoreorientation, Android"See and do more"
+      // ("Double-tap outside an app to reposition it..."). app, 
+      // . , fallback. 
       await this.shell('settings put secure freeform_mode_confirmations confirmed', { timeout: 10000 });
       if (landscape) await this.shell('input keyevent KEYCODE_BACK', { timeout: 8000 });
       await this.shell(`wm density ${tabletDensity()}`, { timeout: 15000 });
@@ -978,21 +978,21 @@ class AdbClient {
   }
 
   /**
- * taskbar（Android 12L+ Taskbar）。
+ * taskbar(Android 12L+ Taskbar). 
    *
- * ： density 190dpi，720 ⇒ sw606dp，
- * Android 600dp 。Pixel Launcher resident
- * NAVIGATION_BAR_PANEL taskbar：、app，
- * // —— 「key」。
+ * :  density 190dpi, 720 ⇒ sw606dp, 
+ * Android 600dp . Pixel Launcher resident
+ * NAVIGATION_BAR_PANEL taskbar: , app, 
+ * // -- "key". 
    *
- * （gestural overlay ）， policy_control immersive
- * ， global enable_taskbar； Launcher launch，
- * restart。launch， Play AOSP 。
+ * (gestural overlay ),  policy_control immersive
+ * ,  global enable_taskbar;  Launcher launch, 
+ * restart. launch,  Play AOSP . 
    */
   async disableLauncherTaskbar() {
     try {
       await this.shell('settings put global enable_taskbar 0', { timeout: 10000 });
-      // grep -c 0 exit 1， || true failure
+      // grep -c 0 exit 1,  || true failure
       const out = await this.shell(
         'dumpsys window windows | grep -c "Window #.*Taskbar" || true',
         { timeout: 12000 },
@@ -1011,23 +1011,23 @@ class AdbClient {
   }
 
   /**
- * app。
+ * app. 
    *
- * 「window」「」：Application ，
- * Android 12+ Splash（app + ），Activity completefirst frame
- * 。boot，，
- * —— launch Splash window。
+ * "window""": Application , 
+ * Android 12+ Splash(app + ), Activity completefirst frame
+ * . boot, , 
+ * -- launch Splash window. 
    *
- * ：window "Splash Screen" ，。
- * timeout false，（failure）。
+ * : window "Splash Screen" , . 
+ * timeout false, (failure). 
    */
   async waitForAppFirstFrame(pkg, { timeoutMs = 12000, intervalMs = 350 } = {}) {
     const t0 = Date.now();
     while (Date.now() - t0 < timeoutMs) {
-      // `dumpsys window`（WINDOW MANAGER ），
-      // `dumpsys window windows`：window，** mCurrentFocus **，
-      // focusOnApp false，timeout —— app
-      // ，boot 12 。
+      // `dumpsys window`(WINDOW MANAGER ), 
+      // `dumpsys window windows`: window, ** mCurrentFocus **, 
+      // focusOnApp false, timeout -- app
+      // , boot 12 . 
       const out = await this.shell(
         'dumpsys window | grep -E "Splash Screen|mCurrentFocus" | head -8',
         { timeout: 8000 },
@@ -1043,22 +1043,22 @@ class AdbClient {
     return false;
   }
 
- /** launchversion wm size / density （ /data，） */
+ /** launchversion wm size / density ( /data, ) */
   async resetDisplayOverrides(landscape = false) {
     try {
-      // density **applaunch**。
-      // `wm density reset`， _healOrientation（app
-      // 1.8 / 60 ） 190 —— 「app」configuration。
-      // cache DisplayMetrics app（） dp，
-      // 、，「window」。
-      // size ，launchpath。
+      // density **applaunch**. 
+      // `wm density reset`,  _healOrientation(app
+      // 1.8 / 60 ) 190 -- "app"configuration. 
+      // cache DisplayMetrics app() dp, 
+      // , , "window". 
+      // size , launchpath. 
       await this.shell(`wm size reset; wm density ${tabletDensity()}`, { timeout: 15000 });
       await this.shell(`settings put system accelerometer_rotation ${guestAutoRotate()}`, { timeout: 15000 });
-      // setOrientation ：orientation，orientation 0。
+      // setOrientation : orientation, orientation 0. 
       await this.shell('wm user-rotation lock 0', { timeout: 15000 });
       await this.shell(`wm set-ignore-orientation-request ${landscape ? 'true' : 'false'}`, { timeout: 15000 });
-      // ，Launcher taskbar（sw>=600dp）。launch
-      // enable_taskbar，，restart。
+      // , Launcher taskbar(sw>=600dp). launch
+      // enable_taskbar, , restart. 
       await this.disableLauncherTaskbar();
       return true;
     } catch (_) {
@@ -1067,24 +1067,24 @@ class AdbClient {
   }
 
   /**
- * guest IME。
+ * guest IME. 
    *
- * system image（Google Play ） LatinIME（），Gboard 
- * download、emulator。 AOSP pinyinIME
- * （assets/PinyinIME.apk， x86_64 ），boot。
+ * system image(Google Play ) LatinIME(), Gboard 
+ * download, emulator.  AOSP pinyinIME
+ * (assets/PinyinIME.apk,  x86_64 ), boot. 
    *
- * ：install，defaultIME。
+ * : install, defaultIME. 
    *
  * @param {string} apkPath PinyinIME.apk path
- * @param {object} [o] { setDefault } defaultIME（default true）
+ * @param {object} [o] { setDefault } defaultIME(default true)
    * @returns {Promise<{ok:boolean, installed?:boolean, ime?:string, reason?:string}>}
    */
   async ensureChineseIme(apkPath, { setDefault = true } = {}) {
     const IME_PKG = 'com.android.inputmethod.pinyin';
     const IME_ID = IME_PKG + '/.PinyinIME';
-    // verify：ime list -s ****IME，
-    // 「」install「」， ime enable。
-    // pkg install， ime list -a 。
+    // verify: ime list -s ****IME, 
+    // ""install"",  ime enable. 
+    // pkg install,  ime list -a . 
     const pkgInstalled = async () => {
       const out = await this.shell(`pm list packages ${IME_PKG}`, { timeout: 10000 }).catch(() => '');
       return String(out).indexOf('package:' + IME_PKG) >= 0;
@@ -1113,8 +1113,8 @@ class AdbClient {
         }
       }
       if (!installed) return { ok: false, justInstalled, reason: 'IME package not registered' };
-      // + default（secure settings ， root）。
-      // ：snapshot enabled ，defaultIME。
+      // + default(secure settings ,  root). 
+      // : snapshot enabled , defaultIME. 
       const cmds = [`ime enable ${IME_ID}`];
       if (setDefault) cmds.push(`settings put secure default_input_method ${IME_ID}`);
       await this.shell(cmds.join(' ; '), { timeout: 12000 }).catch(() => '');
@@ -1126,10 +1126,10 @@ class AdbClient {
   }
 
   /**
- * 。
- * persist.sys.locale SELinux ，runtime（
- * "Failed to set property"）， emulator launch -prop 。
- * ：app locale ，、。
+ * . 
+ * persist.sys.locale SELinux , runtime(
+ * "Failed to set property"),  emulator launch -prop . 
+ * : app locale , , . 
    */
   async ensureChineseLocale(locale = 'zh-CN') {
     const cmds = [
@@ -1142,7 +1142,7 @@ class AdbClient {
     return true;
   }
 
- /** （landscapewindow） */
+ /** (landscapewindow) */
   async displaySize() {
     try {
       const out = await this.shell('wm size', { timeout: 8000 });
@@ -1154,7 +1154,7 @@ class AdbClient {
     return null;
   }
 
- /** （self-healing）， */
+ /** (self-healing),  */
   async dismissPermissionDialog() {    try {
       const top = await this.shell('dumpsys activity activities', { timeout: 12000 });
       if (/GrantPermissionsActivity|permissioncontroller/i.test(String(top))) {
@@ -1166,8 +1166,8 @@ class AdbClient {
   }
 
   /**
- * ： Android （），
- * windowportrait。wm runtime，restart Android。
+ * :  Android (), 
+ * windowportrait. wm runtime, restart Android. 
    */
   async setDisplaySize(width, height, density) {
     const w = Math.max(320, Math.round(Number(width) || 0));

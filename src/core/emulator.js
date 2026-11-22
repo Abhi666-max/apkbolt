@@ -1,14 +1,14 @@
 'use strict';
 /**
- * Emulator ：driver Google Android Emulator ApkStart runtime。
+ * Emulator : driver Google Android Emulator ApkStart runtime. 
  *
- * ：「parameters」。
- * 1. doctor.chooseProfile() memory/CPU/disk//versionparameters；
- * 2. launchfailure planVariants() fallbackretry（GPU → software emulation → memorycold boot）；
- * 3. 、 AVD 、pathpath、system imagesnapshot；
- * 4. quickboot snapshot + data partition，「」、。
+ * : "parameters". 
+ * 1. doctor.chooseProfile() memory/CPU/disk//versionparameters; 
+ * 2. launchfailure planVariants() fallbackretry(GPU → software emulation → memorycold boot); 
+ * 3. ,  AVD , pathpath, system imagesnapshot; 
+ * 4. quickboot snapshot + data partition, "", . 
  *
- * probe （Runtime）， Android 。
+ * probe (Runtime),  Android . 
  */
 const { spawn, spawnSync, execFile } = require('child_process');
 const fs = require('fs');
@@ -25,22 +25,22 @@ const SNAPSHOT_NAME = 'apkstart';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * Windows emulator/qemu exit。
- * 0xC0000005（3221225477）：，
- * driver / Vulkan guest launch，。
+ * Windows emulator/qemu exit. 
+ * 0xC0000005(3221225477): , 
+ * driver / Vulkan guest launch, . 
  */
 function describeExitCode(code) {
-  // code null（Windows taskkill / adb emu kill ），
-  // 0 「exit」，，。
+  // code null(Windows taskkill / adb emu kill ), 
+  // 0 "exit", , . 
   if (code == null) return '';
   switch (Number(code)) {
     case 0: return 'Normal exit';
     case 1: return 'Startup arguments or environment error';
     case 3221225477: return '0xC0000005 Access violation, rendering backend crashed';
     case 3221225725: return '0xC00000FD Stack overflow';
-    // 0xC0000135 「 DLL success」， VC++
-    // ：store version WindowsApps directory。
-    // DLL， WER FaultingModuleName， UI 。
+    // 0xC0000135 " DLL success",  VC++
+    // : store version WindowsApps directory. 
+    // DLL,  WER FaultingModuleName,  UI . 
     case 3221225781: return '0xC0000135 Dependent DLL failed to load';
     case 3221225506: return '0xC0000022 Access denied (driver or permission issue)';
     case 3221225595: return '0xC000007B Binary architecture mismatch or corrupted DLL';
@@ -61,13 +61,13 @@ class EmulatorEngine {
     this.lastDiagnosis = null;
     this.lastExitCode = null;
     /**
- * bootdriver（patch），driver。
- * start() _resolveDrivers() ；buildArgs / env / ensureAvd 。
+ * bootdriver(patch), driver. 
+ * start() _resolveDrivers() ; buildArgs / env / ensureAvd . 
      */
     this._driverEffect = null;
     this._driversApplied = [];
-    // snapshot ram.bin ≈ memory（2-4GB）。
-    // cold boot GB disk，「」。
+    // snapshot ram.bin ≈ memory(2-4GB). 
+    // cold boot GB disk, "". 
     this.snapshotWorthSaving = null;
   }
 
@@ -79,10 +79,10 @@ class EmulatorEngine {
   get settings() { return store.getSettings(); }
 
   /**
- * 「launchfailure」。
- * memory（this.attempts），restart ApkStart diagnose，
- * attempts: []、bootLog: [] ，log —— 
- * issue #20/#25 「」。
+ * "launchfailure". 
+ * memory(this.attempts), restart ApkStart diagnose, 
+ * attempts: [], bootLog: [] , log -- 
+ * issue #20/#25 "". 
    */
   _persistFailure(extra = {}) {
     try {
@@ -100,7 +100,7 @@ class EmulatorEngine {
     } catch (_) { /* failure */ }
   }
 
- /** failure（diagnose / boothint） */
+ /** failure(diagnose / boothint) */
   lastFailure() {
     try {
       return JSON.parse(fs.readFileSync(path.join(store.DATA_DIR, 'logs', 'last-failure.json'), 'utf8'));
@@ -113,7 +113,7 @@ class EmulatorEngine {
 
   get serial() { return `emulator-${this.port}`; }
 
- /** emulator.exe system imagedirectory（runtimedirectory， engine/） */
+ /** emulator.exe system imagedirectory(runtimedirectory,  engine/) */
   locate() {
     const p = this.provisioner.paths();
     const emuCandidates = [p.emulatorExe, path.join(this.appRoot, 'engine', 'emulator', 'emulator.exe')];
@@ -122,7 +122,7 @@ class EmulatorEngine {
     return { emulatorExe, sysImgDir: img.dir, sysImgOk: img.ok, root: emulatorExe ? path.dirname(path.dirname(emulatorExe)) : p.root };
   }
 
- /** system image：system image（API 34 Play），「」 */
+ /** system image: system image(API 34 Play), "" */
   imageChoice() {
     const play = this.provisioner.playImageInfo();
     const base = this.provisioner.systemImageInfo();
@@ -133,9 +133,9 @@ class EmulatorEngine {
   }
 
   /**
- * quickboot snapshot。
- * snapshotmemorydisksystem image，app/snapshot，
- * 「apprestart」。
+ * quickboot snapshot. 
+ * snapshotmemorydisksystem image, app/snapshot, 
+ * "apprestart". 
    */
   invalidateSnapshot() {
     this.cancelSnapshotSave();
@@ -150,10 +150,10 @@ class EmulatorEngine {
   }
 
   /**
- * exit。
- * note hardware-qemu.ini.lock **directory**，bsdtar rmSync(force) ，
+ * exit. 
+ * note hardware-qemu.ini.lock **directory**, bsdtar rmSync(force) , 
  * emulator "Running multiple emulators with the same AVD" 
- * （），。
+ * (), . 
    */
   clearLocks(avdDir) {
     try {
@@ -161,33 +161,33 @@ class EmulatorEngine {
         if (!/\.lock$/i.test(f)) continue;
         try {
           fs.rmSync(path.join(avdDir, f), { recursive: true, force: true });
-        } catch (_) { /* ， */ }
+        } catch (_) { /* ,  */ }
       }
     } catch (_) { /* ignore */ }
   }
 
   /**
- * AVD directory**** quickboot snapshot。
- * 「directory」： 12 snapshot.pb ，
- * emulator 、failure（log "does not have the requested snapshot"）cold boot，
- * 。verify， default_boot（ 3GB）。
+ * AVD directory**** quickboot snapshot. 
+ * "directory":  12 snapshot.pb , 
+ * emulator , failure(log "does not have the requested snapshot")cold boot, 
+ * . verify,  default_boot( 3GB). 
    */
   hasSnapshot() {
     const base = path.join(this.provisioner.paths().avdHome, `${AVD_NAME}.avd`, 'snapshots', SNAPSHOT_NAME);
     const size = (p) => { try { return fs.statSync(p).size; } catch (_) { return 0; } };
     const pb = size(path.join(base, 'snapshot.pb'));
-    // emulator（37.x） ram.bin，version ram.img。
-    // ram.img ： 3GB snapshot，
-    // -no-snapshot-load，cold boot —— 「」。
+    // emulator(37.x) ram.bin, version ram.img. 
+    // ram.img :  3GB snapshot, 
+    // -no-snapshot-load, cold boot -- "". 
     const ram = Math.max(size(path.join(base, 'ram.bin')), size(path.join(base, 'ram.img')));
     if (pb > 1024 && ram > 1024 * 1024) return true;
-    if (pb === 0 && ram === 0) return false;   // directory，
+    if (pb === 0 && ram === 0) return false;   // directory, 
     try { fs.rmSync(base, { recursive: true, force: true }); } catch (_) { /* ignore */ }
     this._cleanLegacySnapshots();
     return false;
   }
 
- /** /failuresnapshotdirectory（default_boot ram.img 3GB） */
+ /** /failuresnapshotdirectory(default_boot ram.img 3GB) */
   _cleanLegacySnapshots() {
     const dir = path.dirname(path.join(this.provisioner.paths().avdHome, `${AVD_NAME}.avd`, 'snapshots', SNAPSHOT_NAME));
     let names = [];
@@ -201,21 +201,21 @@ class EmulatorEngine {
   }
 
   /**
- * AVD emulator。
- * emulator.exe launch， qemu spawn （detached），
- * kill proc multiinstance.lock，
- * launch FATAL "Running multiple emulators with the same AVD"。
- * 「AVD pid」+「 AVD qemu/emulator」。
+ * AVD emulator. 
+ * emulator.exe launch,  qemu spawn (detached), 
+ * kill proc multiinstance.lock, 
+ * launch FATAL "Running multiple emulators with the same AVD". 
+ * "AVD pid"+" AVD qemu/emulator". 
    */
   /**
- * AVD 。
+ * AVD . 
    *
- * ：landscape**** —— `wm size` ，
- * 90°；`adb emu rotate` ，portrait。
- * `hw.lcd.width/height` + restart。 config.ini bootsettings，
- * ****orientation。
+ * : landscape**** -- `wm size` , 
+ * 90°; `adb emu rotate` , portrait. 
+ * `hw.lcd.width/height` + restart.  config.ini bootsettings, 
+ * ****orientation. 
    *
- * @returns {boolean|null} true=landscape，false=portrait，null=
+ * @returns {boolean|null} true=landscape, false=portrait, null=
    */
   panelLandscape() {
     try {
@@ -234,10 +234,10 @@ class EmulatorEngine {
     if (process.platform !== 'win32') return 0;
     const avdDir = path.join(this.provisioner.paths().avdHome, `${AVD_NAME}.avd`);
 
-    // path（cold boot）：
-    // - .lock → emulator AVD，；
-    // - lock → directory，。
-    // wmic（1~3 ， CPU），cold boot。
+    // path(cold boot): 
+    // - .lock → emulator AVD, ; 
+    // - lock → directory, . 
+    // wmic(1~3 ,  CPU), cold boot. 
     let locks = [];
     try { locks = fs.readdirSync(avdDir).filter((f) => /\.lock$/i.test(f)); } catch (_) { locks = []; }
     if (!locks.length) return 0;
@@ -247,7 +247,7 @@ class EmulatorEngine {
     }
 
     const pids = new Set();
-    // 1) lock file emulator pid（）
+    // 1) lock file emulator pid()
     try {
       const f = path.join(avdDir, 'hardware-qemu.ini.lock', 'pid');
       if (fs.existsSync(f) && fs.statSync(f).isFile()) {
@@ -255,7 +255,7 @@ class EmulatorEngine {
         if (pid) pids.add(pid);
       }
     } catch (_) { /* ignore */ }
-    // 2) fallback： + qemu（tasklist/netstat wmic ）
+    // 2) fallback:  + qemu(tasklist/netstat wmic )
     try {
       const [tl, ns] = await Promise.all([
         new Promise((res) => execFile('tasklist', ['/FO', 'CSV', '/NH'], { timeout: 3000, windowsHide: true, maxBuffer: 8 * 1024 * 1024 }, (e, o) => res(e ? '' : String(o || '')))),
@@ -285,7 +285,7 @@ class EmulatorEngine {
     return pids.size;
   }
 
- /** 5554~5620 emulator （，） */
+ /** 5554~5620 emulator (, ) */
   async _anyEmulatorPortAlive() {
     const net = require('net');
     const probe = (port) => new Promise((resolve) => {
@@ -304,7 +304,7 @@ class EmulatorEngine {
   }
 
   /**
- * /diagnosedriver：boot、、。
+ * /diagnosedriver: boot, , . 
    * @returns {{ applied:Array, effect:object|null, errors:Array, host:object|null }}
    */
   driverReport() {
@@ -329,9 +329,9 @@ class EmulatorEngine {
   }
 
   /**
- * driver config.ini defaultconfiguration。
- * （），。
- * drivers.js whitelist，verify。
+ * driver config.ini defaultconfiguration. 
+ * (), . 
+ * drivers.js whitelist, verify. 
    */
   _iniWithDrivers(text) {
     const over = (this._driverEffect && this._driverEffect.ini) || {};
@@ -349,10 +349,10 @@ class EmulatorEngine {
   }
 
   /**
- * driverdirectory，，boot。
+ * driverdirectory, , boot. 
    *
- * directory：（，default enabled:false），driver，
- * id directory —— ，installdirectory。
+ * directory: (, default enabled:false), driver, 
+ * id directory -- , installdirectory. 
    *
    * @returns {{ applied:Array, skipped:Array, errors:Array } | null}
    */
@@ -366,7 +366,7 @@ class EmulatorEngine {
       const release = require('os').release() || '';
       const m = /(\d+)\s*$/.exec(release);
       osBuild = m ? Number(m[1]) : 0;
-    } catch (_) { /* 0， osBuild driver */ }
+    } catch (_) { /* 0,  osBuild driver */ }
     const host = drivers.hostContext({
       info: { ...doctor.hostInfo(), cpuVendor: (require('os').cpus() || [])[0]?.model || '' },
       gpuVendor: doctor.detectGpuVendor(),
@@ -388,7 +388,7 @@ class EmulatorEngine {
   }
 
   /**
- * AVD： config.ini。launchconfiguration，fallbackretry。
+ * AVD:  config.ini. launchconfiguration, fallbackretry. 
    */
   ensureAvd({
     memoryMB = 2048, cores = 2, gpu = 'software', dataMB = 4096,
@@ -400,8 +400,8 @@ class EmulatorEngine {
     fs.mkdirSync(avdDir, { recursive: true });
     this.clearLocks(avdDir);
 
-    // ：hardware acceleration 720x1280@320 、；
-    // software emulation 540x960，（ 56%，）。
+    // : hardware acceleration 720x1280@320 , ; 
+    // software emulation 540x960, ( 56%, ). 
     const screen = lcd || doctor.lcdFor({ accelOk: this.profile ? this.profile.accelOk : accel !== 'off' });
 
     const choice = this.imageChoice();
@@ -423,18 +423,18 @@ class EmulatorEngine {
       const prev = fs.readFileSync(cfgPath, 'utf8');
       const prevTag = /tag\.id=(.+)$/m.exec(prev);
       const prevImg = /image\.sysdir\.1=(.+)$/m.exec(prev);
-      // 「system image」path：system image/directorysystem image，
-      // runtimedirectoryapp（ doctor.imageIdentity ）。
+      // "system image"path: system image/directorysystem image, 
+      // runtimedirectoryapp( doctor.imageIdentity ). 
       const prevId = prevImg ? doctor.imageIdentity(prevImg[1].trim()) : '';
       const wantId = doctor.imageIdentity(wantImg);
       if ((prevTag && prevTag[1].trim() !== tag) || (prevId && prevId !== wantId)) {
-        // userdata system image（APEX ），
+        // userdata system image(APEX ), 
         this.wipePending = true;
       }
     }
 
-    // configuration → quickboot snapshotfailureblack screen，。
-    // note：**snapshot**， -wipe-data —— app。
+    // configuration → quickboot snapshotfailureblack screen, . 
+    // note: **snapshot**,  -wipe-data -- app. 
     const key = `${doctor.snapshotKey({
       dataMB, emulatorVersion: this._emuVersion || '', api, tag,
     }, choice.dir)}|${screen.w}x${screen.h}@${screen.dpi}`;
@@ -443,8 +443,8 @@ class EmulatorEngine {
     try { prevKey = fs.readFileSync(keyFile, 'utf8').trim(); } catch (_) { /*  */ }
     const snapshotStale = !!(prevKey && prevKey !== key);
     if (this.wipePending || snapshotStale || wipe) {
-      // /（snapshotdirectory GB）。
-      // failure emulator ，cleanfailurelaunch。
+      // /(snapshotdirectory GB). 
+      // failure emulator , cleanfailurelaunch. 
       const snapDir = path.join(avdDir, 'snapshots');
       try {
         fs.rmSync(snapDir, { recursive: true, force: true });
@@ -452,11 +452,11 @@ class EmulatorEngine {
         try { fs.renameSync(snapDir, `${snapDir}.stale-${Date.now()}`); } catch (__) { /* ignore */ }
       }
     }
-    // 「system image」（tag / sysdir ） -wipe-data： userdata system image
-    // APEX ，。capacity / / 。
+    // "system image"(tag / sysdir ) -wipe-data:  userdata system image
+    // APEX , . capacity / / . 
     fs.writeFileSync(keyFile, key, 'utf8');
 
-    // hw.cpu.arch ABI （x86_64 x86）
+    // hw.cpu.arch ABI (x86_64 x86)
     const cpuArch = choice.abi === 'arm64-v8a' ? 'arm64'
       : choice.abi === 'armeabi-v7a' ? 'arm' : choice.abi;
 
@@ -472,17 +472,17 @@ class EmulatorEngine {
       `image.sysdir.1=${wantImg}`,
       `tag.id=${tag}`,
       `tag.display=${tagDisplay}`,
-      // 16G，/boot
+      // 16G, /boot
       `disk.dataPartition.size=${dataMB}M`,
       'hw.gpu.enabled=yes',
       `hw.gpu.mode=${gpu}`,
       'hw.keyboard=yes',
-      // Wi-Fi 。API 34 Play Store system image
-      // wlan0（netsim ）， eth0。config.ini ，
-      // emulator wlan0 —— wlan0 NO-CARRIER、
-      // `dumpsys connectivity` Active default network: none，app
-      // 「networkerror，」。 -netdelay/-netspeed/-dns-server
-      // QEMU NAT parameters， guest 。
+      // Wi-Fi . API 34 Play Store system image
+      // wlan0(netsim ),  eth0. config.ini , 
+      // emulator wlan0 -- wlan0 NO-CARRIER, 
+      // `dumpsys connectivity` Active default network: none, app
+      // "networkerror, ".  -netdelay/-netspeed/-dns-server
+      // QEMU NAT parameters,  guest . 
       'hw.wifi=yes',
       'hw.lcd.width=' + screen.w,
       'hw.lcd.height=' + screen.h,
@@ -490,21 +490,21 @@ class EmulatorEngine {
       'hw.mainKeys=no',
       'ShowDeviceFrame=no',
       `PlayStore.enabled=${choice.compat}`,
-      // snapshot -snapshot apkstart ：，
-      // default_boot（ API30 system imagememory，）。
+      // snapshot -snapshot apkstart : , 
+      // default_boot( API30 system imagememory, ). 
       'hw.sdCard=no',
       'hw.audioInput=none',
       'hw.camera.back=none',
       'hw.camera.front=none',
       'hw.gps=no',
-      // orientation/：，Android rotate，portrait
-      // （ 90°、、）。
-      // wm density（ smallestWidth），。
+      // orientation/: , Android rotate, portrait
+      // ( 90°, , ). 
+      // wm density( smallestWidth), . 
       'hw.sensors.orientation=no',
     ].join('\n') + '\n';
     fs.writeFileSync(cfgPath, this._iniWithDrivers(cfg));
 
-    // /data 「」，（ ensureDataPartition ）
+    // /data "", ( ensureDataPartition )
     const data = this.ensureDataPartition(avdDir, dataMB);
 
     return {
@@ -514,18 +514,18 @@ class EmulatorEngine {
   }
 
   /**
- * userdata **** ext4 —— 「app 30 desktop」。
+ * userdata **** ext4 -- "app 30 desktop". 
    *
- * （）：
- * 1. system image userdata.img 1MB ， avdmanager SDK 
- * mke2fs。ApkStart config.ini emulator， → /data →
+ * (): 
+ * 1. system image userdata.img 1MB ,  avdmanager SDK 
+ * mke2fs. ApkStart config.ini emulator,  → /data →
  * "Invalid ext4 superblock on /dev/block/vdc" → guest recovery restart →
- * adbd → probe pending， 240s timeout。：。
- * 2. emulator e2fsck/resize2fs cygwin e2fsprogs 1.42.12，** encrypt
- * **， exit 8 ，「」。
- * 3. ≥ ： 64MB ，APEX extract + dexopt ，
+ * adbd → probe pending,  240s timeout. : . 
+ * 2. emulator e2fsck/resize2fs cygwin e2fsprogs 1.42.12, ** encrypt
+ * **,  exit 8 , "". 
+ * 3. ≥ :  64MB , APEX extract + dexopt , 
  * setxattr ENOSPC → SELinux → netd/media/tombstoned
- * exit 1 → bootlaunch，adb offline。
+ * exit 1 → bootlaunch, adb offline. 
    */
   ensureDataPartition(avdDir, dataMB = 4096) {
     const emulatorExe = this.locate().emulatorExe;
@@ -538,13 +538,13 @@ class EmulatorEngine {
     try { size = fs.statSync(img).size; } catch (_) { /*  */ }
 
     if (size > 0 && userdata.hasExt4Superblock(img)) {
-      // + ，「」。
-      // ：qemu-img 、resize2fs failure，
-      // 6GB、Android 64MB —— 「space」。
+      // + , "". 
+      // : qemu-img , resize2fs failure, 
+      // 6GB, Android 64MB -- "space". 
       const fsBytes = userdata.fsBytes(img);
       const fsOk = fsBytes >= Math.min(size, wantBytes) * 0.95;
       if (size >= wantBytes && fsOk) return { ok: true, created: false, size, fsBytes };
-      // capacityconfiguration（）：，、app
+      // capacityconfiguration(): , , app
       try {
         userdata.clearEncryptFlag(img);
         if (size < wantBytes) this._qemuImg('resize', img, wantBytes);
@@ -555,16 +555,16 @@ class EmulatorEngine {
         return { ok: true, created: false, grown: true, size: wantBytes, fsBytes: grown };
       } catch (e) {
         this.log(`Failed to expand userdata (continuing with existing partition): ${e.message}`);
-        // ，「」，settingssuccess
+        // , "", settingssuccess
         return { ok: false, created: false, size, fsBytes, error: e.message };
       }
     }
 
-    // / / system image：
+    // / / system image: 
     try {
       fs.rmSync(img, { force: true });
       fs.rmSync(`${img}.qcow2`, { force: true });
-      // encrypt （ e2fsck/resize2fs ）
+      // encrypt ( e2fsck/resize2fs )
       fs.writeFileSync(img, userdata.buildEmptyExt4({ sizeMB: 64, encrypt: false }));
       this._qemuImg('resize', img, wantBytes);
       this._resize2fs(img);
@@ -572,16 +572,16 @@ class EmulatorEngine {
       this.log(`Rebuilt userdata: ${(wantBytes / 1024 / 1024 / 1024).toFixed(1)}GB ext4 (4K block, FBE supported)`);
       return { ok: true, created: true, size: wantBytes };
     } catch (e) {
-      // ：failure， encrypt ， FBE （）
+      // : failure,  encrypt ,  FBE ()
       try { userdata.setEncryptFlag(img); } catch (_) { /* ignore */ }
       this.log(`Failed to rebuild userdata: ${e.message}`);
       return { ok: false, created: true, error: e.message };
     }
   }
 
- /** emulator qemu-img.exe：system image（，complete）
- * noteparameters：`qemu-img <> -f raw <> <>`。
- * -f parameters unrecognized option。 */
+ /** emulator qemu-img.exe: system image(, complete)
+ * noteparameters: `qemu-img <> -f raw <> <>`. 
+ * -f parameters unrecognized option.  */
   _qemuImg(op, ...rest) {
     const exe = path.join(path.dirname(this.locate().emulatorExe), 'qemu-img.exe');
     const r = spawnSync(exe, [op, '-f', 'raw', ...rest], {
@@ -590,7 +590,7 @@ class EmulatorEngine {
     if (r.status !== 0) throw new Error(`qemu-img ${op} failed: ${(r.stderr || '').trim() || r.status}`);
   }
 
- /** emulator resize2fs.exe（cygwin ， bin64 directory DLL） */
+ /** emulator resize2fs.exe(cygwin ,  bin64 directory DLL) */
   _resize2fs(img) {
     const bin = path.join(path.dirname(this.locate().emulatorExe), 'bin64');
     const exe = path.join(bin, 'resize2fs.exe');
@@ -601,11 +601,11 @@ class EmulatorEngine {
     if (r.status !== 0) throw new Error(`resize2fs failed: ${(r.stderr || '').trim() || r.status}`);
   }
 
- /** emulator SDK / AVD；path 8.3 path */
+ /** emulator SDK / AVD; path 8.3 path */
   env(root, plan = {}) {
     const safeRoot = doctor.shortPath(root);
-    // AVD directory provisioner.paths().avdHome ：bundled runtime（EXE
-    // resources/runtime） root/avd ，AVD directory。
+    // AVD directory provisioner.paths().avdHome : bundled runtime(EXE
+    // resources/runtime) root/avd , AVD directory. 
     const avdHome = doctor.shortPath(this.provisioner.paths().avdHome);
     const adbPort = String(plan.adbPort || process.env.ANDROID_ADB_SERVER_PORT || '5044');
     return {
@@ -617,14 +617,14 @@ class EmulatorEngine {
       ANDROID_ADB_SERVER_PORT: adbPort,
       ANDROID_EMULATOR_USE_SYSTEM_LIBS: '',
       ...(plan.accel === 'off' ? { ANDROID_I_WANT_MY_TCG: 'yes' } : {}),
-      // driver： ANDROID_/QEMU_/LIBGL_/MESA_/EMUGL_ （ drivers.js）
+      // driver:  ANDROID_/QEMU_/LIBGL_/MESA_/EMUGL_ ( drivers.js)
       ...((this._driverEffect && this._driverEffect.env) || {}),
     };
   }
 
   /**
- * 。default；settings（engine.locale），
- * 'en-US' 'off' system image。
+ * . default; settings(engine.locale), 
+ * 'en-US' 'off' system image. 
    */
   _guestLocale() {
     const v = String(this.settings?.engine?.locale || 'zh-CN').trim();
@@ -637,8 +637,8 @@ class EmulatorEngine {
     gpu = 'software', memoryMB = 2048, cores = 2,
     snapshot = true, wipe = false, lcd = null,
   } = {}) {
-    // driver / software emulation。 gpu/accel，
-    // （-accel off、config.ini hw.gpu.mode）。
+    // driver / software emulation.  gpu/accel, 
+    // (-accel off, config.ini hw.gpu.mode). 
     const eff = this._driverEffect || null;
     const drvGpu = eff ? drivers.gpuModeToArg(eff.gpuMode) : '';
     if (drvGpu) gpu = drvGpu;
@@ -646,43 +646,43 @@ class EmulatorEngine {
     const args = [
       '-avd', AVD_NAME,
       '-port', String(port),
-      // ：default（Androidapphint/）。 // settings -no-audio CPU。
+      // : default(Androidapphint/).  // settings -no-audio CPU. 
       ...(this.settings?.engine?.audio === false ? ['-no-audio'] : []),
       '-no-boot-anim',
       '-no-metrics',
-      // ：，emulator 「」，
-      // 、boot（log Showing crashdialog to get consent）。
+      // : , emulator "", 
+      // , boot(log Showing crashdialog to get consent). 
       '-crash-report-mode', 'disabled',
       '-gpu', gpu,
-      // AMD + emulator 37.x：host Vulkan failure，
-      // exit 1，「host 」 swangle（），
-      // /。 Vulkan GL，hardware acceleration。
-      // Vulkan，， host 。
+      // AMD + emulator 37.x: host Vulkan failure, 
+      // exit 1, "host " swangle(), 
+      // /.  Vulkan GL, hardware acceleration. 
+      // Vulkan, ,  host . 
       ...(gpu === 'host' && process.platform === 'win32' && doctor.detectGpuVendor() === 'amd'
         ? ['-feature', '-Vulkan'] : []),
       '-memory', String(memoryMB),
       '-cores', String(cores),
     ];
-    // network：AOSP emulatordefault QEMU NAT（-netdev user），Android
-    // 10.0.2.x ， NAT 。
-    // 【】 Windows /
-    // （ -netdev tap ，）。
-    // Androidapp" NAT "，network，
-    // driver、network。
-    // ：default full， -gpu / -net
-    // emulatorconfiguration，app（、）。
+    // network: AOSP emulatordefault QEMU NAT(-netdev user), Android
+    // 10.0.2.x ,  NAT . 
+    // [] Windows /
+    // ( -netdev tap , ). 
+    // Androidapp" NAT ", network, 
+    // driver, network. 
+    // : default full,  -gpu / -net
+    // emulatorconfiguration, app(, ). 
     args.push('-netdelay', 'none', '-netspeed', 'full');
-    // ：default。
-    // `-prop persist.sys.locale=zh-CN` —— emulator persist.sys.*
-    // ，ro.product.locale system image build.prop ；guest getprop
-    // 。 -change-locale：restart framework，
-    // /data，snapshot。
-    // settings locale （engine.locale='off'）。
+    // : default. 
+    // `-prop persist.sys.locale=zh-CN` -- emulator persist.sys.*
+    // , ro.product.locale system image build.prop ; guest getprop
+    // .  -change-locale: restart framework, 
+    // /data, snapshot. 
+    // settings locale (engine.locale='off'). 
     const locale = this._guestLocale();
     if (locale) args.push('-change-locale', locale);
-    // DNS：Androiddefault 10.0.2.3（ DNS）。 VPN / /
-    // ，，「」。
-    // DNS ，failure。settings（）。
+    // DNS: Androiddefault 10.0.2.3( DNS).  VPN / /
+    // , , "". 
+    // DNS , failure. settings(). 
     if (this.settings?.engine?.fastDns !== false) {
       args.push('-dns-server', '223.5.5.5,119.29.29.29');
     }
@@ -690,44 +690,44 @@ class EmulatorEngine {
     if (headless) {
       args.push('-no-window');
     } else {
-      // note：** -no-skin**。 -skin，
-      // config.ini —— 「settingslandscape、portrait」，
-      // 「」。 -skin 。
-      // （ShowDeviceFrame=no + style parameters）。
-      // note： -qt-hide-window。emulator**** Qt window，
-      // window SetParent windowappwindow ——
-      // probe window，appwindow。
-      // windowwindowresidentcomplete（ win/agent.ps1 QuietSweep）。
+      // note: ** -no-skin**.  -skin, 
+      // config.ini -- "settingslandscape, portrait", 
+      // "".  -skin . 
+      // (ShowDeviceFrame=no + style parameters). 
+      // note:  -qt-hide-window. emulator**** Qt window, 
+      // window SetParent windowappwindow --
+      // probe window, appwindow. 
+      // windowwindowresidentcomplete( win/agent.ps1 QuietSweep). 
     }
-    // snapshot -snapshot： AVD（snapshot），
-    // qemu memory，boot——
-    // 「boottimeout」，parametersretry， AVD
-    // "Running multiple emulators with the same AVD"。
-    // snapshotparameters「boot 8 90 」，：
-    // 「snapshot -no-snapshot」， -no-snapshot **exit**，
-    // cold bootsnapshot，。
-    // -no-snapshot-load：（snapshot），
-    // exitmemory apkstart，。
-    // snapshot 2~3GB ram.bin（disk，launch）
+    // snapshot -snapshot:  AVD(snapshot), 
+    // qemu memory, boot--
+    // "boottimeout", parametersretry,  AVD
+    // "Running multiple emulators with the same AVD". 
+    // snapshotparameters"boot 8 90 ", : 
+    // "snapshot -no-snapshot",  -no-snapshot **exit**, 
+    // cold bootsnapshot, . 
+    // -no-snapshot-load: (snapshot), 
+    // exitmemory apkstart, . 
+    // snapshot 2~3GB ram.bin(disk, launch)
     const wantSnapshot = this.settings?.engine?.keepSnapshot !== false;
     if (wipe) {
-      // snapshot（），**snapshot**：
-      // repairnetwork「boot → snapshot → 」，
-      // -no-snapshot，，snapshot。
+      // snapshot(), **snapshot**: 
+      // repairnetwork"boot → snapshot → ", 
+      // -no-snapshot, , snapshot. 
       args.push('-no-snapshot-load');
     } else if (!wantSnapshot) {
       args.push('-no-snapshot');
     } else if (snapshot !== false) {
       args.push('-snapshot', SNAPSHOT_NAME);
-      // networkself-healingcold boot：snapshot「」，。
+      // networkself-healingcold boot: snapshot"", . 
       if (!this.hasSnapshot() || this._coldBoot) args.push('-no-snapshot-load');
     } else {
       args.push('-no-snapshot');
     }
     if (wipe) args.push('-wipe-data');
     if (accel === 'off') args.push('-accel', 'off');
-    // driverparameters：-gpu / -accel gpu/accel ，，
-    // parameters（emulator parametersversion）。
+    // driverparameters: -gpu / -accel gpu/accel , , 
+    // parameters(emulator parametersversion). 
     for (const a of ((eff && eff.args) || [])) {
       if (a.flag === '-gpu' || a.flag === '-accel') continue;
       if (a.value === '') args.push(a.flag);
@@ -736,7 +736,7 @@ class EmulatorEngine {
     return args;
   }
 
- /** （boot，boot start() probe ） */
+ /** (boot, boot start() probe ) */
   spawnOnce(plan, { headless, onLog, logFile }) {
     const loc = this.locate();
     const env = this.env(loc.root, plan);
@@ -751,10 +751,10 @@ class EmulatorEngine {
       cwd: path.dirname(loc.emulatorExe),
       env,
       windowsHide: true,
-      // detached: emulator ApkStart 。
-      // Electron exit job ，——
-      // " ApkStart cold boot 20 "。emulator，
-      // launch（ Runtime.adoptExisting），。
+      // detached: emulator ApkStart . 
+      // Electron exit job , --
+      // " ApkStart cold boot 20 ". emulator, 
+      // launch( Runtime.adoptExisting), . 
       detached: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -780,8 +780,8 @@ class EmulatorEngine {
     proc.on('exit', (code) => {
       this.lastExitCode = code;
       const meaning = describeExitCode(code);
-      this.log(`emulator exit ${code}${meaning ? `（${meaning}）` : ''}`);
-      this._logWrite(logFile, `emulator exit ${code}${meaning ? `（${meaning}）` : ''}\n`);
+      this.log(`emulator exit ${code}${meaning ? `(${meaning})` : ''}`);
+      this._logWrite(logFile, `emulator exit ${code}${meaning ? `(${meaning})` : ''}\n`);
       this.proc = null;
       onLog(`Runtime exited (code=${code}${meaning ? `, ${meaning}` : ''})`);
     });
@@ -791,9 +791,9 @@ class EmulatorEngine {
       this.proc = null;
     });
 
-    // qemu detached ，。
-    // 2~4 vCPU Normal Windows desktop CPU，
-    // 「 ApkStart，mouse、」。
+    // qemu detached , . 
+    // 2~4 vCPU Normal Windows desktop CPU, 
+    // " ApkStart, mouse, ". 
     const perf = this.settings?.engine?.priorityMode === 'performance';
     setTimeout(() => {
       this.setPriority(perf ? 'normal' : 'below').catch(() => {});
@@ -801,13 +801,13 @@ class EmulatorEngine {
     return { proc, args };
   }
 
- /** emulatorlog：，disk */
+ /** emulatorlog: , disk */
   _logWrite(file, text) {
     const limit = Math.max(2048, Number(this.settings?.engine?.logLimitKB || 2048) * 4);
     require('./logfile').append(file, text, limit);
   }
 
- /** /data system image（settings，launchAndroid） */
+ /** /data system image(settings, launchAndroid) */
   dataInfo() {
     const dir = path.join(this.provisioner.paths().avdHome, `${AVD_NAME}.avd`);
     const img = path.join(dir, 'userdata-qemu.img');
@@ -821,30 +821,30 @@ class EmulatorEngine {
       avdDir: dir,
       imageBytes: bytes,
       imageGB: bytes ? Number((bytes / 1073741824).toFixed(1)) : 0,
-      // （≠ system image）：system image resize2fs
+      // (≠ system image): system image resize2fs
       fsGB,
       configuredGB,
-      // 、
+      // , 
       pendingGB: configuredGB && fsGB ? Math.max(0, configuredGB - fsGB) : 0,
-      // quickboot userdata qcow2 ，guest ，system image
+      // quickboot userdata qcow2 , guest , system image
       overlay: this._hasDataOverlay(img),
     };
   }
 
- /** userdata quickboot qcow2 （，） */
+ /** userdata quickboot qcow2 (, ) */
   _hasDataOverlay(img) {
     try { return fs.existsSync(`${img}.qcow2`); } catch (_) { return false; }
   }
 
   /**
- * /data （emulator，system image）。
+ * /data (emulator, system image). 
    *
- * path，：
- * - quickboot ：（qemu-img resize + resize2fs），app；
- * - ：guest `userdata-qemu.img.qcow2`， 8GB、
- * 8GB，guest `df /data` 5.7GB（），
- * root 。「」，
- * success —— ， 50GB failure。
+ * path, : 
+ * - quickboot : (qemu-img resize + resize2fs), app; 
+ * - : guest `userdata-qemu.img.qcow2`,  8GB, 
+ * 8GB, guest `df /data` 5.7GB(), 
+ * root . "", 
+ * success -- ,  50GB failure. 
    */
   resizeDataPartition(dataMB) {
     const dir = path.join(this.provisioner.paths().avdHome, `${AVD_NAME}.avd`);
@@ -859,8 +859,8 @@ class EmulatorEngine {
       };
     }
     const r = this.ensureDataPartition(dir, dataMB);
-    // ensureDataPartition resize2fs failure ok:false；，
-    // 「、」success（space）。
+    // ensureDataPartition resize2fs failure ok:false; , 
+    // ", "success(space). 
     let fsAfter = 0;
     try { fsAfter = userdata.fsBytes(img); } catch (_) { /* ignore */ }
     const wantBytes = Math.max(1024, Math.round(Number(dataMB || 0))) * 1048576;
@@ -876,8 +876,8 @@ class EmulatorEngine {
   }
 
   /**
- * qemu/emulator （ AVD ）。
- * level: idle（）| below（app）| normal（）。
+ * qemu/emulator ( AVD ). 
+ * level: idle()| below(app)| normal(). 
    */
   setPriority(level = 'below') {
     if (process.platform !== 'win32') return Promise.resolve(0);
@@ -894,7 +894,7 @@ class EmulatorEngine {
     });
   }
 
- /** （ qemu ） */
+ /** ( qemu ) */
   async killAttempt() {
     const proc = this.proc;
     this.proc = null;
@@ -905,24 +905,24 @@ class EmulatorEngine {
       }
     }
     await sleep(800);
-    // proc （emulator.exe launchexit，qemu detached ），
-    // fallback， AVD FATAL。
+    // proc (emulator.exe launchexit, qemu detached ), 
+    // fallback,  AVD FATAL. 
     await this.killOrphanProcesses().catch(() => {});
   }
 
   /**
- * adb server。
+ * adb server. 
    *
- * 「app」， kill-server ：
- * emulator launch ANDROID_ADB_SERVER_PORT adb daemon，
- * **** —— adb devices emulator-5554，
- * offline（log "Unable to connect to adb daemon on port: 5044"）。
- * probe sys.boot_completed， 3 timeoutretry，
- * retrycold boot，snapshot「」，。
+ * "app",  kill-server : 
+ * emulator launch ANDROID_ADB_SERVER_PORT adb daemon, 
+ * **** -- adb devices emulator-5554, 
+ * offline(log "Unable to connect to adb daemon on port: 5044"). 
+ * probe sys.boot_completed,  3 timeoutretry, 
+ * retrycold boot, snapshot"", . 
    *
- * kill（） start，。
+ * kill() start, . 
    */
- /** adb （offline / unauthorized）restart server */
+ /** adb (offline / unauthorized)restart server */
   async resetAdbServer() {
     const port = Number(process.env.ANDROID_ADB_SERVER_PORT) || this.adbPort || 5044;
     return this._resetAdbServer(port);
@@ -939,8 +939,8 @@ class EmulatorEngine {
     });
     await run(['kill-server'], 6000);
     await run(['start-server'], 12000);
-    // adb start-server ， listen，
-    // （ ~3 ，）。
+    // adb start-server ,  listen, 
+    // ( ~3 , ). 
     const net = require('net');
     for (let i = 0; i < 25; i += 1) {
       // eslint-disable-next-line no-await-in-loop
@@ -960,9 +960,9 @@ class EmulatorEngine {
   }
 
   /**
- * 「spawn 」。
- * parameterserror/DLL emulator 1 ；，
- * 2.5 —— snapshotboot。
+ * "spawn ". 
+ * parameterserror/DLL emulator 1 ; , 
+ * 2.5 -- snapshotboot. 
    */
   _waitSpawnSettled(ms = 900) {
     const proc = this.proc;
@@ -983,41 +983,41 @@ class EmulatorEngine {
   }
 
   /**
- * 「launch」cold boot（launchsnapshot）。
+ * "launch"cold boot(launchsnapshot). 
    *
- * snapshot：snapshot「」，
- * 。networkself-healingcold bootsnapshot。
+ * snapshot: snapshot"", 
+ * . networkself-healingcold bootsnapshot. 
    */
   forceColdBootOnNextStart() { this._coldBoot = true; }
 
   /**
- * 「launch」 -wipe-data（「repairnetwork」failure）。
- * 「 userdata system image」 emulator `-wipe-data` ，。
+ * "launch" -wipe-data("repairnetwork"failure). 
+ * " userdata system image" emulator `-wipe-data` , . 
    */
   forceWipeOnNextStart() { this._forceWipe = true; }
 
   /**
- * checkup。
+ * checkup. 
    *
- * ：Android Wi-Fi configuration /data ，（
- * `cmd wifi list-networks` AndroidWifi 、network id ），
- * wlan0 NO-CARRIER、 IP。「」app
- * black screen —— 「black screen」， GPU/。
+ * : Android Wi-Fi configuration /data , (
+ * `cmd wifi list-networks` AndroidWifi , network id ), 
+ * wlan0 NO-CARRIER,  IP. ""app
+ * black screen -- "black screen",  GPU/. 
    *
- * @param {string} [adbPath] adb （Runtime ）
+ * @param {string} [adbPath] adb (Runtime )
    * @returns {Promise<{ok:boolean, reason:string, gateway?:string, ip?:string}>}
    */
   async checkNetwork(adbPath = '', { waitMs = 0, interval = 3000 } = {}) {
     const fs = require('fs');
     const path = require('path');
-    // repairWifi：「path」error
+    // repairWifi: "path"error
     let adb = typeof adbPath === 'function' ? adbPath() : (adbPath || '');
     if (!adb) {
       try { adb = this.provisioner.adbVersionPath() || ''; } catch (_) { adb = ''; }
     }
     if (!adb) {
-      // adbVersionPath() 「version」，install；
-      // runtimedirectory bundled platform-tools 。
+      // adbVersionPath() "version", install; 
+      // runtimedirectory bundled platform-tools . 
       try { adb = path.join(this.locate().root, 'platform-tools', 'adb.exe'); } catch (_) { adb = ''; }
     }
     if (!adb || !fs.existsSync(adb)) adb = 'adb';
@@ -1030,10 +1030,10 @@ class EmulatorEngine {
         });
       } catch (_) { resolve(''); }
     });
-    // Android `ip route` （default per-interface ），
-    // shell uid app network ，`ping` "Network is unreachable"，
-    // Wi-Fi 、app。「 IPv4 」，
-    // `cmd wifi status` ， ping 。
+    // Android `ip route` (default per-interface ), 
+    // shell uid app network , `ping` "Network is unreachable", 
+    // Wi-Fi , app. " IPv4 ", 
+    // `cmd wifi status` ,  ping . 
     const addr = await sh('ip -o addr');
     const ips = [];
     const re = /inet ((?:\d{1,3}\.){3}\d{1,3})\//g;
@@ -1046,8 +1046,8 @@ class EmulatorEngine {
     const wifi = await sh('cmd wifi status');
     const connected = /Wifi is connected/i.test(wifi);
     if (!ips.length) {
-      // Wi-Fi + DHCP sys.boot_completed complete。
-      // waitMs ，「network」。
+      // Wi-Fi + DHCP sys.boot_completed complete. 
+      // waitMs , "network". 
       if (waitMs > 0) {
         const t0 = Date.now();
         while (Date.now() - t0 < waitMs) {
@@ -1062,12 +1062,12 @@ class EmulatorEngine {
     }
     const ip = ips[0];
     const gw = /^10\.0\.2\./.test(ip) ? '10.0.2.2' : ip.replace(/\.\d+$/, '.1');
-    // IP 。 10.0.2.16 DNS/，app
-    // 「networkerror」，network。 HTTP probe。
-    // nc 80 ping：QEMU NAT ICMP，ping 。
-    // 「network」path（waitMs>0），—— 3
-    // 4 probe，launch。 reachable， ok： IP
-    // app， DNS launch。
+    // IP .  10.0.2.16 DNS/, app
+    // "networkerror", network.  HTTP probe. 
+    // nc 80 ping: QEMU NAT ICMP, ping . 
+    // "network"path(waitMs>0), -- 3
+    // 4 probe, launch.  reachable,  ok:  IP
+    // app,  DNS launch. 
     let reachable = null;
     if (waitMs > 0) {
       const probe = await sh(
@@ -1081,23 +1081,23 @@ class EmulatorEngine {
   }
 
   /**
- * 「」 AndroidWifi 。
+ * "" AndroidWifi . 
    *
- * ：emulator AndroidWifi configuration
- * （open + owe），
-   *   「Saved / Won't automatically connect」
- * boot wlan0 NO-CARRIER，appnetworkerror。
+ * : emulator AndroidWifi configuration
+ * (open + owe), 
+   *   "Saved / Won't automatically connect"
+ * boot wlan0 NO-CARRIER, appnetworkerror. 
    *
- * shell（uid 2000） NETWORK_SETTINGS ，
- * `cmd wifi connect-network` SecurityException，。
- * Wi-Fi settings、network——。
+ * shell(uid 2000) NETWORK_SETTINGS , 
+ * `cmd wifi connect-network` SecurityException, . 
+ * Wi-Fi settings, network--. 
    *
  * @returns {Promise<boolean>} 
    */
   async repairWifi(adbPath = '') {
     const fs = require('fs');
     const path = require('path');
-    // ：（rt.adbPath ）。
+    // : (rt.adbPath ). 
     let adb = typeof adbPath === 'function' ? adbPath() : (adbPath || '');
     if (!adb) {
       try { adb = path.join(this.locate().root, 'platform-tools', 'adb.exe'); } catch (_) { adb = ''; }
@@ -1112,10 +1112,10 @@ class EmulatorEngine {
         });
       } catch (_) { resolve(''); }
     });
-    // 「」probe。
-    // Androiddefault connectifitycheck.gstatic.com 「」，，
-    // network「!」（）。app
-    // 、。 204 endpoint。
+    // ""probe. 
+    // Androiddefault connectifitycheck.gstatic.com "", , 
+    // network"!"(). app
+    // , .  204 endpoint. 
     const tune = async () => {
       await sh('settings put global captive_portal_http_url http://connect.rom.miui.com/generate_204');
       await sh('settings put global captive_portal_https_url https://connect.rom.miui.com/generate_204');
@@ -1126,12 +1126,12 @@ class EmulatorEngine {
       await tune();
       return true;
     }
-    // （ / -svc wifi disable）
+    // ( / -svc wifi disable)
     await sh('svc wifi enable');
     await new Promise((r) => setTimeout(r, 1500));
 
-    // Wi-Fi settings， uiautomator AndroidWifi 。
-    // ： / 。
+    // Wi-Fi settings,  uiautomator AndroidWifi . 
+    // :  / . 
     await sh('am start -a android.settings.WIFI_SETTINGS');
     await new Promise((r) => setTimeout(r, 2500));
     await sh('uiautomator dump /sdcard/ui.xml');
@@ -1159,7 +1159,7 @@ class EmulatorEngine {
       }
       m = re.exec(xml);
     }
-    // fallback：（version dump text， content-desc）
+    // fallback: (version dump text,  content-desc)
     await sh('svc wifi disable');
     await new Promise((r) => setTimeout(r, 1500));
     await sh('svc wifi enable');
@@ -1170,21 +1170,21 @@ class EmulatorEngine {
   }
 
   /**
- * launch + retry。
- * @param {Function} probe ， 'ok' | 'pending' | 'fatal'
+ * launch + retry. 
+ * @param {Function} probe ,  'ok' | 'pending' | 'fatal'
    */
   async start({ headless = false, onLog = () => {}, probe = null, maxAttempts = 4 } = {}) {
     if (this.proc && !this.proc.killed) {
-      // ：emulator.exe launch，spawn qemu exit， proc
-      // （killed false）。「」
-      // —— restart ensure() ：start()
-      // reused， serial adb， `device not found`，
-      // 「apporientation App failure」。
-      // ，。
+      // : emulator.exe launch, spawn qemu exit,  proc
+      // (killed false). ""
+      // -- restart ensure() : start()
+      // reused,  serial adb,  `device not found`, 
+      // "apporientation App failure". 
+      // , . 
       if (await this._consoleAlive()) {
         return { ok: true, reused: true, serial: this.serial, port: this.port };
       }
-      onLog('Previous emulator instance has exited; restarting…');
+      onLog('Previous emulator instance has exited; restarting...');
       this.proc = null;
     }
 
@@ -1196,10 +1196,10 @@ class EmulatorEngine {
     }
 
     const s = this.settings;
-    // bootdisk：emulator AVD（data partition + snapshot， GB），
-    // diskboot；runtimedirectorylog，。
-    // ，「directory D 、C 400MB」
-    // disk —— 。
+    // bootdisk: emulator AVD(data partition + snapshot,  GB), 
+    // diskboot; runtimedirectorylog, . 
+    // , "directory D , C 400MB"
+    // disk -- . 
     const avdHome = this.provisioner.paths().avdHome;
     const avdFreeMB = doctor.freeDiskMB(avdHome);
     const diskMB = doctor.freeDiskMB(loc.root);
@@ -1221,10 +1221,10 @@ class EmulatorEngine {
     process.env.ANDROID_ADB_SERVER_PORT = String(adbPort);
     this.adbPort = adbPort;
 
-    // ，：「 → version → → adb server」，
-    // cold boot 3~5 ，app。
-    // adb server （emulator offline），
-    // server ，。
+    // , : " → version → → adb server", 
+    // cold boot 3~5 , app. 
+    // adb server (emulator offline), 
+    // server , . 
     const [accelInfo, verInfo, startPort] = await Promise.all([
       this.provisioner.emulatorAccel(),
       this.provisioner.emulatorVersion(),
@@ -1234,8 +1234,8 @@ class EmulatorEngine {
     const emuVersion = verInfo.version || '';
     this._emuVersion = emuVersion;
 
-    // driver（patch）：，patch。
-    // JSON，；，。
+    // driver(patch): , patch. 
+    // JSON, ; , . 
     let drv = { applied: [], skipped: [], errors: [], effect: null };
     try {
       drv = this._resolveDrivers({ accel: accelInfo, emulatorVersion: emuVersion });
@@ -1245,7 +1245,7 @@ class EmulatorEngine {
     }
     if (drv.applied.length) {
       onLog(`Applied driver(s): ${drv.applied.map((d) => `${d.name} v${d.version}`).join(', ')}`);
-      for (const n of (this._driverEffect.notes || []).slice(0, 4)) onLog(`· ${n}`);
+      for (const n of (this._driverEffect.notes || []).slice(0, 4)) onLog(` -  ${n}`);
     } else {
       onLog('No matching driver found, starting with default parameters');
     }
@@ -1253,15 +1253,15 @@ class EmulatorEngine {
       onLog(`${drv.errors.length} driver file(s) failed to load (check Settings → Drivers for details)`);
     }
 
-    // settings / diagnose，「」「」
+    // settings / diagnose, """"
     const profile = doctor.autoProfile({
       settings: s, accel: accelInfo, emulatorVersion: emuVersion, diskMB,
       port: startPort, adbPort,
     });
     this.profile = profile;
     let variants = doctor.planVariants(profile).slice(0, maxAttempts);
-    // driver / software emulation，：
-    // driver「」，。
+    // driver / software emulation, : 
+    // driver"", . 
     if (drv.applied.length && this._driverEffect) {
       const gpuFixed = drivers.gpuModeToArg(this._driverEffect.gpuMode);
       if (gpuFixed) {
@@ -1274,15 +1274,15 @@ class EmulatorEngine {
       }
     }
 
-    // 「」 GPU ，。
-    // ：AMD Radeon 780M `-gpu host` emulator ，
-    // VM exit 1（log "AEHD is operational"），
-    // 20 swangle。key emulator version，
-    // upgraderuntime。
+    // "" GPU , . 
+    // : AMD Radeon 780M `-gpu host` emulator , 
+    // VM exit 1(log "AEHD is operational"), 
+    // 20 swangle. key emulator version, 
+    // upgraderuntime. 
     const badGpuKey = this.settings.engine.badGpu || '';
     const [badVer, badGpu] = badGpuKey.includes('|') ? badGpuKey.split('|') : ['', ''];
-    // Vulkan host ： emulator versionretry，
-    // （「」）。
+    // Vulkan host :  emulator versionretry, 
+    // (""). 
     const vulkanRetried = String(this.settings.engine.badGpuVulkanTried || '');
     const retryHostWithoutVulkan = badGpu === 'host' && badVer === emuVersion && vulkanRetried !== emuVersion;
     if (retryHostWithoutVulkan) {
@@ -1301,42 +1301,42 @@ class EmulatorEngine {
     this._logWrite(logFile, `\n\n=== ${new Date().toISOString()} START ${doctor.describeProfile(profile)} ===\n`);
     this._logWrite(logFile, `drivers: ${drv.applied.length ? drv.applied.map((d) => `${d.id}@${d.version}`).join(', ') : '(none)'}\n`);
 
-    // launch，retrysnapshot。
-    // doctor profile（settings「」），auto 。
+    // launch, retrysnapshot. 
+    // doctor profile(settings""), auto . 
     const screen = (profile && profile.lcd) || doctor.lcdFor({ accelOk: accelInfo.ok });
     this.attempts = [];
     this.lastDiagnosis = null;
     let lastError = '';
 
-    // ： qemu AVD ，
-    // FATAL "Running multiple emulators with the same AVD"。
+    // :  qemu AVD , 
+    // FATAL "Running multiple emulators with the same AVD". 
     // eslint-disable-next-line no-await-in-loop
     await this.killOrphanProcesses({ onLog }).catch(() => {});
 
     for (let i = 0; i < variants.length; i += 1) {
       const base = variants[i];
-      // failure，retryprobe
+      // failure, retryprobe
       // eslint-disable-next-line no-await-in-loop
       const port = i === 0 ? startPort : await doctor.freePortPair(startPort + (i * 2));
       const plan = { ...base, port, adbPort, lcd: screen };
       this.port = port;
-      // exit： 0xC0000005 diagnose
+      // exit:  0xC0000005 diagnose
       this.lastExitCode = null;
-      // log：memorylog， 1 ，
-      // 2 （）。
+      // log: memorylog,  1 , 
+      // 2 (). 
       const logStart = this._log.length;
-      onLog(`Starting runtime (attempt ${i + 1}/${variants.length}: ${plan.label})…`);
+      onLog(`Starting runtime (attempt ${i + 1}/${variants.length}: ${plan.label})...`);
 
       // eslint-disable-next-line no-await-in-loop
       const avd = this.ensureAvd({
         ...plan,
-        // _forceWipe 「snapshot」：snapshotfailure
-        // （ Failed to load snapshot cold boot），。
+        // _forceWipe "snapshot": snapshotfailure
+        // ( Failed to load snapshot cold boot), . 
         wipe: plan.wipe || !!this.wipePending || !!this._forceWipe,
       });
-      // ：（main）emulator****。
-      // window spawn ，，
-      // 、。
+      // : (main)emulator****. 
+      // window spawn , , 
+      // , . 
       if (this.onBeforeSpawn) {
         // eslint-disable-next-line no-await-in-loop
         try { await this.onBeforeSpawn(); } catch (_) { /* ignore */ }
@@ -1344,7 +1344,7 @@ class EmulatorEngine {
       // eslint-disable-next-line no-await-in-loop
       const forceWipe = !!this._forceWipe;
       this._forceWipe = false;
-      // _coldBoot spawn ，bootcold boot
+      // _coldBoot spawn , bootcold boot
       this.spawnOnce({ ...plan, wipe: plan.wipe || avd.wipePending || forceWipe }, { headless, onLog, logFile });
       this._coldBoot = false;
 
@@ -1355,19 +1355,19 @@ class EmulatorEngine {
         const d = doctor.diagnose(this._attemptLines(logStart, 60));
         this.attempts.push({ plan: plan.label, diagnosis: d.code, exitCode: this.lastExitCode });
         this.lastDiagnosis = d;
-        lastError = `${d.title}：${d.hint}`;
-        // disk「parameters」：retryfailure，
-        // parameters wipe，。、error。
+        lastError = `${d.title}: ${d.hint}`;
+        // disk"parameters": retryfailure, 
+        // parameters wipe, . , error. 
         if (d.code === 'DISK_FULL') {
           onLog('Insufficient disk space; retry stopped (installed apps and data are untouched).');
           this._persistFailure({ profile, why: 'disk-full' });
           return { ok: false, error: lastError, needsSpace: true, attempts: this.attempts, exitCode: this.lastExitCode };
         }
-        // /system imagecache，，launchprobe
+        // /system imagecache, , launchprobe
         if (['ACCEL', 'GPU_INIT', 'GPU_MODE', 'IMAGE', 'DLL', 'ACCESS_VIOLATION'].includes(d.code)) {
           try { this.provisioner.invalidateEnvCache(); } catch (_) { /* ignore */ }
         }
-        onLog(`${d.title}; retrying automatically with alternative parameters…`);
+        onLog(`${d.title}; retrying automatically with alternative parameters...`);
         this._noteGpuFailure(plan);
         continue;
       }
@@ -1381,9 +1381,9 @@ class EmulatorEngine {
       let ok = false;
       let fatal = false;
       let sawBooting = false;
-      // snapshot， 3 1.5 「」
-      // 。 200ms 1.2 ：boot，
-      // CPU 。
+      // snapshot,  3 1.5 ""
+      // .  200ms 1.2 : boot, 
+      // CPU . 
       let interval = 200;
       let lastNotice = 0;
       // eslint-disable-next-line no-await-in-loop
@@ -1396,9 +1396,9 @@ class EmulatorEngine {
         } catch (_) { state = 'pending'; }
         if (state === 'ok') { ok = true; break; }
         if (state === 'fatal') { fatal = true; break; }
-        // adb shell，，log Vulkan/EGL failure
+        // adb shell, , log Vulkan/EGL failure
         if (state === 'booting') sawBooting = true;
-        // 45 ，logerror → ， 4
+        // 45 , logerror → ,  4
         if (!sawBooting && Date.now() - started > 45000) {
           const d = doctor.diagnose(this._attemptLines(logStart, 80));
           if (['GPU_INIT', 'ACCEL', 'GPU_MODE', 'IMAGE', 'DLL', 'MEMORY', 'ACCESS_VIOLATION'].includes(d.code)) {
@@ -1408,10 +1408,10 @@ class EmulatorEngine {
             break;
           }
         }
-        // 15 ：「」，
+        // 15 : "", 
         if (Date.now() - lastNotice > 15000) {
           lastNotice = Date.now();
-          onLog(`Booting… ${Math.round((Date.now() - started) / 1000)}s`);
+          onLog(`Booting... ${Math.round((Date.now() - started) / 1000)}s`);
         }
         // eslint-disable-next-line no-await-in-loop
         await sleep(interval);
@@ -1420,21 +1420,21 @@ class EmulatorEngine {
 
       if (ok) {
         const bootMs = Date.now() - started;
-        // ：failure，「diagnose」
+        // : failure, "diagnose"
         this._clearFailure();
-        // quickboot snapshot：emulator ApkStart exit（Electron
-        // job ），snapshot 25 7 。
-        // app installer snapshot，"restartapp"。
+        // quickboot snapshot: emulator ApkStart exit(Electron
+        // job ), snapshot 25 7 . 
+        // app installer snapshot, "restartapp". 
         this.snapshotWorthSaving = true;
         onLog(`Runtime ready (${Math.round(bootMs / 1000)}s, ${plan.label})`);
-        // bootsuccess：checkupnetwork。，black screen，
-        // 「appblack screen」，network。。
+        // bootsuccess: checkupnetwork. , black screen, 
+        // "appblack screen", network. . 
         //
-        // 「」：Wi-Fi + DHCP sys.boot_completed
-        // 5~20 ， checkNetwork() ，**cold boot**
-        // 「⚠ network，Android」， 5 network ——
-        // app。 12 window（），timeouthint，
-        // 。
+        // "": Wi-Fi + DHCP sys.boot_completed
+        // 5~20 ,  checkNetwork() , **cold boot**
+        // "⚠ network, Android",  5 network --
+        // app.  12 window(), timeouthint, 
+        // . 
         let network = null;
         try {
           network = await this.checkNetwork('', { waitMs: 12000, interval: 3000 });
@@ -1455,9 +1455,9 @@ class EmulatorEngine {
       this.attempts.push({ plan: plan.label, diagnosis: d.code, timeout: !fatal, exitCode: this.lastExitCode });
       this.lastDiagnosis = d;
       lastError = fatal ? `${d.title}: ${d.hint}` : 'Boot timeout (initial boot may take longer or hardware acceleration is inactive)';
-      onLog(`${lastError}; retrying automatically with alternative parameters…`);
-      // ， GPU 「launch」blacklist，
-      // launch。
+      onLog(`${lastError}; retrying automatically with alternative parameters...`);
+      // ,  GPU "launch"blacklist, 
+      // launch. 
       if (d.code !== 'ADB_UNAUTHORIZED') this._noteGpuFailure(plan);
       // eslint-disable-next-line no-await-in-loop
       await this.killAttempt();
@@ -1489,24 +1489,24 @@ class EmulatorEngine {
   running() { return !!(this.proc && !this.proc.killed); }
 
   /**
- * quickboot snapshot（bootmemory， WSA/applaunch）。
+ * quickboot snapshot(bootmemory,  WSA/applaunch). 
    *
- * ：boot 6 ，appdisk I/O
- * （snapshot 1~3GB），。「」， Runtime 
- * appwindow；shutdown，。
+ * : boot 6 , appdisk I/O
+ * (snapshot 1~3GB), . "",  Runtime 
+ * appwindow; shutdown, . 
    */
   async saveSnapshotNow(adbPath, { timeout = 45000 } = {}) {
     if (!adbPath) return false;
     const ok = await this._saveViaAdb(adbPath, { timeout });
-    // emulator save OK，，
-    // snapshot.pb （failure）。
+    // emulator save OK, , 
+    // snapshot.pb (failure). 
     if (!ok) return false;
     return this.hasSnapshot();
   }
 
   /**
- * 「snapshot」。
- * ；app，。
+ * "snapshot". 
+ * ; app, . 
    */
   scheduleSnapshotSave(adbPath, { delay = 20000, isIdle = () => true } = {}) {
     if (!adbPath) return;
@@ -1516,8 +1516,8 @@ class EmulatorEngine {
         this._snapTimer = null;
         if (!this.running()) return;
         if (!isIdle()) { arm(15000); return; }
-        // disksnapshot（memory + 1GB ）：disk，
-        // bootfailure。snapshotlaunch，。
+        // disksnapshot(memory + 1GB ): disk, 
+        // bootfailure. snapshotlaunch, . 
         const freeMB = require('./doctor').freeDiskMB(store.DATA_DIR);
         const needMB = Math.round(Number(this.profile?.memoryMB || 3072) * 1.15) + 1024;
         if (freeMB && freeMB < needMB) {
@@ -1537,22 +1537,22 @@ class EmulatorEngine {
     this._snapTimer = null;
   }
 
- /** ： quickboot snapshot，shutdown， */
+ /** :  quickboot snapshot, shutdown,  */
   async stop({ adbPath } = {}) {
     if (!this.proc) {
-      // proc ，， true
+      // proc , ,  true
       if (!(await this._anyEmulatorPortAlive())) return true;
     }
     this.cancelSnapshotSave();
     const serial = this.serial;
-    // shutdown guest ， adb：
-    // - → snapshot（path，）；
-    // - （adb unauthorized / bootcomplete）→ ，**exitsnapshot**：
-    // `adb emu kill` emulator quickboot memory，
-    // 。，「boottimeout」snapshot。
+    // shutdown guest ,  adb: 
+    // - → snapshot(path, ); 
+    // - (adb unauthorized / bootcomplete)→ , **exitsnapshot**: 
+    // `adb emu kill` emulator quickboot memory, 
+    // . , "boottimeout"snapshot. 
     const healthy = adbPath ? await this._adbGuestHealthy(adbPath) : false;
     if (adbPath && this.snapshotWorthSaving !== false && healthy) {
-      // 3GB memory，timeout，snapshot kill 。
+      // 3GB memory, timeout, snapshot kill . 
       await this._saveViaAdb(adbPath, { timeout: 60000 });
     }
     if (!healthy && this.snapshotWorthSaving !== false) {
@@ -1564,21 +1564,21 @@ class EmulatorEngine {
           { timeout: 10000, windowsHide: true }, () => resolve());
       });
     }
-    // 「 → exit」。 6 ，
-    // snapshot， ram.img snapshot.pb 。
+    // " → exit".  6 , 
+    // snapshot,  ram.img snapshot.pb . 
     //
-    // note this.proc：emulator.exe launch，spawn qemu ，
-    // exit 「shutdowncomplete」。。
+    // note this.proc: emulator.exe launch, spawn qemu , 
+    // exit "shutdowncomplete". . 
     for (let i = 0; i < 100 && (await this._consoleAlive()); i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await sleep(300);
     }
     await this.killAttempt();
-    // launch。 running() true、
-    // start() （ start() ）。
+    // launch.  running() true, 
+    // start() ( start() ). 
     this.proc = null;
-    // exit，exitsnapshot。：
-    // emu kill + ，snapshot。
+    // exit, exitsnapshot. : 
+    // emu kill + , snapshot. 
     if (!healthy && this.snapshotWorthSaving !== false) {
       try { this.invalidateSnapshot(); } catch (_) { /* ignore */ }
     }
@@ -1586,21 +1586,21 @@ class EmulatorEngine {
   }
 
   /**
- * 「」 GPU ，launch。
- * auto ：，。
+ * "" GPU , launch. 
+ * auto : , . 
    */
   _noteGpuFailure(plan) {
     try {
       const gpu = plan && plan.gpu;
       if (!gpu) return;
-      // fallback，/，
+      // fallback, /, 
       if (/software|swiftshader|swangle/.test(gpu)) return;
       if ((this.settings.engine.gpuMode || 'auto') !== 'auto') return;
       store.saveSettings({ engine: { badGpu: `${this._emuVersion || ''}|${gpu}` } });
     } catch (_) { /* ignore */ }
   }
 
- /** （5554） —— 「」 */
+ /** (5554) -- "" */
   _consoleAlive() {
     const net = require('net');
     const port = this.port || 5554;
@@ -1615,10 +1615,10 @@ class EmulatorEngine {
   }
 
   /**
- * guest 「snapshot」：adb authorized + boot complete。
- * cold boot「 USB ？」，state unauthorized —— 
- * memory + disk，guest host adbkey.pub， unauthorized，
- * probe shell ， 240s /。
+ * guest "snapshot": adb authorized + boot complete. 
+ * cold boot" USB ?", state unauthorized -- 
+ * memory + disk, guest host adbkey.pub,  unauthorized, 
+ * probe shell ,  240s /. 
    */
   async _adbGuestHealthy(adbPath) {
     if (!adbPath) return false;
@@ -1634,8 +1634,8 @@ class EmulatorEngine {
   }
 
   /**
- * adb snapshot（failure false，）。
- * guest ，cold boot 20 ，「bootfailure」snapshot。
+ * adb snapshot(failure false, ). 
+ * guest , cold boot 20 , "bootfailure"snapshot. 
    */
   async _saveViaAdb(adbPath, { timeout = 45000 } = {}) {
     if (!adbPath) return false;
@@ -1652,10 +1652,10 @@ class EmulatorEngine {
   recentLog(n = 40) { return this._log.slice(-n).map((x) => x.line); }
 
   /**
- * 「launch」log。
- * memorylog（diagnose），diagnose：
- * 1 `emulator exit 3221225477` 2 failure。
- * log（），。
+ * "launch"log. 
+ * memorylog(diagnose), diagnose: 
+ * 1 `emulator exit 3221225477` 2 failure. 
+ * log(), . 
    */
   _attemptLines(from, max = 80) {
     const lines = this._log.slice(Math.max(0, from || 0)).map((x) => x.line);
@@ -1663,9 +1663,9 @@ class EmulatorEngine {
   }
 
   /**
- * emulator.log n （memory）。
- * restart ApkStart diagnose，memory this._log ，
- * UNKNOWN —— log。
+ * emulator.log n (memory). 
+ * restart ApkStart diagnose, memory this._log , 
+ * UNKNOWN -- log. 
    */
   tailLogFile(n = 300) {
     try {
@@ -1677,7 +1677,7 @@ class EmulatorEngine {
         const buf = Buffer.alloc(take);
         fs.readSync(fd, buf, 0, take, size - take);
         const lines = buf.toString('utf8').split(/\r?\n/);
-        // ，
+        // , 
         if (take < size) lines.shift();
         return lines.slice(-n);
       } finally { fs.closeSync(fd); }

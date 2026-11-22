@@ -1,5 +1,5 @@
 'use strict';
-/* ：path boot（API 34 Play system image）→ abilist → ARM APK → launch */
+/* : path boot(API 34 Play system image)→ abilist → ARM APK → launch */
 process.env.ANDROID_ADB_SERVER_PORT = process.env.ANDROID_ADB_SERVER_PORT || '5038';
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +13,7 @@ const APK = process.argv[2] || 'D:\\.apk';
   store.saveSettings({ runtime: { compatImage: true } });
   const rt = new Runtime(ROOT);
 
-  console.log('[1] ensure()（ →  Google Play / API 34 ）');
+  console.log('[1] ensure()( →  Google Play / API 34 )');
   const r = await rt.ensure({
     onLog: (m) => console.log('    [boot]', m),
   });
@@ -27,7 +27,7 @@ const APK = process.argv[2] || 'D:\\.apk';
   console.log('    tag     =', await c.shell('getprop ro.build.tags'));
 
   if (APK && fs.existsSync(APK)) {
-    console.log('[3]  ARM APK（）…');
+    console.log('[3]  ARM APK()...');
     const ins = await c.install(APK);
     console.log('    install =', JSON.stringify(ins).slice(0, 160));
     await c.shell('am start -n com.phoenix.read/com.dragon.read.pages.splash.SplashActivity');
@@ -35,7 +35,7 @@ const APK = process.argv[2] || 'D:\\.apk';
     const ps = await c.shell('ps -A | grep phoenix');
     console.log('[4]  20s :', ps ? ' ✓' : ' ✗');
   } else {
-    console.log('[3]  APK （', APK, '）');
+    console.log('[3]  APK (', APK, ')');
   }
 
   console.log('[5] ');

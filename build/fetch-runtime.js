@@ -1,10 +1,10 @@
 'use strict';
 /**
- * 「」runtime：
+ * ""runtime: 
  * node build/fetch-runtime.js <directory>
- * <directory>/runtime/：
+ * <directory>/runtime/: 
  *   emulator/ + platform-tools/ + aehd/ + system-images/android-34/google_apis_playstore/x86_64/
- * Provisioner downloadverify，。
+ * Provisioner downloadverify, . 
  */
 const path = require('path');
 const fs = require('fs');
@@ -16,8 +16,8 @@ if (!outRoot) {
 }
 fs.mkdirSync(outRoot, { recursive: true });
 
-// Provisioner settings.runtime.dir directory：
-// APPDATA directory，configuration
+// Provisioner settings.runtime.dir directory: 
+// APPDATA directory, configuration
 process.env.APPDATA = path.join(outRoot, '_appdata');
 const store = require('../src/core/store');
 store.saveSettings({ runtime: { dir: outRoot } });
@@ -39,8 +39,8 @@ const log = (p) => console.log(`[${p.stage}] ${p.message} ${p.percent != null ? 
     fs.existsSync(path.join(outRoot, 'system-images', 'android-34', 'google_apis_playstore', 'x86_64', 'system.img'));
   if (!ok) throw new Error('');
 
-  // ： x86_64 QEMU 。
-  // x86_64 qemu-system-*.exe（ 400MB）、QtWebEngine、netsim -no-window 。
+  // :  x86_64 QEMU . 
+  // x86_64 qemu-system-*.exe( 400MB), QtWebEngine, netsim -no-window . 
   const layers = require('../src/core/layers');
   const pruned = layers.prune(outRoot, { apply: true, aggressive: true });
   const before = layers.analyze(outRoot).total + pruned.saved;

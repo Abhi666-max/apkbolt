@@ -1,7 +1,7 @@
 'use strict';
 /**
- * （src/core/android.js） Node ： adb client 、，
- * 。：node test/android-test.js
+ * (src/core/android.js) Node :  adb client , , 
+ * . : node test/android-test.js
  */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -27,7 +27,7 @@ function assert(cond, msg) {
   if (!cond) throw new Error(msg || 'Assertion failed');
 }
 
-/** ：shell()  replies ， */
+/** : shell()  replies ,  */
 function fakeSettings(replies) {
   const scripts = [];
   const client = {
@@ -58,24 +58,24 @@ function fakeSettings(replies) {
     assert(volumePercent(null) === 0);
   });
 
-  await test('cmd media_session， media', () => {
+  await test('cmd media_session,  media', () => {
     const c = volumeCmd('--set 7');
     assert(c.indexOf('cmd media_session volume --stream 3 --set 7') >= 0, c);
     assert(c.indexOf('|| media volume --stream 3 --set 7') > c.indexOf('cmd media_session'), c);
     assert(!/^media volume/.test(c), 'Android 11 media');
   });
 
-  await test('setVolume （Android 11+）', async () => {
+  await test('setVolume (Android 11+)', async () => {
     const { set, scripts } = fakeSettings(['volume is 4 in range [0..15]\n', '']);
     const r = await set.setVolume(60);
-    assert(scripts.length === 2, `， ${scripts.length} `);
+    assert(scripts.length === 2, `,  ${scripts.length} `);
     assert(scripts[0].includes('cmd media_session volume --stream 3 --get'), scripts[0]);
     assert(scripts[1].includes('cmd media_session volume --stream 3 --set 9'), scripts[1]);
     assert(!scripts[1].includes('--set 60'), 'assertion failed');
     assert(r.ok && r.volume === 60, JSON.stringify(r));
   });
 
-  await test('setVolume （0..25）', async () => {
+  await test('setVolume (0..25)', async () => {
     const { set, scripts } = fakeSettings(['volume is 10 in range [0..25]\n', '']);
     const r = await set.setVolume(100);
     assert(scripts[1].includes('--set 25'), scripts[1]);
@@ -94,14 +94,14 @@ function fakeSettings(replies) {
     const { set, scripts } = fakeSettings([out]);
     const s = await set.status();
     assert(scripts[0].includes('cmd media_session volume --stream 3 --get'), 'media_session');
-    assert(s.volume === 40, ` 40%， ${s.volume}`);
+    assert(s.volume === 40, ` 40%,  ${s.volume}`);
     assert(s.sdk === 34 && s.wifi === true, JSON.stringify(s));
   });
 
-  // sh ：PATH  `media`（ cmd ），
-  // `cmd`（ Android 11+）。
+  // sh : PATH  `media`( cmd ), 
+  // `cmd`( Android 11+). 
   if (process.platform !== 'win32') {
-    await test('sh ： cmd media， cmd media', () => {
+    await test('sh :  cmd media,  cmd media', () => {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apkstart-vol-'));
       const log = path.join(dir, 'calls.log');
       const write = (name, body) => {
@@ -121,6 +121,6 @@ function fakeSettings(replies) {
     });
   }
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })();

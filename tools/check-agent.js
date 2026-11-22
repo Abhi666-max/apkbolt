@@ -1,5 +1,5 @@
 'use strict';
-// temporary：window、、boothide
+// temporary: window, , boothide
 const { WinAgent } = require('../src/core/agent');
 
 (async () => {

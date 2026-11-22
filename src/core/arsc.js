@@ -1,11 +1,11 @@
 'use strict';
 /**
- * resources.arsc （）
- * ： AndroidManifest @0x7f... 
- * app（）path（res/... png）。
+ * resources.arsc ()
+ * :  AndroidManifest @0x7f... 
+ * app()path(res/... png). 
  *
- * ResTable / ResTable_package / ResTable_type ，
- * 99% app。
+ * ResTable / ResTable_package / ResTable_type , 
+ * 99% app. 
  */
 
 const RES_TABLE_TYPE = 0x0002;
@@ -61,14 +61,14 @@ function parseConfig(buf, off) {
   return cfg;
 }
 
-/** ：defaultconfiguration， */
+/** : defaultconfiguration,  */
 function score(cfg, prefer) {
   let s = 0;
   if (prefer === 'file') {
     s += cfg.density === 0 ? 0 : cfg.density;          // 
-    if (cfg.density === 0xfffe) s -= 500;               // anydpi xml，
+    if (cfg.density === 0xfffe) s -= 500;               // anydpi xml, 
   } else {
-    s -= cfg.density === 0 ? 0 : 10;                    // ：
+    s -= cfg.density === 0 ? 0 : 10;                    // : 
     if (cfg.language) s -= 40;
     if (cfg.sdkVersion) s -= cfg.sdkVersion / 1000;
     if (cfg.uiMode) s -= 20;
@@ -117,7 +117,7 @@ class ResTable {
     try {
       if (typeStringsOff) typeStrings = readStringPool(buf, start + typeStringsOff);
       if (keyStringsOff) keyStrings = readStringPool(buf, start + keyStringsOff);
-    } catch (_) { /* ： */ }
+    } catch (_) { /* :  */ }
 
     const types = new Map(); // typeId -> [{ config, entries: Map }]
     let pos = start + headerSize;
@@ -152,7 +152,7 @@ class ResTable {
     const entriesBase = start + entriesStart;
 
     if (flags & 0x01) {
-      // FLAG_SPARSE：entryCount (idx:u16, offset:u16)
+      // FLAG_SPARSE: entryCount (idx:u16, offset:u16)
       for (let i = 0; i < entryCount; i++) {
         const idx = buf.readUInt16LE(offsetsBase + i * 4);
         const off = buf.readUInt16LE(offsetsBase + i * 4 + 2) * 4;
@@ -183,7 +183,7 @@ class ResTable {
     if (at + 8 > buf.length) return null;
     const entrySize = buf.readUInt16LE(at);
     const flags = buf.readUInt16LE(at + 2);
-    if (flags & 0x0001) return null; // （bag/map），
+    if (flags & 0x0001) return null; // (bag/map), 
     const valueAt = at + entrySize;
     return {
       dataType: buf.readUInt8(valueAt + 3),

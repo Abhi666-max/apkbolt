@@ -1,18 +1,18 @@
 'use strict';
 /**
- * dual source（GitHub / Gitee）+ system imagedownload。
+ * dual source(GitHub / Gitee)+ system imagedownload. 
  *
- * GitHub ：
- * 1. api.github.com ，timeout —— 「update」；
- * 2. download（objects.githubusercontent.com）， 100KB/s ——
- * 1.5 GB runtime 4 。
+ * GitHub : 
+ * 1. api.github.com , timeout -- "update"; 
+ * 2. download(objects.githubusercontent.com),  100KB/s --
+ * 1.5 GB runtime 4 . 
  *
- * 「」，：
- * - version：GitHub / Gitee ****，version；
- * - download：「GitHub / Gitee / system image」，
- * 128KB，，。
+ * "", : 
+ * - version: GitHub / Gitee ****, version; 
+ * - download: "GitHub / Gitee / system image", 
+ * 128KB, , . 
  *
- * memorycache 30 （update/）。
+ * memorycache 30 (update/). 
  */
 const https = require('https');
 const http = require('http');
@@ -38,16 +38,16 @@ const SOURCES = {
   },
 };
 
-/** GitHub 。 autoMirror custom。 */
+/** GitHub .  autoMirror custom.  */
 const KNOWN_MIRRORS = [
   'https://ghfast.top/',
   'https://gh-proxy.com/',
 ];
 
 /**
- * 。
- * 128KB ： + TLS ，「」，
- * 「」。256KB ，。
+ * . 
+ * 128KB :  + TLS , "", 
+ * "". 256KB , . 
  */
 const SAMPLE_BYTES = 256 * 1024;
 
@@ -80,7 +80,7 @@ function openUrl(url, { timeout = 10000, headers = {}, redirects = 0, followRedi
   });
 }
 
-/** JSON（、timeout、） */
+/** JSON(, timeout, ) */
 async function getJson(url, timeout = 10000) {
   const res = await openUrl(url, { timeout });
   if (res.statusCode < 200 || res.statusCode >= 300) {
@@ -102,7 +102,7 @@ async function getJson(url, timeout = 10000) {
 }
 
 /**
- * download。
+ * download. 
  * @returns {Promise<{url:string, ok:boolean, speed:number, got:number, ms:number, error?:string}>}
  */
 function measure(url, { bytes = SAMPLE_BYTES, timeoutMs = 9000 } = {}) {
@@ -117,8 +117,8 @@ function measure(url, { bytes = SAMPLE_BYTES, timeoutMs = 9000 } = {}) {
       settled = true;
       try { req?.destroy(); } catch (_) { /* ignore */ }
       const now = Date.now();
-      // 「」：TLS + DNS ，
-      // 1.4GB ，。
+      // "": TLS + DNS , 
+      // 1.4GB , . 
       const span = Math.max(1, now - (firstAt || t0));
       resolve({
         url,
@@ -149,7 +149,7 @@ function measure(url, { bytes = SAMPLE_BYTES, timeoutMs = 9000 } = {}) {
         got += c.length;
         if (got >= bytes) { clearTimeout(timer); done(true); }
       });
-      // ： EOF success
+      // :  EOF success
       res.on('end', () => { clearTimeout(timer); done(got > 0); });
       res.on('error', (e) => { clearTimeout(timer); done(false, e.message); });
     }).catch((e) => { clearTimeout(timer); done(false, e.message); });
@@ -164,10 +164,10 @@ function withMirror(url, prefix) {
 }
 
 /**
- * Gitee 100MB，install 105~110MB ，
- * xxx.zip.part1 / xxx.zip.part2。split：
+ * Gitee 100MB, install 105~110MB , 
+ * xxx.zip.part1 / xxx.zip.part2. split: 
  * { name: 'xxx.zip', size: , parts: [{index, size, urls:[...]}] }
- * split part1 ，、（，）。
+ * split part1 , , (, ). 
  */
 function groupParts(assets) {
   const groups = new Map();
@@ -195,15 +195,15 @@ function groupParts(assets) {
     g.parts.sort((x, y) => x.index - y.index);
     const contiguous = g.parts.every((p, i) => p.index === i + 1);
     g.size = g.parts.reduce((n, p) => n + (Number(p.size) || 0), 0);
-    // note：Gitee name/url，** size**。
-    // 「size>0」split（），
-    // 「split + split」；。
+    // note: Gitee name/url, ** size**. 
+    // "size>0"split(), 
+    // "split + split"; . 
     if (!contiguous || !g.parts.every((p) => p.urls.length)) g.broken = true;
   }
   return { list: out.filter((a) => !a.broken), broken: [...groups.values()].filter((g) => g.broken).map((g) => g.name) };
 }
 
-/** mirrors ：custom，（autoMirror custom） */
+/** mirrors : custom, (autoMirror custom) */
 function mirrorList(settings) {
   const r = (settings && settings.runtime) || {};
   const custom = String(r.mirrorPrefix || process.env.APKSTART_MIRROR || '').trim();
@@ -217,32 +217,32 @@ class Sources {
     this.settings = typeof settingsFn === 'function' ? settingsFn : () => ({});
     this._rankCache = new Map();   // url -> {at, speed, ok}
     this._rankTtl = 30 * 60 * 1000;
-    // versioncache：Gitee （ 403），
-    // 「version」。
+    // versioncache: Gitee ( 403), 
+    // "version". 
     this._relCache = { at: 0, key: '', value: null };
     this._relTtl = 10 * 60 * 1000;
-    // ：/error，，launch
+    // : /error, , launch
     this._blocked = new Map();     // sourceId -> until(ms)
     this._blockMs = 15 * 60 * 1000;
   }
 
- /** ； null ， */
+ /** ;  null ,  */
   blockedReason(id) {
     const until = this._blocked.get(id) || 0;
     if (until <= Date.now()) return null;
     return `Temporarily skipped (not retrying for ${Math.ceil((until - Date.now()) / 60000)} minute(s))`;
   }
 
- /** release（，failure） */
+ /** release(, failure) */
   /**
- * API fallback： `/releases/latest` 302 tag。
+ * API fallback:  `/releases/latest` 302 tag. 
    *
- * ：GitHub API IP 60 ，
- * Gitee API （ 403 Rate Limit Exceeded）。
- * /、 NAT ，「updatefailure」——
- * `releases/latest` CDN ， API 。
+ * : GitHub API IP 60 , 
+ * Gitee API ( 403 Rate Limit Exceeded). 
+ * /,  NAT , "updatefailure"--
+ * `releases/latest` CDN ,  API . 
    *
- * tag ：
+ * tag : 
    *   ApkStart-<tag>-win64-portable.zip / ApkStart-<version>-Setup.exe / ApkStart-runtime-<tag>.zip
    */
   async _releaseTagViaRedirect(id) {
@@ -255,7 +255,7 @@ class Sources {
     return m ? decodeURIComponent(m[1]) : '';
   }
 
- /** tag 「」 release（ API ） */
+ /** tag "" release( API ) */
   _syntheticRelease(id, tag) {
     const s = SOURCES[id];
     const ver = String(tag).replace(/^v/i, '');
@@ -265,9 +265,9 @@ class Sources {
       `ApkStart-runtime-${tag}.zip`,
     ];
     // GitHub Gitee /releases/download/<tag>/<>
-    // （ Gitee 302 foruda.gitee.com ，），
-    // API download。Gitee 404，
-    // 。
+    // ( Gitee 302 foruda.gitee.com , ), 
+    // API download. Gitee 404, 
+    // . 
     const assets = names.map((n) => ({
       name: n,
       size: 0,
@@ -287,9 +287,9 @@ class Sources {
   async fetchReleases() {
     const prefs = String((this.settings().runtime || {}).sourcePreference || 'auto');
     const ids = prefs === 'github' || prefs === 'gitee' ? [prefs] : ['github', 'gitee'];
-    // releases ；，Gitee 404
-    // "Not Found Project"（ 401）， token。
-    // ， token 。
+    // releases ; , Gitee 404
+    // "Not Found Project"( 401),  token. 
+    // ,  token . 
     const token = String((this.settings().runtime || {}).giteeToken || '').trim();
     const withToken = (id, url) => (id === 'gitee' && token
       ? `${url}${url.includes('?') ? '&' : '?'}access_token=${encodeURIComponent(token)}`
@@ -303,13 +303,13 @@ class Sources {
         const rel = await getJson(withToken(id, `${s.api}/releases/latest`), 9000);
         return { source: id, name: s.name, web: s.web, rel };
       } catch (e) {
-        // Gitee release、 GitHub ，
+        // Gitee release,  GitHub , 
         try {
           const list = await getJson(withToken(id, `${s.api}/releases?per_page=10`), 9000);
           const first = (Array.isArray(list) ? list : []).find((r) => r && !r.draft);
           if (first) return { source: id, name: s.name, web: s.web, rel: first };
         } catch (_) { /* API fallback */ }
-        // API /fallback： tag，
+        // API /fallback:  tag, 
         try {
           const tag = await this._releaseTagViaRedirect(id);
           if (tag) {
@@ -319,7 +319,7 @@ class Sources {
         const limited = /\b(403|429)\b/.test(e.message);
         if (limited) this._blocked.set(id, Date.now() + this._blockMs);
         const hint = limited
-          ? ' (Rate limited — this source is paused temporarily)'
+          ? ' (Rate limited - this source is paused temporarily)'
           : (id === 'gitee' && !token ? ' (Retry later or add a read-only token in Settings to increase the rate limit)' : '');
         return { source: id, name: s.name, web: s.web, error: `${e.message}${hint}` };
       }
@@ -328,8 +328,8 @@ class Sources {
   }
 
   /**
- * version：version，****，
- * Gitee 、 GitHub，。
+ * version: version, ****, 
+ * Gitee ,  GitHub, . 
    */
   async latest({ force = false } = {}) {
     const pref = String((this.settings().runtime || {}).sourcePreference || 'auto');
@@ -338,8 +338,8 @@ class Sources {
       return cached.value;
     }
     const all = await this.fetchReleases();
-    // （ fetchReleases ，「
-    // 」/， 403 ）
+    // ( fetchReleases , "
+    // "/,  403 )
     for (const x of all) {
       if (x && x.error && /\b(403|429)\b/.test(x.error)) {
         this._blocked.set(x.source, Date.now() + this._blockMs);
@@ -348,8 +348,8 @@ class Sources {
     const ok = all.filter((x) => x && x.rel);
     if (!ok.length) {
       const why = all.map((x) => `${x.name || x.source}: ${x.error || 'No data'}`).join('; ');
-      // ：「」version，
-      // error —— version。
+      // : ""version, 
+      // error -- version. 
       if (cached.value) return { ...cached.value, stale: true, staleReason: why };
       throw new Error(`Cannot reach update server (${why})`);
     }
@@ -358,8 +358,8 @@ class Sources {
     const tag = String(top.rel.tag_name || top.rel.name || '');
     const version = tag.replace(/^v/i, '');
 
-    // version（version）。
-    // + split：split，failure。
+    // version(version). 
+    // + split: split, failure. 
     let raw = [];
     for (const item of ok) {
       const t = String(item.rel.tag_name || item.rel.name || '').replace(/^v/i, '');
@@ -367,9 +367,9 @@ class Sources {
       for (const a of (item.rel.assets || [])) {
         const key = String(a.name || '');
         if (!key) continue;
-        // Gitee 「」（v0.3.2.zip / v0.3.2.tar.gz），
-        // install，`\.zip$` updatedownload —— 。
-        // ApkStart ，whitelist。
+        // Gitee ""(v0.3.2.zip / v0.3.2.tar.gz), 
+        // install, `\.zip$` updatedownload -- . 
+        // ApkStart , whitelist. 
         if (!/^ApkStart/i.test(key)) continue;
         raw.push({
           name: key,
@@ -383,11 +383,11 @@ class Sources {
     const wholeNames = new Set(grouped.list.filter((a) => !a.partial).map((a) => a.name));
     raw = grouped.list.filter((a) => !(a.partial && wholeNames.has(a.name)));
 
-    // （split）：。
-    // 「、」—— GitHub ，Gitee ，
-    // 「network」 GitHub。（ rank()）。
-    // ：（compress/， MB），
-    // downloadMulti 「」，。
+    // (split): . 
+    // ", "-- GitHub , Gitee , 
+    // "network" GitHub. ( rank()). 
+    // : (compress/,  MB), 
+    // downloadMulti "", . 
     const assets = [];
     const byName = new Map();
     for (const a of raw) {
@@ -421,12 +421,12 @@ class Sources {
   }
 
   /**
- * + system image（、：，system image）。
- * system image GitHub ：ghfast / gh-proxy GitHub，
- * Gitee 403，。
+ * + system image(, : , system image). 
+ * system image GitHub : ghfast / gh-proxy GitHub, 
+ * Gitee 403, . 
    */
   candidates(assetOrUrl) {
-    // ：、（url）、（urls ，）
+    // : , (url), (urls , )
     const urls = (typeof assetOrUrl === 'string'
       ? [assetOrUrl]
       : (assetOrUrl && (assetOrUrl.urls && assetOrUrl.urls.length ? assetOrUrl.urls : [assetOrUrl.url])))
@@ -450,8 +450,8 @@ class Sources {
   }
 
   /**
- * 。cache 30 ；
- * failure（「」）。
+ * . cache 30 ; 
+ * failure(""). 
    */
   async rank(urls, { onProgress } = {}) {
     const list = (urls || []).filter(Boolean);
@@ -463,17 +463,17 @@ class Sources {
       if (!c || now - c.at > this._rankTtl) need.push(u);
     }
     if (need.length) {
-      onProgress?.({ stage: 'probe', message: `Benchmarking ${need.length} download source(s)…` });
-      // ：，「」，
-      // 「」。 256KB，。
-      // 6 （ 9 × 4 = 36 ，
-      // 「runtime」）；failure，download。
+      onProgress?.({ stage: 'probe', message: `Benchmarking ${need.length} download source(s)...` });
+      // : , "", 
+      // "".  256KB, . 
+      // 6 ( 9 × 4 = 36 , 
+      // "runtime"); failure, download. 
       let i = 0;
       for (const u of need) {
         i += 1;
         let host = u;
         try { host = new URL(u).host; } catch (_) { /* show raw URL if invalid */ }
-        onProgress?.({ stage: 'probe', message: `Testing source ${i}/${need.length}: ${host}…` });
+        onProgress?.({ stage: 'probe', message: `Testing source ${i}/${need.length}: ${host}...` });
         // eslint-disable-next-line no-await-in-loop
         const r = await measure(u, { timeoutMs: 6000 });
         this._rankCache.set(u, { at: Date.now(), ok: r.ok, speed: r.speed });
@@ -495,7 +495,7 @@ class Sources {
     return sorted;
   }
 
- /** cache（system image / network） */
+ /** cache(system image / network) */
   reset() {
     this._rankCache.clear();
     this._relCache = { at: 0, key: '', value: null };

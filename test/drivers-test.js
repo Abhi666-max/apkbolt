@@ -1,9 +1,9 @@
 'use strict';
 /**
- * （） Node ： Electron、、。
- * 「 JSON ，，、
- * 」， /  / 。
- * ：node test/drivers-test.js
+ * () Node :  Electron, , . 
+ * " JSON , , , 
+ * ",  /  / . 
+ * : node test/drivers-test.js
  */
 const assert = require('assert/strict');
 const fs = require('fs');
@@ -49,15 +49,15 @@ const base = () => ({
 });
 
 (() => {
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
-  test('（ ）', () => {
+  test('( )', () => {
     const dir = path.join(ROOT, 'src', 'drivers');
     const files = fs.readdirSync(dir).filter((n) => n.endsWith('.json'));
     assert.ok(files.length >= 3, ` ${files.length} `);
     for (const f of files) {
       const r = drivers.validateDriver(readJSON(path.join(dir, f)), { file: f });
-      assert.equal(r.ok, true, `${f}: ${r.errors.join('；')}`);
+      assert.equal(r.ok, true, `${f}: ${r.errors.join('; ')}`);
     }
   });
 
@@ -68,14 +68,14 @@ const base = () => ({
     assert.ok(/format/.test(r.errors.join('')));
   });
 
-  test('id / （ id ）', () => {
+  test('id / ( id )', () => {
     for (const id of ['../evil', 'a b', 'x', 'name/../../etc/passwd']) {
       const r = drivers.validateDriver({ ...base(), id });
       assert.equal(r.ok, false, `id=${id} `);
     }
   });
 
-  test('match ，', () => {
+  test('match , ', () => {
     const r = drivers.validateDriver({ ...base(), match: { gpu: 'amd' } });
     assert.equal(r.ok, false);
     assert.ok(/match\.gpu/.test(r.errors.join('')));
@@ -87,9 +87,9 @@ const base = () => ({
     assert.ok(/effect\.gpu/.test(r.errors.join('')));
   });
 
-  console.log('\n[ · （ / ）]');
+  console.log('\n[  -  ( / )]');
 
-  test('-wipe-data（ ）', () => {
+  test('-wipe-data( )', () => {
     const r = drivers.validateDriver({ ...base(), effect: { emulatorArgs: ['-wipe-data'] } });
     assert.equal(r.ok, false);
     assert.ok(/ -wipe-data|does not allow -wipe-data/i.test(r.errors.join('')), r.errors.join('; '));
@@ -108,7 +108,7 @@ const base = () => ({
     assert.equal(r.ok, false);
   });
 
-  test('config.ini （ / ）', () => {
+  test('config.ini ( / )', () => {
     assert.equal(drivers.validateDriver({ ...base(), effect: { configIni: { 'hw.gpu.mode': 'swangle' } } }).ok, true);
     for (const k of ['disk.dataPartition.size', 'image.sysdir.1', 'hw.ramSize', 'hw.cpu.arch']) {
       const r = drivers.validateDriver({ ...base(), effect: { configIni: { [k]: '1' } } });
@@ -116,7 +116,7 @@ const base = () => ({
     }
   });
 
-  test('config.ini / env （ ）', () => {
+  test('config.ini / env ( )', () => {
     const a = drivers.validateDriver({ ...base(), effect: { configIni: { 'hw.gpu.mode': 'swangle\nhw.ramSize=99999' } } });
     assert.equal(a.ok, false);
     const b = drivers.validateDriver({ ...base(), effect: { env: { ANDROID_X: 'a\nb' } } });
@@ -138,14 +138,14 @@ const base = () => ({
     assert(!/require\s*\(\s*(raw|d\.|driver)/.test(src), 'require');
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('gpuVendor /', () => {
     assert.equal(drivers.matchHost({ gpuVendor: ['amd'] }, HOST).ok, true);
     assert.equal(drivers.matchHost({ gpuVendor: ['nvidia'] }, HOST).ok, false);
   });
 
-  test('gpuName （ ）', () => {
+  test('gpuName ( )', () => {
     assert.equal(drivers.matchHost({ gpuName: 'radeon\\s+780m' }, HOST).ok, true);
     assert.equal(drivers.matchHost({ gpuName: 'geforce' }, HOST).ok, false);
   });
@@ -158,26 +158,26 @@ const base = () => ({
     assert.equal(drivers.matchHost({ osBuild: { min: 30000 } }, HOST).ok, false);
   });
 
-  test('emulator ， （36.4.9 < 36.4.10）', () => {
+  test('emulator ,  (36.4.9 < 36.4.10)', () => {
     const host = { ...HOST, emulatorVersion: '36.4.9' };
     assert.equal(drivers.matchHost({ emulatorVersion: { max: '36.4.10' } }, host).ok, true);
     assert.equal(drivers.matchHost({ emulatorVersion: { min: '36.4.10' } }, host).ok, false);
   });
 
-  test('accel ： tcg', () => {
+  test('accel :  tcg', () => {
     const noHv = { ...HOST, accel: 'none' };
     assert.equal(drivers.matchHost({ accel: ['none'] }, noHv).ok, true);
     assert.equal(drivers.matchHost({ accel: ['none'] }, HOST).ok, false);
   });
 
-  test('match / 「 」', () => {
+  test('match / " "', () => {
     assert.equal(drivers.matchHost({}, HOST).ok, false);
     assert.equal(drivers.matchHost(null, HOST).ok, false);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
-  test('（enabled:false），', () => {
+  test('(enabled:false), ', () => {
     const d = { ...drivers.validateDriver(readJSON(path.join(ROOT, 'src', 'drivers', 'example-amd-igpu-swangle.json'))).driver };
     const off = drivers.resolve({ drivers: [d], host: HOST });
     assert.equal(off.applied.length, 0, 'assertion failed');
@@ -192,7 +192,7 @@ const base = () => ({
     assert.equal(r.applied.length, 0);
   });
 
-  test('priority （ gpuMode / ）', () => {
+  test('priority ( gpuMode / )', () => {
     const a = drivers.validateDriver({ ...base(), id: 'aaa', priority: 0, effect: { gpuMode: 'software', emulatorArgs: ['-gpu=software'] } }).driver;
     const b = drivers.validateDriver({ ...base(), id: 'bbb', priority: 10, effect: { gpuMode: 'swangle', emulatorArgs: ['-gpu=swangle'] } }).driver;
     const r = drivers.resolve({ drivers: [b, a], host: HOST });
@@ -210,15 +210,15 @@ const base = () => ({
     assert.deepEqual(r.effect.env, { ANDROID_AA: '1', ANDROID_BB: '2' });
   });
 
-  test('notes ，', () => {
+  test('notes , ', () => {
     const d = drivers.validateDriver({ ...base(), name: 'Test Driver', effect: { notes: ['check note'] } }).driver;
     const r = drivers.resolve({ drivers: [d], host: HOST });
     assert.deepEqual(r.effect.notes, ['Test Driver: check note']);
   });
 
-  console.log('\n[ ·  /  / ]');
+  console.log('\n[  -   /  / ]');
 
-  test('，', () => {
+  test(', ', () => {
     const dir = tmpDir('load');
     fs.writeFileSync(path.join(dir, 'good.json'), JSON.stringify(base()));
     fs.writeFileSync(path.join(dir, 'bad.json'), '{ not json');
@@ -237,7 +237,7 @@ const base = () => ({
     fs.rmSync(dir, { recursive: true, force: true });
   });
 
-  test('： id <id>.json（ ）', () => {
+  test(':  id <id>.json( )', () => {
     const src = tmpDir('src');
     const dst = tmpDir('dst');
     const f = path.join(src, '.json');
@@ -249,7 +249,7 @@ const base = () => ({
     fs.rmSync(dst, { recursive: true, force: true });
   });
 
-  test('：', () => {
+  test(': ', () => {
     const src = tmpDir('src2');
     const dst = tmpDir('dst2');
     const f = path.join(src, 'bad.json');
@@ -264,11 +264,11 @@ const base = () => ({
   test('unit test verification', () => {
     const tpl = drivers.templateFromHost(HOST);
     const r = drivers.validateDriver(tpl);
-    assert.equal(r.ok, true, r.errors.join('；'));
+    assert.equal(r.ok, true, r.errors.join('; '));
     assert.deepEqual(r.driver.match.gpuVendor, ['amd']);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('buildArgs / env / config.ini', () => {
     const { EmulatorEngine } = require('../src/core/emulator');
@@ -285,7 +285,7 @@ const base = () => ({
     const at = (flag) => args[args.indexOf(flag) + 1];
     assert.equal(at('-gpu'), 'swangle', '-gpu');
     assert.equal(at('-accel'), 'off', 'forceTcg -accel off');
-    assert.equal(args.filter((a) => a === '-gpu').length, 1, '-gpu （ ）');
+    assert.equal(args.filter((a) => a === '-gpu').length, 1, '-gpu ( )');
     assert.equal(at('-feature'), 'Vulkan');
     const env = emu.env(ROOT, { accel: 'off' });
     assert.equal(env.ANDROID_EMU_TEST, '1');
@@ -296,6 +296,6 @@ const base = () => ({
     emu._driverEffect = null;
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })();

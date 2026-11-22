@@ -1,10 +1,10 @@
 'use strict';
 /**
- * Microsoft Store （1920×1080， 1366×768 ）
+ * Microsoft Store (1920×1080,  1366×768 )
  *   node_modules/electron/dist/electron.exe build/store-shots.js
  *
- * （docs/images），，
- * —— Store UI。
+ * (docs/images), , 
+ * -- Store UI. 
  */
 const { app, BrowserWindow, nativeImage } = require('electron');
 const fs = require('fs');
@@ -49,6 +49,6 @@ app.whenReady().then(async () => {
     console.log(`  ${path.relative(ROOT, file).replace(/\\/g, '/')}  ${s.width}x${s.height}  ${(buf.length / 1024).toFixed(0)}KB`);
     if (s.width !== W || s.height !== H) console.log(`  []  ${W}x${H}`);
   }
-  console.log('。');
+  console.log('. ');
   app.exit(0);
-}).catch((e) => { console.error('：', e); app.exit(1); });
+}).catch((e) => { console.error(': ', e); app.exit(1); });

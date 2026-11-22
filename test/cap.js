@@ -1,5 +1,5 @@
 'use strict';
-// （ PowerShell）：electron test/cap.js out.png
+// ( PowerShell): electron test/cap.js out.png
 const { app, desktopCapturer, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');

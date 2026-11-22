@@ -1,7 +1,7 @@
 'use strict';
 /**
  * install / launch / uninstall 
- * 「 APK → installruntime → → desktopshortcut」。
+ * " APK → installruntime → → desktopshortcut". 
  */
 const fs = require('fs');
 const os = require('os');
@@ -14,17 +14,17 @@ const { iconToIco, writeShortcut, removeShortcut, safeFileName, shortcutExt } = 
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** APK ARM （ App ） */
+/** APK ARM ( App ) */
 function isArmOnly(meta) {
   return !!(meta && meta.abis && meta.abis.length && !meta.abis.some((a) => /x86/i.test(a)));
 }
 
 /**
- * 「」Android ARM 。
- * ：system imagedisk（playImageInfo().ok）emulator。
- * version / snapshotemulator，Play system image，abilist arm —— 
- * ARM-only app INSTALL_FAILED_NO_MATCHING_ABIS。 null probe，installfailure
- * retryfallback，「probe」install。
+ * ""Android ARM . 
+ * : system imagedisk(playImageInfo().ok)emulator. 
+ * version / snapshotemulator, Play system image, abilist arm -- 
+ * ARM-only app INSTALL_FAILED_NO_MATCHING_ABIS.  null probe, installfailure
+ * retryfallback, "probe"install. 
  */
 async function runningHasArm(client) {
   try {
@@ -37,9 +37,9 @@ async function runningHasArm(client) {
 }
 
 /**
- * install（.apks / .xapk）：split APK ASCII temporarydirectory。
- * ZIP + ： 2GB+，memoryfailure。
- * { meta, files, cleanup }；meta AndroidManifest base APK。
+ * install(.apks / .xapk): split APK ASCII temporarydirectory. 
+ * ZIP + :  2GB+, memoryfailure. 
+ * { meta, files, cleanup }; meta AndroidManifest base APK. 
  */
 async function parseBundle(filePath) {
   const zip = new ZipFile(filePath);
@@ -53,7 +53,7 @@ async function parseBundle(filePath) {
     const files = [];
     for (let i = 0; i < apkNames.length; i++) {
       const target = path.join(dir, `split-${i}.apk`);
-      // split MB：extract， Buffer
+      // split MB: extract,  Buffer
       // eslint-disable-next-line no-await-in-loop
       await zip.pipeTo(apkNames[i], fs.createWriteStream(target));
       files.push(target);
@@ -101,40 +101,40 @@ class Installer {
   }
 
   /**
- * desktop + 。
- * Windows 「 \ 」 .lnk，desktop；
- * desktop OneDrive ，。
+ * desktop + . 
+ * Windows " \ " .lnk, desktop; 
+ * desktop OneDrive , . 
    *
- * Linux（FydeOS） freedesktop .desktop：
- * desktop，app ~/.local/share/applications 。
+ * Linux(FydeOS) freedesktop .desktop: 
+ * desktop, app ~/.local/share/applications . 
    */
   shortcutPaths(app) {
     const out = [this.shortcutPath(app)];
     if (this.ctx.startMenuDir && store.getSettings().createStartMenuShortcut !== false) {
-      // directory： Windows ，appshortcut
-      // （「」desktop）
+      // directory:  Windows , appshortcut
+      // (""desktop)
       out.push(path.join(this.ctx.startMenuDir, 'ApkStart', `${safeFileName(app.label)}${shortcutExt()}`));
     }
     return [...new Set(out)];
   }
 
- /** system image「 ARM app」download， */
+ /** system image" ARM app"download,  */
   async ensureCompatImage(onProgress) {
     const prov = this.runtime.provisioner;
     if (prov.playImageInfo().ok) return true;
-    onProgress({ stage: 'runtime', message: 'First-time ARM app install: downloading compatible image (~1.5 GB, one-time)…' });
+    onProgress({ stage: 'runtime', message: 'First-time ARM app install: downloading compatible image (~1.5 GB, one-time)...' });
     await prov.installPlayImage((p) => onProgress({ stage: 'runtime', message: p.message, percent: p.percent }));
     if (!prov.playImageInfo().ok) throw new Error('Failed to download compatible image. Check connection and retry.');
     return true;
   }
 
- /** system imagerestartruntime；restartapp APK */
+ /** system imagerestartruntime; restartapp APK */
   async switchToCompat(onProgress) {
     const apps = store.getApps();
     store.saveSettings({ runtime: { compatImage: true } });
-    onProgress({ stage: 'runtime', message: 'Switching to compatible image and restarting runtime…' });
+    onProgress({ stage: 'runtime', message: 'Switching to compatible image and restarting runtime...' });
     try { await this.runtime.stop(); } catch (_) { /* ignore */ }
-    // adb ， ensure()
+    // adb ,  ensure()
     for (let i = 0; i < 12; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       const ds = await this.runtime.client().devices().catch(() => []);
@@ -142,9 +142,9 @@ class Installer {
       // eslint-disable-next-line no-await-in-loop
       await sleep(1000);
     }
-    // ：snapshot。snapshot「」memorydisk，
-    // ，ensure() snapshot —— system image，
-    // NO_MATCHING_ABIS，「」。
+    // : snapshot. snapshot""memorydisk, 
+    // , ensure() snapshot -- system image, 
+    // NO_MATCHING_ABIS, "". 
     try { this.runtime.emulator?.invalidateSnapshot(); } catch (_) { /* ignore */ }
     const rt = await this.runtime.ensure({ onLog: (m) => onProgress({ stage: 'runtime', message: m }) });
     if (!rt.ok) {
@@ -165,14 +165,14 @@ class Installer {
           // eslint-disable-next-line no-await-in-loop
           await rt.client.install(app.apkPath);
         }
-        onProgress({ stage: 'runtime', message: `Restoring installed app ${app.label}…` });
+        onProgress({ stage: 'runtime', message: `Restoring installed app ${app.label}...` });
       } catch (_) { /* appfailure */ }
     }
     return rt;
   }
 
   async install(filePath, onProgress = () => {}) {
-    onProgress({ stage: 'parse', message: 'Parsing APK…' });
+    onProgress({ stage: 'parse', message: 'Parsing APK...' });
     let meta;
     let bundle = null;
     if (/\.(apks|xapk)$/i.test(filePath)) {
@@ -187,8 +187,8 @@ class Installer {
       meta: { label: meta.label, package: meta.package, versionName: meta.versionName },
     });
 
-    // 50GB ：emulatorspace，
-    // INSTALL_INSUFFICIENT_STORAGE（「failure」）。
+    // 50GB : emulatorspace, 
+    // INSTALL_INSUFFICIENT_STORAGE("failure"). 
     try {
       const backend = this.runtime && this.runtime.backend;
       if (backend && typeof backend.checkDiskFor === 'function') {
@@ -214,7 +214,7 @@ class Installer {
     }
 
     try {
-      onProgress({ stage: 'runtime', message: 'Preparing Android runtime…' });
+      onProgress({ stage: 'runtime', message: 'Preparing Android runtime...' });
       let rt = await this.runtime.ensure({ onLog: (m) => onProgress({ stage: 'runtime', message: m }) });
       if (!rt.ok) {
         const err = new Error(rt.error || 'Runtime unavailable');
@@ -222,11 +222,11 @@ class Installer {
         throw err;
       }
 
-      // configuration ARM ：「runtime」，system imagedisk。
-      // version/snapshot、emulator，playImageInfo().ok true，
-      // ， NO_MATCHING_ABIS。，。
+      // configuration ARM : "runtime", system imagedisk. 
+      // version/snapshot, emulator, playImageInfo().ok true, 
+      // ,  NO_MATCHING_ABIS. , . 
       if (isArmOnly(meta) && await runningHasArm(rt.client) === false) {
-        onProgress({ stage: 'runtime', message: 'App contains ARM libraries only; switching to compatible image…' });
+        onProgress({ stage: 'runtime', message: 'App contains ARM libraries only; switching to compatible image...' });
         await this.ensureCompatImage(onProgress);
         rt = await this.switchToCompat(onProgress);
       }
@@ -236,32 +236,32 @@ class Installer {
     }
   }
 
- /** install + + shortcut；failurerepairretry */
+ /** install + + shortcut; failurerepairretry */
   async finishInstall(rt, meta, filePath, bundle, onProgress) {
     const client = rt.client;
     const existing = store.getApp(meta.package);
-    // quickboot snapshotdisk，「apprestart」
+    // quickboot snapshotdisk, "apprestart"
     try { this.runtime.emulator?.invalidateSnapshot(); } catch (_) { /* ignore */ }
-    onProgress({ stage: 'install', message: existing ? 'Updating app…' : 'Installing app…' });
+    onProgress({ stage: 'install', message: existing ? 'Updating app...' : 'Installing app...' });
     try {
       if (bundle) await client.installMultiple(bundle.files);
       else await client.install(filePath);
     } catch (e) {
-      // ABI ，「runtime ARM 」 ——
-      // playImageInfo()。 `!playImageInfo().ok` ，system imagedisk
-      // emulator，retry、，
-      // 「system imageretry」，「installfailure + retry」。
-      // ：errorretry。
+      // ABI , "runtime ARM " --
+      // playImageInfo().  `!playImageInfo().ok` , system imagedisk
+      // emulator, retry, , 
+      // "system imageretry", "installfailure + retry". 
+      // : errorretry. 
       if (e.code === 'NO_MATCHING_ABIS') {
-        onProgress({ stage: 'runtime', message: 'App contains ARM libraries only; reinstalling on compatible image…' });
+        onProgress({ stage: 'runtime', message: 'App contains ARM libraries only; reinstalling on compatible image...' });
         await this.ensureCompatImage(onProgress);
         const rt2 = await this.switchToCompat(onProgress);
-        onProgress({ stage: 'install', message: 'Switched to compatible image, reinstalling…' });
+        onProgress({ stage: 'install', message: 'Switched to compatible image, reinstalling...' });
         try {
           if (bundle) await rt2.client.installMultiple(bundle.files);
           else await rt2.client.install(filePath);
         } catch (e2) {
-          // system imagefailure：，「retry」。
+          // system imagefailure: , "retry". 
           const raw2 = (e2 && e2.message) || String(e2 || '');
           const err = new Error(
             `Switched to Android 14 compatible image, but installation of ${meta.label} failed (${raw2}).`
@@ -277,10 +277,10 @@ class Installer {
     }
     this.runtime.touch();
 
-    // 。APK WebP，nativeImage ， +
-    // fallback， .lnk （ icoPath null）。
-    // iconFallback 「、」——warning，
-    // desktop， ApkStart 。
+    // . APK WebP, nativeImage ,  +
+    // fallback,  .lnk ( icoPath null). 
+    // iconFallback ", "--warning, 
+    // desktop,  ApkStart . 
     let iconPath = null;
     let icoPath = null;
     let iconFallback = '';
@@ -301,15 +301,15 @@ class Installer {
       } catch (_) { /* failureinstall */ }
     }
 
-    // APK，/
+    // APK, /
     let apkCopy = null;
     try {
       apkCopy = store.apkPath(meta.package, meta.versionCode.toString(36));
       fs.copyFileSync(filePath, apkCopy);
     } catch (_) { /* ignore */ }
 
-    // launch：APK 「 Activity」
-    // LAUNCHER ，launchappcrash。
+    // launch: APK " Activity"
+    // LAUNCHER , launchappcrash. 
     let launchActivity = meta.launchActivity;
     try {
       client.clearLauncherCache?.(meta.package);
@@ -337,12 +337,12 @@ class Installer {
       lastLaunchAt: existing ? existing.lastLaunchAt || 0 : 0,
       shortcutPath: existing ? existing.shortcutPath || null : null,
       bounds: existing ? existing.bounds || null : null,
-      // appportrait（ APK ）：
-      // emulatororientation，orientationwindow。
-      // orientationOverride ，「default」。
+      // appportrait( APK ): 
+      // emulatororientation, orientationwindow. 
+      // orientationOverride , "default". 
       orientation: meta.orientation || (existing ? existing.orientation || null : null),
       pinned: existing ? !!existing.pinned : false,
-      // = ，「」cache，launch
+      // = , ""cache, launch
       permGranted: false,
     };
 
@@ -350,7 +350,7 @@ class Installer {
 
     const settings = store.getSettings();
     if (settings.createShortcutOnInstall) {
-      onProgress({ stage: 'shortcut', message: 'Creating desktop shortcut…' });
+      onProgress({ stage: 'shortcut', message: 'Creating desktop shortcut...' });
       try {
         app.shortcutPath = this.createShortcut(app);
         store.upsertApp({ package: app.package, shortcutPath: app.shortcutPath });
@@ -359,7 +359,7 @@ class Installer {
       }
     }
 
-    // hint： ARM ，x86 runtime
+    // hint:  ARM , x86 runtime
     const warnings = [];
     if (meta.minSdk && meta.minSdk > 34) {
       warnings.push(`This app requires Android ${meta.minSdk}+, which is higher than the current runtime version.`);
@@ -370,8 +370,8 @@ class Installer {
       warnings.push('Failed to decode WebP icon; using fallback icon for shortcut.');
     }
     client.batteryOptimizeOff(meta.package).catch(() => {});
-    // appsnapshot，：「app」，
-    // bootcold boot（20 ）。
+    // appsnapshot, : "app", 
+    // bootcold boot(20 ). 
     try { this.runtime.scheduleSnapshotSave?.(12000); } catch (_) { /* ignore */ }
 
     onProgress({ stage: 'done', message: `${app.label} installed successfully`, app });
@@ -382,8 +382,8 @@ class Installer {
     const { target, baseArgs } = this.shortcutTarget();
     const args = `${baseArgs ? baseArgs + ' ' : ''}--launch "${app.package}"`.trim();
     const ico = app.icoPath && fs.existsSync(app.icoPath) ? app.icoPath : undefined;
-    // Linux .desktop PNG/SVG path，ICO —— path，
-    // writeShortcut 。（Windows ico，FydeOS png）
+    // Linux .desktop PNG/SVG path, ICO -- path, 
+    // writeShortcut . (Windows ico, FydeOS png)
     const png = app.iconPath && fs.existsSync(app.iconPath) ? app.iconPath : undefined;
     const paths = this.shortcutPaths(app);
 
@@ -393,7 +393,7 @@ class Installer {
       args,
       iconIcoPath: ico,
       iconPngPath: png,
-      description: `${app.label} — Run by ApkBolt`,
+      description: `${app.label} - Run by ApkBolt`,
       cwd: this.ctx.cwd,
       // app AUMID: Windows taskbar grouping and desktop notifications
       appUserModelId: `AbhijeetKangane.ApkBolt.${app.package}`.slice(0, 128),
@@ -412,8 +412,8 @@ class Installer {
       }
     });
 
-    // pathfailure（customshortcutdirectory / ）：
-    // desktop——desktop，app。
+    // pathfailure(customshortcutdirectory / ): 
+    // desktop--desktop, app. 
     if (!first) {
       const fallback = path.join(this.ctx.desktopDir, `${safeFileName(app.label)}${shortcutExt()}`);
       try {
@@ -424,18 +424,18 @@ class Installer {
       }
     }
     if (!first) throw new Error(errors.join('; ') || 'Failed to create shortcut');
-    // path，uninstall
+    // path, uninstall
     if (startMenuPath || first) {
       store.upsertApp({ package: app.package, startMenuPath });
     }
     return first;
   }
 
- /** shortcut：versiondesktop， WebP success */
+ /** shortcut: versiondesktop,  WebP success */
   async ensureShortcuts() {
     const made = [];
-    // 「install」、app，
-    // launch。
+    // "install", app, 
+    // launch. 
     const auto = store.getSettings().createShortcutOnInstall !== false;
     for (const app of store.getApps()) {
       if (!auto && !app.shortcutPath && !app.startMenuPath) continue;
@@ -455,7 +455,7 @@ class Installer {
       const missing = this.shortcutPaths(app).filter((p) => !fs.existsSync(p));
       if (!missing.length && !dirty) continue;
       try {
-        // ， .lnk ，shortcutapp
+        // ,  .lnk , shortcutapp
         const madePath = this.createShortcut(app);
         store.upsertApp({ package: app.package, shortcutPath: madePath });
         made.push(app.label);
@@ -483,10 +483,10 @@ class Installer {
 
   async launch(pkg, { onLog = () => {}, beforeStart = null, onMark = () => {}, onAppUp = null } = {}) {
     const app = store.getApp(pkg);
-    // let：beforeStart 「orientationapporientation」restartruntime
-    // rt（ client stop ）。 const，
-    // restart "Assignment to constant variable."，launch ——
-    // 「landscape/portraitappfailure」。
+    // let: beforeStart "orientationapporientation"restartruntime
+    // rt( client stop ).  const, 
+    // restart "Assignment to constant variable.", launch --
+    // "landscape/portraitappfailure". 
     let rt = await this.runtime.ensure({ onLog });
     onMark('ensure done');
     if (!rt.ok) {
@@ -494,58 +494,58 @@ class Installer {
       err.needsSetup = rt.needsSetup;
       throw err;
     }
-    // app， wm size configurationlaunch Activity
+    // app,  wm size configurationlaunch Activity
     if (beforeStart) {
       const replaced = await beforeStart(rt).catch((e) => { onLog(`Display adaptation skipped: ${e.message}`); return null; });
-      // beforeStart rt（restartruntime client ），
-      // 。。
+      // beforeStart rt(restartruntime client ), 
+      // . . 
       if (replaced && replaced.client) rt = replaced;
     }
-    // version /data wm size / density rotatesettings。
-    // ，cleanlaunch 90° 、、
-    // mouse（「rotate / / 」）。
+    // version /data wm size / density rotatesettings. 
+    // , cleanlaunch 90° , , 
+    // mouse("rotate / / "). 
     await rt.client.resetDisplayOverrides(!!(store.getSettings().display || {}).landscape).catch(() => {});
-    // cold bootnetworkcheckup：。「appblack screen」，
-    // （）。
-    // repair：Wi-Fi sys.boot_completed ，，
-    // —— 「black screen」。
-    // appnetwork（ 90 ），black screen。
-    // network：**，restart**。
-    // ensureNetwork()，network「 → cold boot」，
-    // adb install，「」。
-    // launchpath，launch，。
+    // cold bootnetworkcheckup: . "appblack screen", 
+    // (). 
+    // repair: Wi-Fi sys.boot_completed , , 
+    // -- "black screen". 
+    // appnetwork( 90 ), black screen. 
+    // network: **, restart**. 
+    // ensureNetwork(), network" → cold boot", 
+    // adb install, "". 
+    // launchpath, launch, . 
     if (rt.engine === 'emulator' || rt.engine === 'builtin') {
       let net = await this.runtime.waitForNetwork({ onLog, timeoutMs: 20000 }).catch(() => null);
       if (net && net.ok) {
         onLog(`VM network ready (${net.ip || ''})`);
       } else {
-        // network，****：「」
-        // AndroidWifi 。restart、，settings
-        // ，launchpath。
-        // 「」（ emulator.repairWifi）。
-        onLog('VM unable to connect to Wi-Fi, retrying connection…');
+        // network, ****: ""
+        // AndroidWifi . restart, , settings
+        // , launchpath. 
+        // ""( emulator.repairWifi). 
+        onLog('VM unable to connect to Wi-Fi, retrying connection...');
         try {
-          // note：repairWifi engine（this.runtime）， rt 。
-          // rt ensure() { ok, client, engine, ... }， client；
-          // rt.repairWifi undefined， TypeError catch ，
-          // 「log， 1 」。
+          // note: repairWifi engine(this.runtime),  rt . 
+          // rt ensure() { ok, client, engine, ... },  client; 
+          // rt.repairWifi undefined,  TypeError catch , 
+          // "log,  1 ". 
           const fixed = await this.runtime.repairWifi().catch(() => false);
           if (fixed) {
             net = await this.runtime.waitForNetwork({ onLog, timeoutMs: 15000 }).catch(() => null);
             if (net && net.ok) {
               onLog(`VM network restored (${net.ip || ''})`);
-              // ：「network」snapshot。
-              // boot「」snapshot，。
-              // forceSnapshotSave launchapp，「」。
+              // : "network"snapshot. 
+              // boot""snapshot, . 
+              // forceSnapshotSave launchapp, "". 
               try { this.runtime.forceSnapshotSave?.(3000); } catch (_) { /* launch */ }
             }
           }
         } catch (e) {
-          // ：log「」。
+          // : log"". 
           onLog(`Auto-reconnect Wi-Fi failed: ${e.message}`);
         }
         if (!net || !net.ok) {
-          onLog('VM network not fully ready, launching app anyway…');
+          onLog('VM network not fully ready, launching app anyway...');
         }
       }
     }
@@ -554,43 +554,43 @@ class Installer {
       freeform: settings.freeform,
       bounds: app ? app.bounds : null,
     });
-    // appruntime（system image / / ），
-    // "Invalid packageName"。cachelaunch，「app」，
-    // ——「installapp」。
-    // ： isInstalled()（pm path + APK ）
-    // `pm list packages`。snapshotdata partition PackageManager installed=true，
-    // /data/app —— am start failure。verify。
+    // appruntime(system image / / ), 
+    // "Invalid packageName". cachelaunch, "app", 
+    // --"installapp". 
+    // :  isInstalled()(pm path + APK )
+    // `pm list packages`. snapshotdata partition PackageManager installed=true, 
+    // /data/app -- am start failure. verify. 
     if (app && app.apkPath && fs.existsSync(app.apkPath)) {
       let installed = false;
-      try { installed = await rt.client.isInstalled(pkg); } catch (_) { /* install， */ }
+      try { installed = await rt.client.isInstalled(pkg); } catch (_) { /* install,  */ }
       if (!installed) {
-        onLog('App files missing, reinstalling from local backup…');
-        // snapshot：snapshot packages.xml 「」，
+        onLog('App files missing, reinstalling from local backup...');
+        // snapshot: snapshot packages.xml "", 
         try { this.runtime.emulator?.invalidateSnapshot(); } catch (_) { /* ignore */ }
         await rt.client.install(app.apkPath).catch((e) => onLog(`Auto-reinstall failed: ${e.message}`));
       }
     }
-    // 25 「 5 」launchsuccess。
-    // ："Not yet ready""Process exited unexpectedly"。 pidof failure，
-    // app（） force-stop restart，
-    // ，"Takes up to 1 minute to launch"。
+    // 25 " 5 "launchsuccess. 
+    // : "Not yet ready""Process exited unexpectedly".  pidof failure, 
+    // app() force-stop restart, 
+    // , "Takes up to 1 minute to launch". 
     const staysAlive = async () => {
       const t0 = Date.now();
       let aliveSince = 0;
       let seen = false;
       while (Date.now() - t0 < 25000) {
-        // ：residentlaunch 1 ，
-        // sleep 1 path。
+        // : residentlaunch 1 , 
+        // sleep 1 path. 
         // eslint-disable-next-line no-await-in-loop
         const pid = await rt.client.shell(`pidof ${pkg}`, { timeout: 6000 }).catch(() => '');
         if (!String(pid).trim()) {
           if (seen) return false; // =
         } else {
           if (!seen && typeof onAppUp === 'function') {
-            // （ 4 ）。
-            // 4 「」，「」；
-            // app， 4 。
-            // fire-and-forget：failure。
+            // ( 4 ). 
+            // 4 "", ""; 
+            // app,  4 . 
+            // fire-and-forget: failure. 
             try { onAppUp(); } catch (_) { /* ignore */ }
           }
           seen = true;
@@ -603,8 +603,8 @@ class Installer {
       return seen; // failure
     };
     try {
-      // runtime：install -g ，
-      // app，「/」。
+      // runtime: install -g , 
+      // app, "/". 
       await rt.client.grantRuntimePermissions(pkg).catch(() => {});
       onMark('permissions granted');
       let ok = false;
@@ -612,7 +612,7 @@ class Installer {
         if (attempt > 1) {
           // eslint-disable-next-line no-await-in-loop
           await rt.client.forceStop(pkg).catch(() => {});
-          // ，app「」；
+          // , app""; 
           // eslint-disable-next-line no-await-in-loop
           await rt.client.grantRuntimePermissions(pkg).catch(() => {});
           // eslint-disable-next-line no-await-in-loop
@@ -625,14 +625,14 @@ class Installer {
           // eslint-disable-next-line no-await-in-loop
           await start();
         } catch (e) {
-          // log（system image）；launch，retry
+          // log(system image); launch, retry
           if (e.code === 'APP_CRASHED' && e.crash) throw e;
           started = false;
         }
         onMark(`am start #${attempt} ${started ? 'ok' : 'fail'}`);
-        // Activity orientation。applaunch
-        // configuration（Activity ），launch user-rotation 0 ——
-        // 0，landscape 90°（「」）。
+        // Activity orientation. applaunch
+        // configuration(Activity ), launch user-rotation 0 --
+        // 0, landscape 90°(""). 
         if (started) {
           // eslint-disable-next-line no-await-in-loop
           await rt.client.setOrientation(!!(store.getSettings().display || {}).landscape).catch(() => {});
@@ -640,15 +640,15 @@ class Installer {
         // eslint-disable-next-line no-await-in-loop
         ok = started ? await staysAlive() : false;
         onMark(`alive #${attempt} ${ok}`);
-        if (!ok && attempt < 3) onLog(`App exited after launch (attempt ${attempt}), retrying…`);
+        if (!ok && attempt < 3) onLog(`App exited after launch (attempt ${attempt}), retrying...`);
       }
       if (!ok) {
-        // fallback：exit「」，。
-        // app，success（settingscache）。
-        onLog('App repeatedly exited; resetting app data and retrying…');
+        // fallback: exit"", . 
+        // app, success(settingscache). 
+        onLog('App repeatedly exited; resetting app data and retrying...');
         await rt.client.shell(`pm clear ${pkg}`, { timeout: 20000 }).catch(() => '');
         await sleep(800);
-        // pm clear runtime，，
+        // pm clear runtime, , 
         await rt.client.grantRuntimePermissions(pkg).catch(() => {});
         await start().catch((e) => {
           if (e.code === 'APP_CRASHED' && e.crash) throw e;
@@ -663,8 +663,8 @@ class Installer {
       }
     } catch (e) {
       if (e.code === 'APP_CRASHED' && !this.runtime.provisioner.playImageInfo().ok) {
-        // ARM ：system image、 APK、launch
-        onLog('ARM translation crash detected; automatically switching to compatible image…');
+        // ARM : system image,  APK, launch
+        onLog('ARM translation crash detected; automatically switching to compatible image...');
         await this.ensureCompatImage(onLog ? (m) => onLog(m.message || '') : () => {});
         const rt2 = await this.switchToCompat((m) => onLog(m.message || ''));
         if (app && app.apkPath && fs.existsSync(app.apkPath)) {

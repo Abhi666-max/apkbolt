@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<!-- ApkBolt brand mark — inline SVG for crisp rendering at any size -->
+<!-- ApkBolt brand mark - inline SVG for crisp rendering at any size -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
@@ -36,7 +36,7 @@
   </div>
   <div class="titlebar-spacer"></div>
   <div class="titlebar-actions">
-    <!-- Engine restart button — visible when engine is idle/stalled -->
+    <!-- Engine restart button - visible when engine is idle/stalled -->
     <button class="btn ghost sm" id="btnRestartEngine" title="Restart the Android engine" style="display:none">
       ↺ Restart Engine
     </button>
@@ -53,7 +53,7 @@
   <section class="toolbar">
     <div class="search">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="search" type="text" placeholder="Search installed apps…" autocomplete="off" />
+      <input id="search" type="text" placeholder="Search installed apps..." autocomplete="off" />
     </div>
     <div class="toolbar-right">
       <button class="btn primary" id="btnInstall">
@@ -84,7 +84,7 @@
   <footer class="statusbar">
     <div class="status-left">
       <span class="dot" id="statusDot"></span>
-      <span id="statusText">Checking runtime…</span>
+      <span id="statusText">Checking runtime...</span>
       <button class="status-chip" id="envChip" hidden></button>
     </div>
     <div class="status-right">
@@ -145,7 +145,7 @@
       <h2>Settings</h2>
       <div class="set-search-wrap">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="setSearch" class="set-search" type="search" autocomplete="off" placeholder="Search settings: orientation / memory / proxy / snapshot…" />
+        <input id="setSearch" class="set-search" type="search" autocomplete="off" placeholder="Search settings: orientation / memory / proxy / snapshot..." />
         <button class="set-search-clear" id="btnClearSearch" type="button" hidden aria-label="Clear search">×</button>
       </div>
       <button class="icon-btn" id="btnCloseSettings">
@@ -208,12 +208,12 @@
         <div class="field">
           <label>Status</label>
           <div class="row" style="align-items:center;">
-            <span class="inline-note" id="setupStateText">Checking…</span>
+            <span class="inline-note" id="setupStateText">Checking...</span>
             <span style="flex:1"></span>
             <button class="btn primary sm" id="btnDeployAll">One-Click Setup</button>
             <button class="btn ghost sm" id="btnSetupAdvanced">Advanced: Connect Existing Runtime</button>
           </div>
-          <span class="sub" id="setupNote">Fully automatic — no image selection, no manual acceleration, no memory tuning needed</span>
+          <span class="sub" id="setupNote">Fully automatic - no image selection, no manual acceleration, no memory tuning needed</span>
         </div>
         <div class="field">
           <div class="steps" id="setupSteps"></div>
@@ -229,7 +229,7 @@
             <li><b>cfdisk partition</b>: <code>New</code> → <code>Primary</code> → accept default size → <code>Bootable</code> → <code>Write</code> → type <code>yes</code> → <code>Quit</code></li>
             <li><b>Format</b>: Select <code>vda1</code> → choose <code>ext4</code> → <code>Yes</code></li>
             <li><b>Bootloader &amp; system</b>: <code>Install GRUB</code> → <code>Yes</code>; <code>Install /system as read-write</code> → <code>Yes</code></li>
-            <li><b>Done</b>: Wait for 100% then click "Mark as Installed" below — ApkBolt will restart and take over</li>
+            <li><b>Done</b>: Wait for 100% then click "Mark as Installed" below - ApkBolt will restart and take over</li>
           </ol>
           <p class="guide-tip">If adb shows as disconnected afterward: in the VM window press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F1</kbd>, run
             <code>setprop service.adb.tcp.port 5555</code>, <code>stop adbd</code>, <code>start adbd</code>,
@@ -242,26 +242,26 @@
       </div>
 
       <div class="group" data-cat="basic">
-        <div class="group-title">Automatic Mode (default — no manual tuning needed)</div>
+        <div class="group-title">Automatic Mode (default - no manual tuning needed)</div>
         <div class="field">
           <label>Auto-detected profile</label>
-          <div class="inline-note" id="autoProfileText">Detecting…</div>
+          <div class="inline-note" id="autoProfileText">Detecting...</div>
           <span class="sub">Memory, CPU cores, rendering backend, ports, and acceleration are all chosen automatically.
-            If startup fails, ApkBolt falls back gracefully — no manual intervention needed.
+            If startup fails, ApkBolt falls back gracefully - no manual intervention needed.
             ApkBolt uses a <b>dedicated adb port 5044</b> (your system adb uses 5037), so the Android device
-            won't appear in a regular <code>adb devices</code> call — this is intentional isolation.
+            won't appear in a regular <code>adb devices</code> call - this is intentional isolation.
             To connect manually, set <code>$env:ANDROID_ADB_SERVER_PORT=5044</code> before running adb.
-            Note: do not manually run <code>adb connect</code> against port 5555 — it will pop up an
+            Note: do not manually run <code>adb connect</code> against port 5555 - it will pop up an
             "Allow USB debugging?" system dialog over a running app.</span>
         </div>
         <div class="field">
           <label>Disk usage (runtime + Android data + cache)</label>
           <div class="row">
-            <span class="inline-note" id="usageText">Calculating…</span>
+            <span class="inline-note" id="usageText">Calculating...</span>
             <button class="btn ghost sm" id="btnCleanup">Clean recoverable files</button>
             <button class="btn ghost sm" id="btnLeftovers" title="Scan and remove old-version directories, stale uninstall entries, and update temp files">Clean legacy leftovers</button>
             <button class="btn ghost sm" id="btnRepairNetwork" title="If Android apps show a blank/spinning network page, this resets the Android data to fix networking. Your app list is preserved; apps reinstall automatically on next launch.">Repair Network</button>
-            <button class="btn ghost sm danger" id="btnResetData" title="Wipe Android /data user data, installed apps, and fast-boot snapshots — returns to a clean post-install state">Reset Android Data</button>
+            <button class="btn ghost sm danger" id="btnResetData" title="Wipe Android /data user data, installed apps, and fast-boot snapshots - returns to a clean post-install state">Reset Android Data</button>
           </div>
           <label class="checkbox-inline">
             <input type="checkbox" id="chkCleanSnapshots" />
@@ -277,7 +277,7 @@
         <div class="field switch-field">
           <div>
             <label>Launch at login (default: on)</label>
-            <span class="sub">Stays in the system tray on Windows login — double-clicking a desktop shortcut opens apps instantly without a manual startup.</span>
+            <span class="sub">Stays in the system tray on Windows login - double-clicking a desktop shortcut opens apps instantly without a manual startup.</span>
           </div>
           <input type="checkbox" id="setAutoStart" class="switch" />
         </div>
@@ -292,43 +292,43 @@
             <option value="window">Portrait window (freely resizable, remembers size per app)</option>
             <option value="fullscreen">Fullscreen (fills screen, maintains phone aspect ratio with black bars)</option>
           </select>
-          <span class="sub">Press <b>F11</b> or right-click the tray to toggle at any time. Fullscreen just maximizes the window — it does not change aspect ratio or restart the app.</span>
+          <span class="sub">Press <b>F11</b> or right-click the tray to toggle at any time. Fullscreen just maximizes the window - it does not change aspect ratio or restart the app.</span>
         </div>
         <div class="field">
           <label>Auto-fullscreen</label>
           <select id="setAutoFullscreen">
             <option value="off">Off (follow the display mode above)</option>
-            <option value="on">On · Launch every app in fullscreen automatically</option>
+            <option value="on">On  -  Launch every app in fullscreen automatically</option>
           </select>
-          <span class="sub">When on, every app opens fullscreen without pressing F11. Works best with landscape orientation — landscape apps naturally fill the screen without black bars.</span>
+          <span class="sub">When on, every app opens fullscreen without pressing F11. Works best with landscape orientation - landscape apps naturally fill the screen without black bars.</span>
         </div>
         <div class="field">
           <label>Screen orientation</label>
           <select id="setOrientationMode">
-            <option value="auto">Follow app (recommended · auto-selects portrait or landscape, fills the window)</option>
+            <option value="auto">Follow app (recommended  -  auto-selects portrait or landscape, fills the window)</option>
             <option value="portrait">Force portrait (phone ratio, good for short-video or reading apps)</option>
             <option value="landscape">Force landscape (widescreen fill, good for video and games)</option>
           </select>
           <span class="sub">Android's orientation is determined by the <b>physical panel direction</b> of the virtual device.
             If the panel direction doesn't match what the app requests, Android only gives it a narrow letterboxed strip.
-            "Follow app" reads the orientation from the APK manifest at install time and restarts the panel to match —
-            so portrait apps launch portrait and fill the window. A panel restart takes ~10–40 s but only happens once per orientation change.</span>
+            "Follow app" reads the orientation from the APK manifest at install time and restarts the panel to match -
+            so portrait apps launch portrait and fill the window. A panel restart takes ~10-40 s but only happens once per orientation change.</span>
         </div>
         <div class="field">
           <label>Auto-rotate</label>
           <select id="setAutoRotate">
-            <option value="on">On (default) · System auto-rotate is enabled</option>
-            <option value="off">Off · Revert to locked behavior</option>
+            <option value="on">On (default)  -  System auto-rotate is enabled</option>
+            <option value="off">Off  -  Revert to locked behavior</option>
           </select>
-          <span class="sub">Android's <b>auto-rotate is on by default</b>. This does not affect actual screen direction — panel orientation and the orientation policy above still control what the display shows. Only some apps that read this switch value are affected.</span>
+          <span class="sub">Android's <b>auto-rotate is on by default</b>. This does not affect actual screen direction - panel orientation and the orientation policy above still control what the display shows. Only some apps that read this switch value are affected.</span>
         </div>
         <div class="field">
           <label>Tablet layout</label>
           <select id="setTabletMode">
-            <option value="on">On (recommended · 190 dpi logical density, sw606dp tablet layout)</option>
+            <option value="on">On (recommended  -  190 dpi logical density, sw606dp tablet layout)</option>
             <option value="off">Off (default image density, phone layout)</option>
           </select>
-          <span class="sub">At 720px wide with 190 dpi, the logical width is 606dp — just past Android's 600dp tablet breakpoint.
+          <span class="sub">At 720px wide with 190 dpi, the logical width is 606dp - just past Android's 600dp tablet breakpoint.
             Disabling reverts to phone layout (larger text, less content). Takes effect on next app launch.</span>
         </div>
         <div class="field">
@@ -343,18 +343,18 @@
         <div class="field">
           <label>Window embedding</label>
           <select id="setWindowEmbed">
-            <option value="detached">Native window (default · recommended) · Emulator manages its own window for best frame rate and scaling</option>
-            <option value="embed">Embedded mode · Android canvas embedded inside the ApkBolt window, with rotation button in title bar</option>
+            <option value="detached">Native window (default  -  recommended)  -  Emulator manages its own window for best frame rate and scaling</option>
+            <option value="embed">Embedded mode  -  Android canvas embedded inside the ApkBolt window, with rotation button in title bar</option>
           </select>
-          <span class="sub">Native window is rendered and managed by the emulator directly — drag, resize, and rotation all track perfectly, at the cost of a second taskbar button (use the tray or Ctrl+Alt+R for landscape). Embedded mode looks more integrated and adds a rotation button, but can drop frames and show black bars during resize, rotation, or app switching. Takes effect on next app launch.</span>
+          <span class="sub">Native window is rendered and managed by the emulator directly - drag, resize, and rotation all track perfectly, at the cost of a second taskbar button (use the tray or Ctrl+Alt+R for landscape). Embedded mode looks more integrated and adds a rotation button, but can drop frames and show black bars during resize, rotation, or app switching. Takes effect on next app launch.</span>
         </div>
         <div class="field" id="portraitField">
           <label>Portrait canvas size</label>
           <select id="setPortrait">
-            <option value="720x1280">Small · 720 × 1280</option>
-            <option value="900x1600">Medium · 900 × 1600</option>
-            <option value="1080x1920">Large · 1080 × 1920</option>
-            <option value="1440x2560">Extra Large · 1440 × 2560</option>
+            <option value="720x1280">Small  -  720 × 1280</option>
+            <option value="900x1600">Medium  -  900 × 1600</option>
+            <option value="1080x1920">Large  -  1080 × 1920</option>
+            <option value="1440x2560">Extra Large  -  1440 × 2560</option>
           </select>
           <span class="sub">In window mode you can drag the border freely; this sets Android's internal render resolution. Smaller = better performance.</span>
         </div>
@@ -364,29 +364,29 @@
       <div class="group" data-cat="input">
         <div class="group-title">Mouse Mapping</div>
         <div class="field">
-          <label>Left click · Confirm / Tap</label>
+          <label>Left click  -  Confirm / Tap</label>
           <span class="sub">The emulator natively treats left-click as a finger tap; click-and-drag acts as a swipe. No extra setup needed.</span>
         </div>
         <div class="field switch-field">
           <div>
-            <label>Right click · Android Back</label>
+            <label>Right click  -  Android Back</label>
             <span class="sub">By default the emulator treats right-click as a tap (easy to mis-trigger). Enable this to map right-click to Back instead.</span>
           </div>
           <input type="checkbox" id="setMouseRightBack" class="switch" />
         </div>
         <div class="field">
-          <label>Scroll wheel · Scroll</label>
+          <label>Scroll wheel  -  Scroll</label>
           <select id="setMouseWheelMode">
-            <option value="smooth">Smooth (recommended) · Merges rapid scroll events into one fluid gesture</option>
-            <option value="native">Native · Pass each tick to the emulator individually</option>
-            <option value="off">Off · Don't intercept scroll wheel</option>
+            <option value="smooth">Smooth (recommended)  -  Merges rapid scroll events into one fluid gesture</option>
+            <option value="native">Native  -  Pass each tick to the emulator individually</option>
+            <option value="off">Off  -  Don't intercept scroll wheel</option>
           </select>
           <span class="sub">Smooth mode batches scroll events over a short window into a single swipe gesture, avoiding jitter and preventing adb from spawning on every tick.</span>
         </div>
         <div class="field switch-field">
           <div>
-            <label>Mouse side buttons · Back / Forward (default: off)</label>
-            <span class="sub">Side-button mapping requires a global mouse hook. The hook is installed only while an ApkBolt app window is in the foreground and removed immediately on blur or close — no desktop slowdown.</span>
+            <label>Mouse side buttons  -  Back / Forward (default: off)</label>
+            <span class="sub">Side-button mapping requires a global mouse hook. The hook is installed only while an ApkBolt app window is in the foreground and removed immediately on blur or close - no desktop slowdown.</span>
           </div>
           <input type="checkbox" id="setMouseSideButtons" class="switch" />
         </div>
@@ -401,7 +401,7 @@
           <div>
             <label>Enable keyboard mapping</label>
             <span class="sub">Map keyboard keys to Android touch taps and swipes. Great for playing games with WASD, skill keys, etc.
-              Each app can have its own mapping — right-click an app card and choose "Key Mapping" to pick a preset or customize.</span>
+              Each app can have its own mapping - right-click an app card and choose "Key Mapping" to pick a preset or customize.</span>
           </div>
           <input type="checkbox" id="setKeymapEnabled" class="switch" />
         </div>
@@ -416,9 +416,9 @@
         <div class="field">
           <label>Resource profile</label>
           <select id="setResourceMode">
-            <option value="save">Power Saver · 2 cores / yield to foreground / 540p (old hardware, background)</option>
-            <option value="balanced">Balanced · Half physical cores / yield to foreground / 720p (recommended)</option>
-            <option value="smooth">Performance · No core limit / same priority as foreground (video, games)</option>
+            <option value="save">Power Saver  -  2 cores / yield to foreground / 540p (old hardware, background)</option>
+            <option value="balanced">Balanced  -  Half physical cores / yield to foreground / 720p (recommended)</option>
+            <option value="smooth">Performance  -  No core limit / same priority as foreground (video, games)</option>
           </select>
           <span class="sub">Controls how much CPU the Android VM uses and how sharp the display is. Switch to Performance if video or games stutter; use Power Saver for background/idle tasks. Takes effect on next app launch.</span>
         </div>
@@ -427,9 +427,9 @@
             <label>Render quality (Android internal resolution)</label>
             <select id="setRenderSize">
               <option value="auto">Auto (based on acceleration status)</option>
-              <option value="540x960">Smooth · 540 × 960</option>
-              <option value="720x1280">Balanced · 720 × 1280</option>
-              <option value="1080x1920">High · 1080 × 1920</option>
+              <option value="540x960">Smooth  -  540 × 960</option>
+              <option value="720x1280">Balanced  -  720 × 1280</option>
+              <option value="1080x1920">High  -  1080 × 1920</option>
             </select>
           </div>
           <div>
@@ -453,11 +453,11 @@
         <div class="field">
           <div class="row">
             <button class="btn ghost sm" id="btnGrowData">Expand Partition Now</button>
-            <span class="sub" style="flex:1;margin:0">Expansion is done in-place — installed apps and saves are kept. Expect a few extra seconds on the next launch.</span>
+            <span class="sub" style="flex:1;margin:0">Expansion is done in-place - installed apps and saves are kept. Expect a few extra seconds on the next launch.</span>
           </div>
         </div>
         <div class="field">
-          <span class="sub" id="dataNote">Reading partition info…</span>
+          <span class="sub" id="dataNote">Reading partition info...</span>
         </div>
         <div class="field">
           <label>System language</label>
@@ -468,7 +468,7 @@
             <option value="ja-JP">Japanese</option>
             <option value="ko-KR">Korean</option>
           </select>
-          <span class="sub">Language for system settings, permission dialogs, and date formats. Injected into the VM at boot — <b>takes effect after runtime restart</b>.</span>
+          <span class="sub">Language for system settings, permission dialogs, and date formats. Injected into the VM at boot - <b>takes effect after runtime restart</b>.</span>
         </div>
         <div class="field switch-field">
           <div>
@@ -480,7 +480,7 @@
         <div class="field switch-field">
           <div>
             <label>Fast DNS (recommended)</label>
-            <span class="sub">Points Android to public DNS servers for faster resolution. Without this, Android inherits the host's DNS — which can be slow when a VPN or corporate proxy is active. Disable if you need to reach internal domain names.</span>
+            <span class="sub">Points Android to public DNS servers for faster resolution. Without this, Android inherits the host's DNS - which can be slow when a VPN or corporate proxy is active. Disable if you need to reach internal domain names.</span>
           </div>
           <input type="checkbox" id="setFastDns" class="switch" />
         </div>
@@ -494,7 +494,7 @@
         <div class="field switch-field">
           <div>
             <label>Keep fast-boot snapshot (recommended)</label>
-            <span class="sub">The second launch of any app takes only a few seconds thanks to a snapshot. The trade-off is ~2–3 GB of disk space for <code>ram.bin</code>. Disabling only affects startup speed — apps and saves are unaffected.</span>
+            <span class="sub">The second launch of any app takes only a few seconds thanks to a snapshot. The trade-off is ~2-3 GB of disk space for <code>ram.bin</code>. Disabling only affects startup speed - apps and saves are unaffected.</span>
           </div>
           <input type="checkbox" id="setKeepSnapshot" class="switch" />
         </div>
@@ -510,9 +510,9 @@
           <div class="field">
             <label>VM priority</label>
             <select id="setPriorityMode">
-              <option value="balanced">Balanced (recommended) · Runtime yields to the foreground window</option>
-              <option value="performance">Performance · Runtime runs at the same priority as the foreground</option>
-              <option value="game">Game / Low-latency · Runtime runs at high priority — best for FPS and rhythm games</option>
+              <option value="balanced">Balanced (recommended)  -  Runtime yields to the foreground window</option>
+              <option value="performance">Performance  -  Runtime runs at the same priority as the foreground</option>
+              <option value="game">Game / Low-latency  -  Runtime runs at high priority - best for FPS and rhythm games</option>
             </select>
             <span class="sub">Game mode keeps the Android VM at a high CPU priority and reduces host-side polling for minimum input and frame latency. Other apps on the system will run slower as a result.</span>
           </div>
@@ -527,7 +527,7 @@
         <div class="field switch-field">
           <div>
             <label>Pre-warm on startup (recommended)</label>
-            <span class="sub">Boots the Android environment silently in the background after ApkBolt starts (emulator window stays hidden). Once warm, launching any app skips the full cold-boot wait — from 20+ seconds down to nearly instant. The trade-off is ~1 GB idle RAM. Disabling means the first app launch always cold-boots.</span>
+            <span class="sub">Boots the Android environment silently in the background after ApkBolt starts (emulator window stays hidden). Once warm, launching any app skips the full cold-boot wait - from 20+ seconds down to nearly instant. The trade-off is ~1 GB idle RAM. Disabling means the first app launch always cold-boots.</span>
           </div>
           <input type="checkbox" id="setPrewarm" class="switch" />
         </div>
@@ -542,7 +542,7 @@
         <div class="field">
           <label>Update &amp; download source</label>
           <select id="setSourcePref">
-            <option value="auto">Auto — pick the fastest source (recommended)</option>
+            <option value="auto">Auto - pick the fastest source (recommended)</option>
             <option value="gitee">Gitee only (usually fastest in China)</option>
             <option value="github">GitHub only</option>
           </select>
@@ -556,12 +556,12 @@
           <input type="checkbox" id="setAutoMirror" class="switch" />
         </div>
         <div class="field">
-          <label>Download mirror prefix (optional — accelerates GitHub)</label>
+          <label>Download mirror prefix (optional - accelerates GitHub)</label>
           <input id="setMirrorPrefix" type="text" placeholder="e.g. https://ghfast.top/" />
-          <span class="sub">If set, this prefix is used exclusively — the two public mirrors above are skipped. Leave blank to let the auto logic decide. The downloader prepends this URL to the original address.</span>
+          <span class="sub">If set, this prefix is used exclusively - the two public mirrors above are skipped. Leave blank to let the auto logic decide. The downloader prepends this URL to the original address.</span>
         </div>
         <div class="field">
-          <label>Download threads (1–16, default 8)</label>
+          <label>Download threads (1-16, default 8)</label>
           <input id="setConnections" type="number" min="1" max="16" step="1" />
           <span class="sub">Large files are split and downloaded in parallel. 8 threads saturates most home connections; try 16 for very fast and stable links.</span>
         </div>
@@ -569,16 +569,16 @@
           <summary>Gitee source (optional)</summary>
           <div class="field">
             <label>Gitee read-only token (usually not needed)</label>
-            <input id="setGiteeToken" type="password" placeholder="Leave blank — public repos work without a token" />
+            <input id="setGiteeToken" type="password" placeholder="Leave blank - public repos work without a token" />
             <span class="sub">The project repository is public, so the Gitee release list is accessible anonymously. Only fill this in if Gitee is rate-limiting you (HTTP 403/429) or you need to read a private branch:
-              gitee.com → Settings → Personal Access Tokens — only check "projects". The token is only used to read release metadata; nothing is uploaded.</span>
+              gitee.com → Settings → Personal Access Tokens - only check "projects". The token is only used to read release metadata; nothing is uploaded.</span>
           </div>
         </details>
       </div>
 
       <!-- ── DIAGNOSTICS & REPAIR ── -->
       <div class="group" id="preflightGroup" data-cat="diag">
-        <div class="group-title">System Check · Auto-configure</div>
+        <div class="group-title">System Check  -  Auto-configure</div>
         <div class="field">
           <span class="sub">Scans this PC: CPU virtualization, Windows Hypervisor Platform, GPU model, VRAM size, RAM, OS version.
             Settings that can be auto-fixed (memory / cores / render quality / backend) are written immediately and baked into a driver profile.
@@ -597,20 +597,20 @@
       </div>
 
       <div class="group" id="driverGroup" data-cat="diag">
-        <div class="group-title">Drivers · Compatibility Patches</div>
+        <div class="group-title">Drivers  -  Compatibility Patches</div>
         <div class="field">
           <span class="sub">Some hardware needs specific launch flags to work correctly (old GPU with limited GLES support, missing hardware acceleration, driver versions that crash with hardware rendering).
             A driver is a JSON file: "match criteria" + "parameters to apply on match". You can write, import, and share them.
-            Drivers only modify whitelisted launch options — <b>no code is executed</b>; unmatched drivers have no effect.</span>
+            Drivers only modify whitelisted launch options - <b>no code is executed</b>; unmatched drivers have no effect.</span>
         </div>
         <div class="field">
-          <span class="sub" id="drvSummary">Loading drivers…</span>
+          <span class="sub" id="drvSummary">Loading drivers...</span>
         </div>
         <div id="drvList" class="drv-list"></div>
         <div class="field">
           <div class="row">
             <button class="btn ghost sm" id="btnDrvReload">Refresh</button>
-            <button class="btn ghost sm" id="btnDrvImport">Import driver…</button>
+            <button class="btn ghost sm" id="btnDrvImport">Import driver...</button>
             <button class="btn ghost sm" id="btnDrvFolder">Open drivers folder</button>
             <button class="btn ghost sm" id="btnDrvExport">Export template for this PC</button>
           </div>
@@ -619,11 +619,11 @@
       </div>
 
       <div class="group" id="autodebugGroup" data-cat="diag">
-        <div class="group-title">Auto-detect · Smart Diagnostics</div>
+        <div class="group-title">Auto-detect  -  Smart Diagnostics</div>
         <div class="field">
           <span class="sub">Periodically scans this PC: Android runtime state, adb authorization, free disk space,
             data partition conflicts, snapshot integrity, and conflicting settings.
-            Only pops a notification for <b>new</b> critical issues — known issues are silently listed below.</span>
+            Only pops a notification for <b>new</b> critical issues - known issues are silently listed below.</span>
         </div>
         <div class="field switch-field">
           <div>
@@ -646,7 +646,7 @@
           <div class="switch-field" style="align-items:center">
             <div>
               <label>Notify me of new issues</label>
-              <span class="sub">Only alerts on critical new problems — known issues won't repeat.</span>
+              <span class="sub">Only alerts on critical new problems - known issues won't repeat.</span>
             </div>
             <input type="checkbox" id="setAutodebugNotify" class="switch" />
           </div>
@@ -669,8 +669,8 @@
           <div class="row">
             <input id="setEngineLabel" type="text" readonly value="ApkBolt built-in runtime (QEMU + Android 14, standalone)" />
           </div>
-          <span class="sub">ApkBolt exclusively runs its own managed runtime — adb, the emulator, and the system image are all downloaded and managed by ApkBolt itself.
-            It does not detect, take over, or depend on any other emulator you may have installed (MuMu, LDPlayer, BlueStacks, WSA — none are touched).
+          <span class="sub">ApkBolt exclusively runs its own managed runtime - adb, the emulator, and the system image are all downloaded and managed by ApkBolt itself.
+            It does not detect, take over, or depend on any other emulator you may have installed (MuMu, LDPlayer, BlueStacks, WSA - none are touched).
             This means ApkBolt works the same regardless of what else is on your PC.</span>
         </div>
         <div class="field">
@@ -683,7 +683,7 @@
         </div>
         <div class="field">
           <label>System image (ISO)</label>
-          <input id="setSystemImage" type="text" placeholder="Path to Android-x86 / Bliss OS ISO or IMG — leave blank to use default location" />
+          <input id="setSystemImage" type="text" placeholder="Path to Android-x86 / Bliss OS ISO or IMG - leave blank to use default location" />
         </div>
         <div class="field two">
           <div>
@@ -761,7 +761,7 @@
           <label>Media volume</label>
           <div class="row">
             <input type="range" id="setAndroidVolume" min="0" max="100" step="1" style="flex:1" />
-            <span class="inline-note" id="androidVolumeText">—</span>
+            <span class="inline-note" id="androidVolumeText">-</span>
           </div>
         </div>
         <div class="field two">
@@ -799,7 +799,7 @@
         <div class="field switch-field">
           <div>
             <label>Auto-create desktop shortcut after install</label>
-            <span class="sub">Shortcut uses the real app icon — double-click to launch directly</span>
+            <span class="sub">Shortcut uses the real app icon - double-click to launch directly</span>
           </div>
           <input type="checkbox" id="setAutoShortcut" class="switch" />
         </div>
@@ -845,18 +845,18 @@
         <div class="field switch-field">
           <div>
             <label>Associate .apk files</label>
-            <span class="sub">Double-clicking an APK in File Explorer installs it into ApkBolt (writes to current user only — no admin required)</span>
+            <span class="sub">Double-clicking an APK in File Explorer installs it into ApkBolt (writes to current user only - no admin required)</span>
           </div>
-          <button class="btn ghost sm" id="btnAssoc">Checking…</button>
+          <button class="btn ghost sm" id="btnAssoc">Checking...</button>
         </div>
         <div class="field">
-          <label>Runtime data directory (system image · installed apps · snapshots)</label>
+          <label>Runtime data directory (system image  -  installed apps  -  snapshots)</label>
           <div class="row">
             <input id="setRuntimeDir" type="text" readonly placeholder="Default: user data directory on C:" />
             <button class="btn ghost sm" id="btnBrowseRuntimeDir">Browse</button>
             <button class="btn ghost sm" id="btnOpenData">Open</button>
           </div>
-          <span class="sub">This folder uses the most space (several GB). Moving it to a non-system drive frees up C:. Requires an app restart; existing data is not moved automatically — copy it manually then delete the old folder.</span>
+          <span class="sub">This folder uses the most space (several GB). Moving it to a non-system drive frees up C:. Requires an app restart; existing data is not moved automatically - copy it manually then delete the old folder.</span>
         </div>
         <div class="field">
           <label>Android data directory (apps, games, and fast-boot snapshots)</label>
@@ -865,7 +865,7 @@
             <button class="btn ghost sm" id="btnBrowseAvdDir">Browse</button>
             <button class="btn ghost sm" id="btnOpenAvdDir">Open</button>
           </div>
-          <span class="sub">This is where disk space is really consumed: the data partition (default 6 GB, expandable above) + fast-boot snapshot (~2–3 GB).
+          <span class="sub">This is where disk space is really consumed: the data partition (default 6 GB, expandable above) + fast-boot snapshot (~2-3 GB).
             Moving to another drive (e.g. D:) takes effect after restart. The existing <code>apkbolt.avd</code> folder can be moved wholesale and the old location deleted.</span>
         </div>
         <div class="field">
@@ -881,7 +881,7 @@
       <div class="group" id="updateGroup" data-cat="about">
         <div class="group-title">Software Updates</div>
         <div class="field">
-          <label>Current version <span class="inline-note" id="updateCurrent">—</span></label>
+          <label>Current version <span class="inline-note" id="updateCurrent">-</span></label>
           <div class="row">
             <span class="inline-note" id="updateState">Not checked</span>
             <span style="flex:1"></span>
@@ -890,7 +890,7 @@
           </div>
           <div class="update-bar" id="updateBar" hidden><i id="updateBarFill"></i></div>
           <span class="sub" id="updateNote">
-            Fetches the latest release from GitHub (abhi666-max/apkbolt). The portable build downloads a new package and replaces the binary files automatically — runtime data, installed apps, and snapshots are unaffected.
+            Fetches the latest release from GitHub (abhi666-max/apkbolt). The portable build downloads a new package and replaces the binary files automatically - runtime data, installed apps, and snapshots are unaffected.
           </span>
         </div>
       </div>
@@ -903,13 +903,13 @@
           </div>
           <div class="about-info">
             <div class="about-name">ApkBolt <span class="about-ver" id="aboutVer"></span></div>
-            <p class="note">Lightning-fast Android app launcher for Windows — drag, drop, and run APKs instantly in standalone windows with real app icons and desktop shortcuts.</p>
+            <p class="note">Lightning-fast Android app launcher for Windows - drag, drop, and run APKs instantly in standalone windows with real app icons and desktop shortcuts.</p>
             <div class="about-author" style="margin: 6px 0; font-size: 13px; color: var(--text-secondary);">
               Created &amp; Maintained by <b>Abhijeet Kangane</b> (<a href="https://github.com/abhi666-max" target="_blank" rel="noopener" style="color: var(--accent);">@abhi666-max</a>)
             </div>
             <div class="about-links">
               <button class="btn ghost sm" id="btnOpenManual">Open User Guide (includes troubleshooting)</button>
-              <a href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener">GitHub · @abhi666-max/apkbolt</a>
+              <a href="https://github.com/abhi666-max/apkbolt" target="_blank" rel="noopener">GitHub  -  @abhi666-max/apkbolt</a>
               
             </div>
           </div>
@@ -924,8 +924,8 @@
         </div>
         <div class="field switch-field">
           <div>
-            <label>Windows native multi-window · Multi-instance (experimental)</label>
-            <span class="sub">When enabled, opening a new app no longer closes the previous one — multiple apps can stay resident and be switched back to instantly (login state preserved, no reload needed).
+            <label>Windows native multi-window  -  Multi-instance (experimental)</label>
+            <span class="sub">When enabled, opening a new app no longer closes the previous one - multiple apps can stay resident and be switched back to instantly (login state preserved, no reload needed).
               Due to the Android runtime having a single emulator window, only one app's canvas is visible at a time; this is not true simultaneous side-by-side windows.
               Memory usage will increase notably. Disable to return to stable single-app mode.</span>
           </div>
@@ -934,10 +934,10 @@
         <div class="field">
           <label for="setKeepBackground">Background app retention</label>
           <select id="setKeepBackground">
-            <option value="0">0 · Most memory-efficient (keep only current app)</option>
-            <option value="1">1 · Balanced (recommended)</option>
-            <option value="2">2 · More stable multi-instance</option>
-            <option value="3">3 · Maximum concurrent</option>
+            <option value="0">0  -  Most memory-efficient (keep only current app)</option>
+            <option value="1">1  -  Balanced (recommended)</option>
+            <option value="2">2  -  More stable multi-instance</option>
+            <option value="3">3  -  Maximum concurrent</option>
           </select>
           <span class="sub">In multi-window mode, apps beyond this count are suspended (data kept, instant resume) to free memory.</span>
         </div>

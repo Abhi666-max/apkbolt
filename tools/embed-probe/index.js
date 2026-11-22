@@ -1,4 +1,4 @@
-// ： Electron ， ../embed-probe.js
+// :  Electron ,  ../embed-probe.js
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -8,7 +8,7 @@ function mark(m) { try { fs.appendFileSync(LOG, m + ' ' + new Date().toISOString
 try { fs.mkdirSync(path.dirname(LOG), { recursive: true }); fs.writeFileSync(LOG, ''); } catch (_) {}
 mark('module-loaded');
 
-// （--type=renderer/gpu/...），
+// (--type=renderer/gpu/...), 
 if (process.argv.some((a) => a.startsWith('--type='))) {
   module.exports = {};
 } else {

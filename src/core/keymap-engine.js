@@ -2,15 +2,15 @@
 /**
  * keyruntime
  *
- * appwindow， → app → adb input 。
- * pointer.js（mousehook）：mouse Qt + /wheelhook，
- * 。。
+ * appwindow,  → app → adb input . 
+ * pointer.js(mousehook): mouse Qt + /wheelhook, 
+ * . . 
  *
- * ：
- * - Node ， Electron BrowserWindow（）；
- * - adb `execInput(cmd)` ， AdbClient；
- * - （default 50ms）， adb shell ；
- * - app，app。
+ * : 
+ * - Node ,  Electron BrowserWindow(); 
+ * - adb `execInput(cmd)` ,  AdbClient; 
+ * - (default 50ms),  adb shell ; 
+ * - app, app. 
  */
 
 const { lookup, toCommand } = require('./keymap');
@@ -18,9 +18,9 @@ const { lookup, toCommand } = require('./keymap');
 class KeymapEngine {
   /**
    * @param {object} opts
- * @param {Function} opts.execInput (cmd) => Promise — adb shell input 
- * @param {Function} opts.getSize () => {width, height} — LCD 
- * @param {number} [opts.minInterval=50] （ms）
+ * @param {Function} opts.execInput (cmd) => Promise - adb shell input 
+ * @param {Function} opts.getSize () => {width, height} - LCD 
+ * @param {number} [opts.minInterval=50] (ms)
    */
   constructor({ execInput, getSize, minInterval = 50 } = {}) {
     this._exec = execInput || (() => Promise.resolve());
@@ -47,10 +47,10 @@ class KeymapEngine {
   get enabled() { return this._enabled; }
 
   /**
- * 。
+ * . 
    * @param {string} key Electron KeyboardEvent.key
  * @param {string} pkg app
- * @returns {Promise<boolean>} key（true = ）
+ * @returns {Promise<boolean>} key(true = )
    */
   async handleKey(key, pkg) {
     if (!this._enabled || !pkg) return false;
@@ -61,7 +61,7 @@ class KeymapEngine {
     const { width, height } = this._getSize();
     const cmd = toCommand(hit, width, height);
     if (!cmd) return false;
-    // ： adb shell
+    // :  adb shell
     const now = Date.now();
     const wait = Math.max(0, this._minInterval - (now - this._lastExec));
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));

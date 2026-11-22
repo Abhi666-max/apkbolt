@@ -1,13 +1,13 @@
 'use strict';
 /**
- *  Node ： Electron、、。
- * （0.5.6 ）：
- *   **ApkStart 、、。**
- * ：
- *   1. （MuMu /  /  / WSA / FydeOS）；
- *   2.  settings.json  mode=mumu / fydeos / attach， builtin；
- *   3. 。
- * ：node test/standalone-test.js
+ *  Node :  Electron, , . 
+ * (0.5.6 ): 
+ *   **ApkStart , , . **
+ * : 
+ *   1. (MuMu /  /  / WSA / FydeOS); 
+ *   2.  settings.json  mode=mumu / fydeos / attach,  builtin; 
+ *   3. . 
+ * : node test/standalone-test.js
  */
 const assert = require('assert/strict');
 const fs = require('fs');
@@ -40,7 +40,7 @@ function touch(dir, rel, bytes = 8) {
 }
 
 (() => {
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   const store = require('../src/core/store');
   const settings = store.getSettings();
@@ -72,17 +72,17 @@ function touch(dir, rel, bytes = 8) {
   });
 
   test('Auto-selection does not probe external emulators', async () => {
-    // ：autoPick 「 builtin」， probe()
+    // : autoPick " builtin",  probe()
     const src = read('src', 'core', 'backends', 'index.js');
     assert(!/\.probe\(/.test(src), 'assertion failed');
     assert(!/mumu|fydeos|ldplayer|bluestacks/i.test(src.replace(/[\s\S]*?const REGISTRY[\s\S]*?\];/, '')), 'assertion failed');
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('backends/ directory contains only base, builtin, index', () => {
     const files = fs.readdirSync(path.join(ROOT, 'src', 'core', 'backends')).sort();
-    assert.deepEqual(files, ['base.js', 'builtin.js', 'index.js'], `：${files.join(', ')}`);
+    assert.deepEqual(files, ['base.js', 'builtin.js', 'index.js'], `: ${files.join(', ')}`);
   });
 
   test('External emulator modules removed', () => {
@@ -100,7 +100,7 @@ function touch(dir, rel, bytes = 8) {
     const src = read('src', 'core', 'engine.js');
     assert(!/_fallbackFrom/.test(src), 'assertion failed');
     assert(!/backend\.id !== 'builtin'/.test(src), 'id');
-    assert(!/engine\.mode === 'attach'/.test(src), 'attach（ ）');
+    assert(!/engine\.mode === 'attach'/.test(src), 'attach( )');
     assert(!/ATTACH_ENDPOINTS/.test(src), 'adb');
   });
 
@@ -124,7 +124,7 @@ function touch(dir, rel, bytes = 8) {
     assert(!/mumu|ldplayer|bluestacks|hd-adb/i.test(block), 'adb');
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('Guard identifies MuMu binary', () => {
     const d = tmpDir('guard-hit');
@@ -169,7 +169,7 @@ function touch(dir, rel, bytes = 8) {
     touch(d, 'app/src/core/backends/fydeos.js', 64);
     touch(d, 'app/src/core/mumu-compat.js', 64);
     const hits = findForbiddenSource(d);
-    assert.equal(hits.length, 3, ` ${hits.length}（ 3）`);
+    assert.equal(hits.length, 3, ` ${hits.length}( 3)`);
     const r = assertStandalone(d, { label: '', exit: false });
     assert.equal(r.ok, false, 'assertion failed');
     fs.rmSync(d, { recursive: true, force: true });
@@ -198,7 +198,7 @@ function touch(dir, rel, bytes = 8) {
     assert.equal(r.skipped, true);
   });
 
-  console.log('\n[ · ]');
+  console.log('\n[  -  ]');
 
   test('Portable build scans resources directory', () => {
     const src = read('build', 'pack.js');
@@ -218,6 +218,6 @@ function touch(dir, rel, bytes = 8) {
     assert(/build\/runtime/.test(head), 'extraResources');
   });
 
-  console.log(`\n：${passed} ，${failed} \n`);
+  console.log(`\n: ${passed} , ${failed} \n`);
   process.exit(failed ? 1 : 0);
 })();

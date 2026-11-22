@@ -1,7 +1,7 @@
 'use strict';
 /**
  * ApkStart 
- * ：window / / single instance / （ apk、desktopshortcutlaunch）/ IPC
+ * : window / / single instance / ( apk, desktopshortcutlaunch)/ IPC
  */
 const { app, BrowserWindow, ipcMain, dialog, Tray, Menu, shell, nativeImage, screen, globalShortcut } = require('electron');
 const fs = require('fs');
@@ -15,7 +15,7 @@ const { parseApk } = require('./core/apk');
 const { drawAppIcon } = require('./core/png');
 const orientation = require('./core/orientation');
 
-// Logo（build/render-logo.js ）；
+// Logo(build/render-logo.js ); 
 const LOGO_DIR = path.join(__dirname, 'ui', 'assets');
 const LOGO_FILE = path.join(LOGO_DIR, 'logo.png');
 const APPICON_FILE = path.join(LOGO_DIR, 'appicon.ico');
@@ -29,7 +29,7 @@ function loadBrandIcon(size) {
   return nativeImage.createFromBuffer(drawAppIcon(size || 256));
 }
 
-// 「」： 512 16px ，
+// "":  512 16px , 
 function loadTrayIcon() {
   try {
     const p = path.join(LOGO_DIR, 'tray-16.png');
@@ -51,15 +51,15 @@ const { Updater, findUninstaller } = require('./core/updater');
 const leftovers = require('./core/leftovers');
 const manual = require('./core/manual');
 
-// Windows window capturePage ，
+// Windows window capturePage , 
 app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 
 /**
- * ， Chromium cache（Cache / GPUCache / Local Storage …）
- * 「Androiddirectory」。
- * defaultcache %APPDATA%\apkstart —— C MB ，launchfailure，
- * Android，cache C 。
- * app ready settings，。
+ * ,  Chromium cache(Cache / GPUCache / Local Storage ...)
+ * "Androiddirectory". 
+ * defaultcache %APPDATA%\apkstart -- C MB , launchfailure, 
+ * Android, cache C . 
+ * app ready settings, . 
  */
 function relocateUserDataIfCrowded() {
   try {
@@ -72,25 +72,25 @@ function relocateUserDataIfCrowded() {
     const target = path.join(avd, 'appdata');
     fs.mkdirSync(target, { recursive: true });
     app.setPath('userData', target);
-  } catch (_) { /* default，launch */ }
+  } catch (_) { /* default, launch */ }
 }
 relocateUserDataIfCrowded();
 
-// appwindowemulator SetParent window。Chromium default
-// DirectComposition （Intermediate D3D Window /
-// WS_EX_NOREDIRECTIONBITMAP）， DWM window，
-// window——"Screen is black but Android is running"。
-// 38px launch，，
-// hardware acceleration Chromium HWND，window。
-// APKSTART_HWACCEL=1 launch。
+// appwindowemulator SetParent window. Chromium default
+// DirectComposition (Intermediate D3D Window /
+// WS_EX_NOREDIRECTIONBITMAP),  DWM window, 
+// window--"Screen is black but Android is running". 
+// 38px launch, , 
+// hardware acceleration Chromium HWND, window. 
+// APKSTART_HWACCEL=1 launch. 
 if (process.env.APKSTART_HWACCEL !== '1') app.disableHardwareAcceleration();
 
 const APP_ROOT = path.join(__dirname, '..');
 const IS_DEV = process.argv.includes('--dev');
 
 /**
- * log：， app.log 。
- * ，path。
+ * log: ,  app.log . 
+ * , path. 
  */
 function appLog(line) {
   try {
@@ -101,39 +101,39 @@ function appLog(line) {
 }
 process.on('uncaughtException', (e) => appLog(`UNCAUGHT ${e && (e.stack || e.message)}`));
 process.on('unhandledRejection', (e) => appLog(`REJECT ${e && (e.stack || e.message || e)}`));
-// exitexit：exit（、 before-quit），
-// 「exit」「」「shutdown」。
+// exitexit: exit(,  before-quit), 
+// "exit""""shutdown". 
 process.on('exit', (code) => appLog(`process exit code=${code}`));
 
 /**
- * （runtime）：
- * ApkStart.exe runtime/（emulator + platform-tools + AEHD + ARM system image）。
- * launch（settings.json ） runtime.dir ，
- * downloadsettings，。settings。
+ * (runtime): 
+ * ApkStart.exe runtime/(emulator + platform-tools + AEHD + ARM system image). 
+ * launch(settings.json ) runtime.dir , 
+ * downloadsettings, . settings. 
  */
 /**
- * installruntimedirectory（ exe runtime/、 MSIX 
- * app\resources\runtime）。 = emulatorsystem image：boot
- * 「download」，autoDeploy 。
+ * installruntimedirectory( exe runtime/,  MSIX 
+ * app\resources\runtime).  = emulatorsystem image: boot
+ * "download", autoDeploy . 
  *
- * bootstrapBundledRuntime() ：，
- * `let` TDZ（， catch ，）。
+ * bootstrapBundledRuntime() : , 
+ * `let` TDZ(,  catch , ). 
  */
 let bundledRuntimeDir = null;
 
 function bootstrapBundledRuntime() {
   try {
     const exeDir = path.dirname(process.execPath);
-    // portable versionruntime exe ；electron-builder portable
-    // resources/ ， exe resources ，。
+    // portable versionruntime exe ; electron-builder portable
+    // resources/ ,  exe resources , . 
     const candidates = [
       path.join(exeDir, 'runtime'),
       path.join(path.dirname(exeDir), 'runtime'),
       path.join(process.resourcesPath || '', 'runtime'),
       path.join(process.resourcesPath || '', 'app', 'runtime'),
     ];
-    // runtime「 emulator + System Image」， API version：
-    // AOSP system image， API34 runtime。
+    // runtime" emulator + System Image",  API version: 
+    // AOSP system image,  API34 runtime. 
     const hasImage = (dir) => {
       const root = path.join(dir, 'system-images');
       let apis = [];
@@ -146,8 +146,8 @@ function bootstrapBundledRuntime() {
           try { abis = fs.readdirSync(path.join(root, api, tag)); } catch (_) { continue; }
           for (const abi of abis) {
             const d = path.join(root, api, tag, abi);
-            // system imagecompress（system.img.xz / .gz），extractlaunch。
-            // system.img 「system image」，download。
+            // system imagecompress(system.img.xz / .gz), extractlaunch. 
+            // system.img "system image", download. 
             const hasSys = ['system.img', 'system.img.xz', 'system.img.gz']
               .some((f) => fs.existsSync(path.join(d, f)));
             if (hasSys && fs.existsSync(path.join(d, 'kernel-ranchu'))) return true;
@@ -161,15 +161,15 @@ function bootstrapBundledRuntime() {
     if (!bundled) return;
 
     const s = store.getSettings();
-    // settings.json ：extract，
-    // 「」。runtimedirectory emulator 。
+    // settings.json : extract, 
+    // "". runtimedirectory emulator . 
     const explicit = String(s.runtime.dir || '').trim();
     const current = explicit || path.join(store.DATA_DIR, 'runtime');
-    // 「installruntime」：path <directory>/resources/runtime， EXE directory。
-    // 「extract、settings.json path」——
-    // ：launch，version emulator/system image/snapshot，
-    // upgradestutter、orientationparameters，。
-    // directory（D:\ApkStartRuntime ）。
+    // "installruntime": path <directory>/resources/runtime,  EXE directory. 
+    // "extract, settings.json path"--
+    // : launch, version emulator/system image/snapshot, 
+    // upgradestutter, orientationparameters, . 
+    // directory(D:\ApkStartRuntime ). 
     const looksForeignBundle = /[\\/]resources[\\/]runtime$/i.test(current)
       && !path.resolve(current).toLowerCase().startsWith(path.resolve(exeDir).toLowerCase());
     if (looksForeignBundle && fs.existsSync(path.join(bundled, 'emulator', 'emulator.exe'))) {
@@ -179,33 +179,33 @@ function bootstrapBundledRuntime() {
       return;
     }
     const currentExe = path.join(current, 'emulator', 'emulator.exe');
-    // portable version/upgrade（extractdirectory），settings path：
-    // 「 EXE directory runtime」，
-    // （： emulator emulator-check → probefailure → TCG software emulation）。
+    // portable version/upgrade(extractdirectory), settings path: 
+    // " EXE directory runtime", 
+    // (:  emulator emulator-check → probefailure → TCG software emulation). 
     const sameTree = path.resolve(current).toLowerCase()
       .startsWith(path.resolve(exeDir).toLowerCase());
     const currentOk = fs.existsSync(currentExe) && sameTree;
-    // directory（ EXE directory， D:\ApkStartRuntime ）
-    // ： C space、portable versionruntime。
-    // exe bundled runtime，
-    // 「settingsruntimedirectory，directory / AppData」（issue #23）。
+    // directory( EXE directory,  D:\ApkStartRuntime )
+    // :  C space, portable versionruntime. 
+    // exe bundled runtime, 
+    // "settingsruntimedirectory, directory / AppData"(issue #23). 
     if (explicit && !sameTree && fs.existsSync(currentExe)) {
       if (s.engine.gpuMode === 'swiftshader_indirect' || s.engine.memoryMB === 4096) {
         store.saveSettings({ engine: { gpuMode: 'auto', autoMemory: true, memoryMB: 0, cores: 0 } });
       }
       return;
     }
-    // runtime（）：AVD directory，
+    // runtime(): AVD directory, 
     if (currentOk) {
-      // runtime EXE directory = install（ / store version）
+      // runtime EXE directory = install( / store version)
       bundledRuntimeDir = current;
-      // parameters，configuration 4G/4/ GPU
+      // parameters, configuration 4G/4/ GPU
       if (s.engine.gpuMode === 'swiftshader_indirect' || s.engine.memoryMB === 4096) {
         store.saveSettings({ engine: { gpuMode: 'auto', autoMemory: true, memoryMB: 0, cores: 0 } });
       }
       return;
     }
-    // Google Play system image；AOSP system image x86_64
+    // Google Play system image; AOSP system image x86_64
     let playBundled = false;
     try {
       const root = path.join(bundled, 'system-images');
@@ -220,19 +220,19 @@ function bootstrapBundledRuntime() {
       engine: { gpuMode: 'auto', autoMemory: true },
     });
     bundledRuntimeDir = bundled;
-  } catch (_) { /* failurelaunch， */ }
+  } catch (_) { /* failurelaunch,  */ }
 }
 bootstrapBundledRuntime();
 
-// probe（ reg.exe）
+// probe( reg.exe)
 const NO_SHELL_PROBE = process.argv.includes('--smoke') || process.env.APKSTART_NO_SHELL_PROBE === '1';
 const ICON_PNG = loadBrandIcon().toPNG();
 
 let mainWindow = null;
 let tray = null;
 let runtime = null;
-// 「window」 whenReady （ agentScope）。
-// runLaunch / ， const 。
+// "window" whenReady ( agentScope). 
+// runLaunch / ,  const . 
 let armAgent = async () => ({ ok: false });
 let installer = null;
 let sharer = null;
@@ -246,16 +246,16 @@ let updateBusy = false;
 let updateInfo = null;
 
 /**
- * bootwindow。
+ * bootwindow. 
  *
- * app.whenReady() （const splashWin/splashDone），
- * runLaunch() / autoDeploy() —— 
- * `typeof splashDone === 'function'` false，：
- * - update（「…」）；
- * - launchsuccess splash ，480x360 alwaysOnTop window
- * 、Android。
- * 「appwindow」：window/splash/appwindow。
- * 。
+ * app.whenReady() (const splashWin/splashDone), 
+ * runLaunch() / autoDeploy() -- 
+ * `typeof splashDone === 'function'` false, : 
+ * - update("..."); 
+ * - launchsuccess splash , 480x360 alwaysOnTop window
+ * , Android. 
+ * "appwindow": window/splash/appwindow. 
+ * . 
  */
 let splashWin = null;
 let splashProgress = () => {};
@@ -269,7 +269,7 @@ function parseArgs(argv) {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === '--launch') {
-      // Electron argv app path， com.foo.bar
+      // Electron argv app path,  com.foo.bar
       const v = args.slice(i + 1).find((x) => x && /^[a-zA-Z][\w]*(\.[\w]+)+$/.test(x));
       if (v) { out.launch = v; out.silent = true; }
     } else if (a === '--silent' || a === '--autostart') out.silent = true;
@@ -278,7 +278,7 @@ function parseArgs(argv) {
   return out;
 }
 
-/** Chromium WebP，nativeImage ；window APK PNG */
+/** Chromium WebP, nativeImage ; window APK PNG */
 let decodeWindow = null;
 async function decodeIcon(raw) {
   if (!decodeWindow || decodeWindow.isDestroyed()) {
@@ -299,12 +299,12 @@ async function decodeIcon(raw) {
   return Buffer.from(String(url).split(',')[1] || '', 'base64');
 }
 
-/** boot：default，settings */
+/** boot: default, settings */
 function applyAutoStart() {
   if (!app.isPackaged) return; // 
   const on = !!store.getSettings().autoStart;
   try {
-    // name，launch "electron.app.Electron"
+    // name, launch "electron.app.Electron"
     app.setLoginItemSettings({
       openAtLogin: on,
       name: 'ApkBolt',
@@ -330,14 +330,14 @@ function setAumid(id) {
 }
 
 /**
- * applandscapeportrait？
+ * applandscapeportrait?
  *
- * emulator（hw.lcd）「」，Android 
- * orientationapprotate —— app
- * ，。「window」：orientation = apporientation。
+ * emulator(hw.lcd)"", Android 
+ * orientationapprotate -- app
+ * , . "window": orientation = apporientation. 
  *
- * ：settings > app > APK orientation
- * > orientation（apprestart）。
+ * : settings > app > APK orientation
+ * > orientation(apprestart). 
  */
 function wantLandscapeFor(pkg) {
   const ds = displaySettings();
@@ -351,13 +351,13 @@ function wantLandscapeFor(pkg) {
 }
 
 /**
- * rotateapp：orientation → per-app → restart。
+ * rotateapp: orientation → per-app → restart. 
  *
- * 、、Ctrl+R 「orientation」，
- * （ display.landscape， appWin.state.landscape）。rotate，
- * apps.json orientation，launch
- * wantLandscapeFor —— 「」。
- * wantLandscapeFor(pkg) ， + 。
+ * , , Ctrl+R "orientation", 
+ * ( display.landscape,  appWin.state.landscape). rotate, 
+ * apps.json orientation, launch
+ * wantLandscapeFor -- "". 
+ * wantLandscapeFor(pkg) ,  + . 
  */
 async function rotateCurrentApp() {
   const pkg = appWin && appWin.pkg;
@@ -367,8 +367,8 @@ async function rotateCurrentApp() {
     store.upsertApp({ package: pkg, orientationOverride: orientation.overrideValue(next) });
     appLog(`orientation override ${pkg} = ${orientation.overrideValue(next)}`);
   }
-  // appWin.rotate updatewindow； next orientation，
-  // restartForOrientation complete（restart）。
+  // appWin.rotate updatewindow;  next orientation, 
+  // restartForOrientation complete(restart). 
   if (appWin && appWin.isOpen) {
     await appWin.rotate((want) => restartForOrientation(want, { reloadApp: false }), next).catch(() => {});
   } else {
@@ -378,12 +378,12 @@ async function rotateCurrentApp() {
 }
 
 /**
- * 「」apporientation。
+ * ""apporientation. 
  *
- * AndroidManifest app（ Activity portrait），
- * app sensor / fullSensor，。
- * Android（ActivityRecord requestedOrientation 
- * app）。 apps.json，launch。
+ * AndroidManifest app( Activity portrait), 
+ * app sensor / fullSensor, . 
+ * Android(ActivityRecord requestedOrientation 
+ * app).  apps.json, launch. 
  */
 async function learnAppOrientation(pkg) {
   const app = store.getApp(pkg);
@@ -413,7 +413,7 @@ let currentAppPkg = null;
 let wheelRouter = null;
 const deviceSize = { value: null };
 
-/** wheel Android ；cache，/restartruntime */
+/** wheel Android ; cache, /restartruntime */
 async function getDeviceSize() {
   if (deviceSize.value) return deviceSize.value;
   try { deviceSize.value = await runtime.client().wmSize(); } catch (_) { /* runtime */ }
@@ -429,45 +429,45 @@ function portraitSize() {
   return display.portraitSize(d.portrait || '540x960');
 }
 
-/** settingsmousekeymap，windowhookconfiguration */
+/** settingsmousekeymap, windowhookconfiguration */
 function refreshPointerMapping() {
   if (appWin && appWin.isOpen) appWin.refreshPointer();
   else if (winAgent && winAgent.hooked) winAgent.setHook(false).catch(() => {});
 }
 
 /**
- * rotate = restartemulator。
+ * rotate = restartemulator. 
  *
- * 「 + 」landscape（）：
- * - wm size：， LCD -> 90°、；
- * - wm density：framebuffer -> ，；
- * - adb emu rotate：，portrait。
- * hw.lcd.width/height landscaperestart，Qt landscapewindow、。
+ * " + "landscape(): 
+ * - wm size: ,  LCD -> 90°, ; 
+ * - wm density: framebuffer -> , ; 
+ * - adb emu rotate: , portrait. 
+ * hw.lcd.width/height landscaperestart, Qt landscapewindow, . 
  */
 async function restartForOrientation(landscape, { reloadApp = true } = {}) {
   if (!appWin || !appWin.isOpen) return false;
   const pkg = appWin.pkg;
   store.saveSettings({ display: { landscape: !!landscape } });
-  send('runtime:log', landscape ? 'Switching to landscape: restarting Android runtime…' : 'Switching to portrait: restarting Android runtime…');
+  send('runtime:log', landscape ? 'Switching to landscape: restarting Android runtime...' : 'Switching to portrait: restarting Android runtime...');
   try {
-    // restartemulatorwindow、。，
-    // windowhintwindow（window openDetached ）。
+    // restartemulatorwindow, . , 
+    // windowhintwindow(window openDetached ). 
     try {
       appWin.showWaiting(landscape
-        ? 'Switching to landscape (restarting Android runtime, ~40s, one-time)…'
-        : 'Switching to portrait (restarting Android runtime, ~40s, one-time)…');
+        ? 'Switching to landscape (restarting Android runtime, ~40s, one-time)...'
+        : 'Switching to portrait (restarting Android runtime, ~40s, one-time)...');
     } catch (_) { /* window */ }
-    // window，restartdesktop
+    // window, restartdesktop
     try { await appWin.agent.detach(); } catch (_) { /* ignore */ }
     await runtime.stop({ graceful: false }).catch(() => {});
     /**
- * adb ，。
+ * adb , . 
      *
- * emulatorexit adb update：
- * `adb -s emulator-5554 get-state` "device"。 ensure()，
- * isOnline() 「Runtime ready（reused）」，
- * adb `device 'emulator-5554' not found` ——
- * orientationlaunch（ 0.2 ""，failure）。
+ * emulatorexit adb update: 
+ * `adb -s emulator-5554 get-state` "device".  ensure(), 
+ * isOnline() "Runtime ready(reused)", 
+ * adb `device 'emulator-5554' not found` --
+ * orientationlaunch( 0.2 "", failure). 
      */
     try {
       const c = runtime.client();
@@ -478,16 +478,16 @@ async function restartForOrientation(landscape, { reloadApp = true } = {}) {
         // eslint-disable-next-line no-await-in-loop
         await new Promise((r) => setTimeout(r, 300));
       }
-    } catch (_) { /* failure，ensure fallback */ }
+    } catch (_) { /* failure, ensure fallback */ }
     appLog(`rotate -> landscape=${landscape} restarting runtime`);
     const rt = await runtime.ensure({
       onLog: (m) => { send('runtime:log', m); appLog(`  rt ${m}`); },
     });
     if (!rt || !rt.ok) { appWin.waitingForRestart = false; return false; }
-    // ****network。restartemulator WiFi 20 ，
-    // （launcher beforeStart → installer.launch） waitForNetwork，
-    // ：orientation 25 timeout， 23 ，
-    // 100 125 。 launch 。
+    // ****network. restartemulator WiFi 20 , 
+    // (launcher beforeStart → installer.launch) waitForNetwork, 
+    // : orientation 25 timeout,  23 , 
+    // 100 125 .  launch . 
     if (reloadApp && pkg) {
       const app = store.getApp(pkg);
       if (app) {
@@ -498,7 +498,7 @@ async function restartForOrientation(landscape, { reloadApp = true } = {}) {
       await attachAppWindow();
       appWin.scheduleFit(6);
     }
-    // rt：beforeStart （ client stop ）
+    // rt: beforeStart ( client stop )
     return rt;
   } catch (e) {
     appLog(`rotate restart failed: ${e && e.message}`);
@@ -508,24 +508,24 @@ async function restartForOrientation(landscape, { reloadApp = true } = {}) {
 }
 
 /**
- * Android。：
- * - window（default）：emulatorwindow，orientation、、，
- * 、、、；
- * - ：SetParent window，、rotate。
- * settings display.windowEmbed （true ）。
+ * Android. : 
+ * - window(default): emulatorwindow, orientation, , , 
+ * , , , ; 
+ * - : SetParent window, , rotate. 
+ * settings display.windowEmbed (true ). 
  */
 async function attachAppWindow() {
   if (!appWin) return false;
   const embedMode = displaySettings().windowEmbed === true;
   if (!embedMode) {
     /**
- * windowretry。
+ * windowretry. 
      *
- * emulatorwindow， `am start` ：
- * cold boot、snapshot、orientation，Qt window
- * 。，failure —— window「launch」
- * ，「launchwindow」，
- * （log attach failed (detached): unknown）。
+ * emulatorwindow,  `am start` : 
+ * cold boot, snapshot, orientation, Qt window
+ * . , failure -- window"launch"
+ * , "launchwindow", 
+ * (log attach failed (detached): unknown). 
      */
     for (let i = 0; i < 4; i += 1) {
       if (!appWin.isOpen) {
@@ -539,13 +539,13 @@ async function attachAppWindow() {
       });
       if (ok) return true;
       appLog(`attach detached #${i + 1} failed: ${appWin.lastEmbedError || 'unknown'}`);
-      // ：window show/layout window
+      // : window show/layout window
       // eslint-disable-next-line no-await-in-loop
       await new Promise((r) => setTimeout(r, 400 + i * 600));
     }
-    // （desktop / driver / emulator --no-window ）：
-    // ，，
-    // fallback —— launchwindow。
+    // (desktop / driver / emulator --no-window ): 
+    // , , 
+    // fallback -- launchwindow. 
     appLog('attach detached: retries failed, falling back to embedded mode');
     const fallback = await appWin.embed().catch(() => false);
     if (fallback) {
@@ -564,25 +564,25 @@ async function attachAppWindow() {
 }
 
 /**
- * （）「appwindow」。
+ * ()"appwindow". 
  *
- * app****app，
- * 「app， / ANR」：
- * - appWin.open() window close({keepApp:true})，window、
- * ** endApp**，app force-stop，
- * runtime._activeApps ；
- * - app beginApp `first = _activeApps.size === 0` error，
- * / snapshot；
- * - appemulator → ANR。
- * await app，window。
+ * app****app, 
+ * "app,  / ANR": 
+ * - appWin.open() window close({keepApp:true}), window, 
+ * ** endApp**, app force-stop, 
+ * runtime._activeApps ; 
+ * - app beginApp `first = _activeApps.size === 0` error, 
+ * / snapshot; 
+ * - appemulator → ANR. 
+ * await app, window. 
  */
 async function openAppWindow(pkg, tip) {
-  // 「app」；path，。
+  // "app"; path, . 
   if (currentAppPkg && currentAppPkg !== pkg && appWin && appWin.isOpen) {
     const prev = currentAppPkg;
     try {
-      // ：windowemulatorwindow，
-      // park ，desktop。
+      // : windowemulatorwindow, 
+      // park , desktop. 
       await appWin.close({ keepApp: true });
       await runtime.endApp(prev, { onIdle: onContainerActive }).catch(() => {});
       appLog(`switch: closed ${prev} before launching ${pkg}`);
@@ -590,46 +590,46 @@ async function openAppWindow(pkg, tip) {
       appLog(`switch close ${prev} failed: ${e && e.message}`);
     }
   } else if (currentAppPkg && currentAppPkg !== pkg) {
-    // window， _activeApps ，。
+    // window,  _activeApps , . 
     await runtime.endApp(currentAppPkg).catch(() => {});
   }
   const rec = store.getApp(pkg);
   const land = wantLandscapeFor(pkg);
   const p0 = portraitSize();
   const detached = displaySettings().windowEmbed === false;
-  // orientationapporientation → beforeStart restartruntime（ 40 ）。
+  // orientationapporientation → beforeStart restartruntime( 40 ). 
   const willRestart = land !== !!displaySettings().landscape;
-  // windowwindow，****：
-  // - boot（launch）；
-  // - （app）window，desktop 40 ，
-  // 。
+  // windowwindow, ****: 
+  // - boot(launch); 
+  // - (app)window, desktop 40 , 
+  // . 
   const splashVisible = !!(splashWin && !splashWin.isDestroyed());
   const label = (rec && rec.label) || pkg;
-  // app，window：taskbarshortcutapp
+  // app, window: taskbarshortcutapp
   setAumid(`${APP_AUMID}.${pkg}`);
   appWin.open({
     pkg,
     label,
     iconPath: rec && rec.icoPath,
-    // landscapewindow，window
+    // landscapewindow, window
     portrait: land ? { w: p0.h, h: p0.w } : p0,
-    // ：「」，「launch」。
-    // （defaultsettings，），。
+    // : "", "launch". 
+    // (defaultsettings, ), . 
     fullscreen: displaySettings().mode === 'fullscreen'
       || displaySettings().autoFullscreenOnLaunch === true,
     detached,
     showWhileWaiting: detached && !splashVisible,
   });
-  // launchapp PNG（iconPath， 192px+）：ICO Chromium
-  // <img> 、，64px 「」。
-  // window ICO（open() iconPath rec.icoPath，Win32 ）。
+  // launchapp PNG(iconPath,  192px+): ICO Chromium
+  // <img> , , 64px "". 
+  // window ICO(open() iconPath rec.icoPath, Win32 ). 
   appWin.setIcon(rec && (rec.iconPath || rec.icoPath));
-  // orientation（orientation doctor.lcdFor ）
+  // orientation(orientation doctor.lcdFor )
   appWin.setState({
-    // restart，「」hint， 40
+    // restart, ""hint,  40
     tip: willRestart
-      ? `Switching orientation for "${String(label).slice(0, 20)}" to ${land ? 'landscape' : 'portrait'} (restarting runtime, ~40s)…`
-      : (tip || 'Starting Android runtime…'),
+      ? `Switching orientation for "${String(label).slice(0, 20)}" to ${land ? 'landscape' : 'portrait'} (restarting runtime, ~40s)...`
+      : (tip || 'Starting Android runtime...'),
     ready: false,
     landscape: land,
   });
@@ -642,29 +642,29 @@ async function toggleDisplayMode() {
   });
   const full = next.display.mode === 'fullscreen';
   if (appWin && appWin.isOpen) {
-    // windowemulatorwindow，maximize window，
-    // appWin.toggleMaximize emulatorwindow/。
+    // windowemulatorwindow, maximize window, 
+    // appWin.toggleMaximize emulatorwindow/. 
     if (displaySettings().windowEmbed === false) {
       appWin.toggleMaximize().catch(() => {});
     } else if (full) appWin.win.maximize();
     else appWin.win.unmaximize();
     appWin.scheduleFit(6);
-    // note：****orientation。
-    // landscape：orientation「apporientation」
-    // （ wantLandscapeFor）。 F11 restartruntimelandscape，portraitapp
-    // landscape → → 「」。
+    // note: ****orientation. 
+    // landscape: orientation"apporientation"
+    // ( wantLandscapeFor).  F11 restartruntimelandscape, portraitapp
+    // landscape → → "". 
   }
   return next.display.mode;
 }
 
-/** adb / emulator / System Image， 1~5 */
+/** adb / emulator / System Image,  1~5 */
 let deploying = false;
 async function autoDeploy({ force = false } = {}) {
   if (deploying || !store.getSettings().autoDeploy) return { ok: false, error: 'skipped' };
-  // downloadfailure： checkEnv() ，launch ApkStart
-  // 1.5GB runtime，「download」。
-  // failure，30 retry；「」
-  // force=true retry。success。
+  // downloadfailure:  checkEnv() , launch ApkStart
+  // 1.5GB runtime, "download". 
+  // failure, 30 retry; ""
+  // force=true retry. success. 
   const COOLDOWN_MS = 30 * 60 * 1000;
   const lastFail = Number(store.getSettings().runtime.deployFailedAt || 0);
   if (!force && lastFail && Date.now() - lastFail < COOLDOWN_MS) {
@@ -681,52 +681,52 @@ async function autoDeploy({ force = false } = {}) {
   try {
     const env = await runtime.provisioner.checkEnv();
     const needEngine = !env.emulator.ok || !env.sysimg.ok;
-    // runtime（install / store version）：****。
-    // system image（compress），boot engine.ensure() ；
-    // 1.5GB ，「system image」。
+    // runtime(install / store version): ****. 
+    // system image(compress), boot engine.ensure() ; 
+    // 1.5GB , "system image". 
     if (bundledRuntimeDir && env.adb.ok && env.emulator.ok && env.sysimg.ok) {
       appLog(`autoDeploy skipped: bundled runtime detected (${bundledRuntimeDir}), no network needed`
         + (env.needsExtract ? ', system image will be extracted locally on first launch' : ''));
-      // **success**，failure。 return succeeded，finally
-      // failure deployFailedAt —— runtime 30
-      // 「failure」，log「failure …」，
-      // settings「retry」。
+      // **success**, failure.  return succeeded, finally
+      // failure deployFailedAt -- runtime 30
+      // "failure", log"failure ...", 
+      // settings"retry". 
       succeeded = true;
       return { ok: true, source: 'bundled', needsExtract: !!env.needsExtract };
     }
     if (bundledRuntimeDir && !env.emulator.ok) {
       appLog(`autoDeploy skipped download: runtime is bundled (${bundledRuntimeDir})`);
-      // diagnose「downloadfailure」，。
+      // diagnose"downloadfailure", . 
       succeeded = true;
       return { ok: false, error: 'bundled', bundled: true };
     }
-    // 「 GitHub runtime」： emulator + System Image，
-    // downloadupdate GitHub （ dl.google.com ）。
-    // （ / / ）。
+    // " GitHub runtime":  emulator + System Image, 
+    // downloadupdate GitHub ( dl.google.com ). 
+    // ( / / ). 
     if (needEngine && store.getSettings().runtime.preferGithubRuntime !== false) {
       try {
-        progress({ message: 'Downloading runtime from GitHub…' });
+        progress({ message: 'Downloading runtime from GitHub...' });
         await runtime.provisioner.installRuntimePack(progress);
         const afterPack = await runtime.provisioner.checkEnv();
         if (afterPack.emulator.ok && afterPack.sysimg.ok) {
           succeeded = true;
           return { ok: true, source: 'github' };
         }
-        progress({ message: 'Runtime bundle incomplete, fetching from official source…' });
+        progress({ message: 'Runtime bundle incomplete, fetching from official source...' });
       } catch (e) {
-        progress({ message: `GitHub runtime unavailable (${e.message}), switching to official source…` });
+        progress({ message: `GitHub runtime unavailable (${e.message}), switching to official source...` });
       }
     }
     if (!env.adb.ok) {
-      progress({ message: 'Preparing adb…' });
+      progress({ message: 'Preparing adb...' });
       await runtime.provisioner.installAdb(progress);
     }
     if (!env.emulator.ok) {
-      progress({ message: 'Preparing Android runtime…' });
+      progress({ message: 'Preparing Android runtime...' });
       await runtime.provisioner.installEmulator(progress);
     }
     if (!env.sysimg.ok) {
-      progress({ message: 'Preparing Android system image…' });
+      progress({ message: 'Preparing Android system image...' });
       await runtime.provisioner.installSystemImage(progress);
     }
     const after = await runtime.provisioner.checkEnv();
@@ -735,7 +735,7 @@ async function autoDeploy({ force = false } = {}) {
   } catch (e) {
     return { ok: false, error: e.message };
   } finally {
-    // 「failure」；successfailure。
+    // "failure"; successfailure. 
     try {
       store.saveSettings({ runtime: { deployFailedAt: succeeded ? 0 : Date.now() } });
     } catch (_) { /* settings */ }
@@ -750,7 +750,7 @@ function launcherInfo() {
   return { target: process.execPath, args: `"${APP_ROOT}"`, cwd: APP_ROOT };
 }
 
-/** directory（best-effort，；directorypath） */
+/** directory(best-effort, ; directorypath) */
 function copyDirContents(src, dest) {
   if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
@@ -764,13 +764,13 @@ function copyDirContents(src, dest) {
   }
 }
 
-/** Windows （ VirtualMachinePlatform / HypervisorPlatform） */
+/** Windows ( VirtualMachinePlatform / HypervisorPlatform) */
 /**
- * Windows 。
+ * Windows . 
  *
- * { ok, cancelled, code, feature }：
- * cancelled 1223（ERROR_CANCELLED）「 UAC 」「failure」——
- * ok:false，UI 「」，。
+ * { ok, cancelled, code, feature }: 
+ * cancelled 1223(ERROR_CANCELLED)" UAC ""failure"--
+ * ok:false, UI "", . 
  */
 function enableWindowsFeature(feature) {
   return new Promise((resolve) => {
@@ -789,16 +789,16 @@ function enableWindowsFeature(feature) {
 }
 
 /**
- * WHPX（Windows Hypervisor Platform）。
+ * WHPX(Windows Hypervisor Platform). 
  *
- * note： Android emulator WHPX 
- * **「Windows 」(HypervisorPlatform)**；
- * 「」(VirtualMachinePlatform) WSL2 ， WHPX 。
- * ，（）。
+ * note:  Android emulator WHPX 
+ * **"Windows "(HypervisorPlatform)**; 
+ * ""(VirtualMachinePlatform) WSL2 ,  WHPX . 
+ * , (). 
  *
- * WinHvPlatform.dll ： DLL Windows 
- * （ WinHvPlatform.dll ， AEHD）——「 WHPX」
- * 。
+ * WinHvPlatform.dll :  DLL Windows 
+ * ( WinHvPlatform.dll ,  AEHD)--" WHPX"
+ * . 
  */
 async function enableWhpxFeatures() {
   const steps = [];
@@ -809,7 +809,7 @@ async function enableWhpxFeatures() {
   return { ok: steps.some((s) => s.ok), cancelled: steps.every((s) => s.cancelled), steps };
 }
 
-/** store version：MSIX mediumIL， */
+/** store version: MSIX mediumIL,  */
 const MSIX_ACCEL_HINT = 'Store edition cannot elevate permissions. Please enable manually:'
   + 'Press Win+R → type optionalfeatures → check "Windows Hypervisor Platform"'
   + '(HypervisorPlatform), click OK and restart PC.';
@@ -840,15 +840,15 @@ function createWindow({ show = true } = {}) {
   mainWindow.loadFile(path.join(__dirname, 'ui', 'index.html'));
   if (show) mainWindow.once('ready-to-show', () => mainWindow.show());
 
-  // error stdout：、，
-  // app.js id ，。
+  // error stdout: , , 
+  // app.js id , . 
   if (process.argv.includes('--smoke')) {
     mainWindow.webContents.on('console-message', (_e, level, message, line, source) => {
       if (level >= 2) console.log(`[renderer] ${message} (${String(source).split('/').pop()}:${line})`);
     });
   }
 
-  // （/GitHub ），appwindow
+  // (/GitHub ), appwindow
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https?:\/\//i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
@@ -871,7 +871,7 @@ function createWindow({ show = true } = {}) {
 }
 
 function showWindow() {
-  // window = ApkStart （taskbarapp）
+  // window = ApkStart (taskbarapp)
   setAumid(APP_AUMID);
   if (!mainWindow) createWindow();
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -885,10 +885,10 @@ let manualWindow = null;
 const manualAutoAt = new Map();
 
 /**
- * manual。payload 「」， core/manual.js ：
- * issue code / installerror / topic id ，directory。
- * reason='fix-failed' ： 60 ，repair
- * installfailuremanualwindow。
+ * manual. payload "",  core/manual.js : 
+ * issue code / installerror / topic id , directory. 
+ * reason='fix-failed' :  60 , repair
+ * installfailuremanualwindow. 
  */
 function openManual(payload = {}) {
   const target = manual.resolve(payload);
@@ -922,7 +922,7 @@ function openManual(payload = {}) {
         },
       });
       manualWindow.on('closed', () => { manualWindow = null; });
-      // manual（GitHub/Gitee）；window。
+      // manual(GitHub/Gitee); window. 
       manualWindow.webContents.setWindowOpenHandler(({ url }) => {
         if (/^https?:\/\//i.test(url)) shell.openExternal(url);
         return { action: 'deny' };
@@ -933,7 +933,7 @@ function openManual(payload = {}) {
         if (/^https?:\/\//i.test(url)) shell.openExternal(url);
       });
     }
-    manualWindow.setTitle(`ApkBolt Guide · ${target.title}`);
+    manualWindow.setTitle(`ApkBolt Guide  -  ${target.title}`);
     manualWindow.loadFile(path.join(__dirname, 'ui', 'manual.html'), { hash: target.anchor });
     manualWindow.once('ready-to-show', () => {
       if (!manualWindow || manualWindow.isDestroyed()) return;
@@ -945,7 +945,7 @@ function openManual(payload = {}) {
     appLog(`manual open ${target.id}#${target.anchor} reason=${target.reason || 'manual'}`);
   } catch (e) {
     appLog(`manual open failed: ${e && e.message}`);
-    // manualrepair：
+    // manualrepair: 
     shell.openExternal('https://github.com/abhi666-max/apkbolt#readme').catch(() => {});
   }
   return target;
@@ -963,18 +963,18 @@ function send(channel, payload) {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(channel, payload);
 }
 
-// ---------------- check（ debug）----------------
+// ---------------- check( debug)----------------
 
 /**
- * check = ，「」。
+ * check = , "". 
  *
- * （）：
- * 1) ： src/core/autodebug-probe.js（），
- * src/core/autodebug.js（，）。
- * 2) probefailure ≠ ：，「」，
- * 「」。，。
- * 3) 「」：hint，
- * ；。
+ * (): 
+ * 1) :  src/core/autodebug-probe.js(), 
+ * src/core/autodebug.js(, ). 
+ * 2) probefailure ≠ : , "", 
+ * "". , . 
+ * 3) "": hint, 
+ * ; . 
  */
 let autodebugState = { issues: [], summary: null, at: 0, running: false };
 let autodebugTimer = null;
@@ -1006,10 +1006,10 @@ async function runAutodebug({ force = false } = {}) {
     autodebugState = { issues, summary, at: Date.now(), running: false };
     send('autodebug:state', autodebugState);
     if (cfg.notify) {
-      // 「 error」：warn/info settings，。
+      // " error": warn/info settings, . 
       const fresh = added.filter((i) => i.severity === 'error');
       if (fresh.length) {
-        const text = fresh.map((i) => i.title).join('；');
+        const text = fresh.map((i) => i.title).join('; ');
         send('toast', { type: 'error', message: `Auto-diagnostics found issues: ${text} (Settings → Diagnostics)` });
         notify('Issues detected', `${text}. Open ApkBolt Settings → Diagnostics & Repair to resolve.`);
         appLog(`autodebug new issues: ${fresh.map((i) => i.code).join(',')}`);
@@ -1017,7 +1017,7 @@ async function runAutodebug({ force = false } = {}) {
     }
     return autodebugState;
   } catch (e) {
-    // checkfailure：log，。
+    // checkfailure: log, . 
     appLog(`autodebug failed: ${e && e.message}`);
     autodebugState = { ...autodebugState, running: false, error: String((e && e.message) || e) };
     send('autodebug:state', autodebugState);
@@ -1051,11 +1051,11 @@ function buildTray() {
   }
   const refresh = () => {
     const apps = store.getApps().slice(0, 8);
-    // window， ——
-    // 「app」，app。
-    // 「app」 currentAppPkg runtime.activeApps：
-    // endApp activeApps ， false。
-    // currentAppPkg app（endApp ），。
+    // window,  --
+    // "app", app. 
+    // "app" currentAppPkg runtime.activeApps: 
+    // endApp activeApps ,  false. 
+    // currentAppPkg app(endApp ), . 
     const hasRunning = currentAppPkg && runtime && runtime.activeApps
       ? runtime.activeApps.includes(currentAppPkg)
       : false;
@@ -1076,7 +1076,7 @@ function buildTray() {
         click: () => {
           const pkg = currentAppPkg;
           if (!pkg) return;
-          // app:stop path，
+          // app:stop path, 
           stopApp(pkg).then(() => refresh());
         },
       },
@@ -1127,10 +1127,10 @@ function buildTray() {
     ]);
     tray.setContextMenu(menu);
   };
-  tray.setToolTip('ApkBolt — Fast Android Runtime');
-  // Windows window（）。
-  // double-click，，。
-  // ， showWindow 。
+  tray.setToolTip('ApkBolt - Fast Android Runtime');
+  // Windows window(). 
+  // double-click, , . 
+  // ,  showWindow . 
   tray.on('click', () => showWindow());
   tray.on('double-click', () => showWindow());
   refresh();
@@ -1139,15 +1139,15 @@ function buildTray() {
 
 // ---------------- ----------------
 
-let installBusy = null;   // installpath： APK second-instance，
+let installBusy = null;   // installpath:  APK second-instance, 
 let lastInstallErr = { msg: '', at: 0 };
 
 async function runInstall(filePath) {
   showWindow();
-  // （ / ）→ hint，install
+  // ( / )→ hint, install
   if (installBusy) {
     if (installBusy === filePath) {
-      send('toast', { type: 'info', message: 'This APK is currently installing, please wait…' });
+      send('toast', { type: 'info', message: 'This APK is currently installing, please wait...' });
       return { ok: false, error: 'Installation already in progress' };
     }
     send('toast', { type: 'info', message: 'An installation is already running. Please wait for it to finish.' });
@@ -1158,18 +1158,18 @@ async function runInstall(filePath) {
   try {
     const result = await installer.install(filePath, (p) => send('install:progress', p));
     send('install:done', result);
-    // desktop，「shortcut」
+    // desktop, "shortcut"
     windowctl.refreshShell().catch(() => {});
     notify('Installation Complete', `${result.app.label} is installed${result.app.shortcutPath ? ' (desktop shortcut created)' : ''}`);
     return result;
   } catch (e) {
     send('install:error', { message: e.message, file: filePath });
     if (e.needsSetup) send('ui:navigate', 'setup');
-    // error 8 ：retry
+    // error 8 : retry
     const now = Date.now();
     if (e.message !== lastInstallErr.msg || now - lastInstallErr.at > 8000) {
       lastInstallErr = { msg: e.message, at: now };
-      // windowhint，
+      // windowhint, 
       if (!mainWindow || !mainWindow.isVisible() || mainWindow.isMinimized()) {
         notify('Installation Failed', e.message.slice(0, 120));
       }
@@ -1181,14 +1181,14 @@ async function runInstall(filePath) {
 }
 
 /**
- * downloadinstallversion， update-apply 「 + restart」。
- * path。
+ * downloadinstallversion,  update-apply " + restart". 
+ * path. 
  */
 async function runUpdate() {
   if (updateBusy) return { ok: false, error: 'Update in progress' };
-  // （MSIX）update：installdirectory C:\Program Files\WindowsApps ，
-  // exe failure，verify、app。
-  // update Microsoft Store（ms-windows-store: ）。
+  // (MSIX)update: installdirectory C:\Program Files\WindowsApps , 
+  // exe failure, verify, app. 
+  // update Microsoft Store(ms-windows-store: ). 
   if (store.STORE_BUILD) {
     shell.openExternal('ms-windows-store://downloadsandupdates').catch(() => {});
     return { ok: false, error: 'Store updates are handled by Microsoft Store', manual: true };
@@ -1203,11 +1203,11 @@ async function runUpdate() {
       shell.openExternal(info.htmlUrl || Updater.repoUrl()).catch(() => {});
       return { ok: false, error: 'No direct installer package available, opened releases page', manual: true };
     }
-    sendProgress({ stage: 'download', percent: 0, message: 'Preparing download…' });
+    sendProgress({ stage: 'download', percent: 0, message: 'Preparing download...' });
     const job = await updater.prepare(info);
-    sendProgress({ stage: 'apply', percent: 100, message: 'Updating files and restarting…' });
+    sendProgress({ stage: 'apply', percent: 100, message: 'Updating files and restarting...' });
     updater.apply(job);
-    // 「restart」，exit（before-quit emulatorwindow）
+    // "restart", exit(before-quit emulatorwindow)
     setTimeout(() => { quitting = true; app.quit(); }, 900);
     return { ok: true, version: info.version, mode: job.mode };
   } catch (e) {
@@ -1219,19 +1219,19 @@ async function runUpdate() {
 }
 
 /**
- * launch。
+ * launch. 
  *
- * launch 80 （restart + cold boot）。app、
- * 、 —— ：
- * openAppWindow launchapp（close + endApp），restart，
- * failure，log `cmd: Can't find service: activity` / `device not found`，
- * 「，」。
+ * launch 80 (restart + cold boot). app, 
+ * ,  -- : 
+ * openAppWindow launchapp(close + endApp), restart, 
+ * failure, log `cmd: Can't find service: activity` / `device not found`, 
+ * ", ". 
  *
- * ：app → （）；app → 
- * ，runtime。
+ * : app → (); app → 
+ * , runtime. 
  */
 let launchInFlight = null;
-// 「software emulation」，app
+// "software emulation", app
 let accelWarned = false;
 
 async function runLaunch(pkg) {
@@ -1254,14 +1254,14 @@ async function runLaunch(pkg) {
 async function launchOne(pkg) {
   const t0 = Date.now();
   const mark = (s) => appLog(`launch ${pkg} ${s} +${Date.now() - t0}ms`);
-  // 「」：，。
-  // ，。
+  // "": , . 
+  // , . 
   let attachDoneEarly = false;
   let earlyAttachOk = false;
-  // launch： splash window + appwindow boot 。
-  // （onAppUp first frame / launch fallback / ），
-  // boot 「appfirst frame」， Splash ——
-  // 「Androidlaunch」。
+  // launch:  splash window + appwindow boot . 
+  // (onAppUp first frame / launch fallback / ), 
+  // boot "appfirst frame",  Splash --
+  // "Androidlaunch". 
   let bootAnimDone = false;
   let bootFuse = null;
   const finishBootAnimation = () => {
@@ -1271,31 +1271,31 @@ async function launchOne(pkg) {
     if (appWin && appWin.isOpen) appWin.setState({ ready: true, tip: '' });
     if (typeof splashDone === 'function') splashDone();
   };
-  // ：waitForAppFirstFrame 20 ， 4 。path（first frame
-  // 、onAppUp 、launch ），24 ，
-  // launch。
+  // : waitForAppFirstFrame 20 ,  4 . path(first frame
+  // , onAppUp , launch ), 24 , 
+  // launch. 
   bootFuse = setTimeout(finishBootAnimation, 24000);
   bootFuse.unref?.();
   appLog(`launch start ${pkg}`);
   try {
-    // 0) window，appwindow。
-    // ： openAppWindow() 、armAgent() hide()，
-    // armAgent windowcold boot（300~600ms），「window +
-    // appwindow(+ boot)」 —— window。
+    // 0) window, appwindow. 
+    // :  openAppWindow() , armAgent() hide(), 
+    // armAgent windowcold boot(300~600ms), "window +
+    // appwindow(+ boot)" -- window. 
     if (mainWindow && mainWindow.isVisible() && !IS_DEV) mainWindow.hide();
-    // 1) 「appwindow」launch：Androiddesktop，emulatorwindow
-    await openAppWindow(pkg, 'Starting Android runtime…');
+    // 1) "appwindow"launch: Androiddesktop, emulatorwindow
+    await openAppWindow(pkg, 'Starting Android runtime...');
     /**
- * window：**、**emulatorwindow，
- * 「launch」window。
+ * window: **, **emulatorwindow, 
+ * "launch"window. 
      *
- * ，window（ + Logo + ），
- * window am start —— cold boot / orientation 30 。
- * 「launchwindow」。
+ * , window( + Logo + ), 
+ * window am start -- cold boot / orientation 30 . 
+ * "launchwindow". 
      *
- * cold boot Qt windowruntime，failure，
- * ： 1.5 ，success（ 30 ）。orientationrestartruntime，
- * windowruntime、window。
+ * cold boot Qt windowruntime, failure, 
+ * :  1.5 , success( 30 ). orientationrestartruntime, 
+ * windowruntime, window. 
      */
     if (displaySettings().windowEmbed === false && appWin && appWin.isOpen) {
       let tries = 0;
@@ -1303,11 +1303,11 @@ async function launchOne(pkg) {
       const preAttach = async () => {
         if (!appWin || !appWin.isOpen) return;
         rounds += 1;
-        // ：failure， 45 （ 1 ），
-        // failure。
+        // : failure,  45 ( 1 ), 
+        // failure. 
         if (rounds > 45) return;
-        // orientation、restartruntime：
-        // window，。，restartcomplete。
+        // orientation, restartruntime: 
+        // window, . , restartcomplete. 
         if (appWin.waitingForRestart) {
           setTimeout(preAttach, 1500);
           return;
@@ -1320,9 +1320,9 @@ async function launchOne(pkg) {
       };
       preAttach();
     }
-    // bootemulator + qemu / netsimd ，。
-    // resident（embed window， appwin.embed）。
-    // await：，launch。
+    // bootemulator + qemu / netsimd , . 
+    // resident(embed window,  appwin.embed). 
+    // await: , launch. 
     if (winAgent) { try { await armAgent(winAgent); } catch (_) { /* ignore */ } }
 
     const r = await installer.launch(pkg, {
@@ -1332,10 +1332,10 @@ async function launchOne(pkg) {
         if (typeof splashProgress === 'function') splashProgress({ message: m });
       },
       onMark: mark,
-      // app， 4 「」。
-      // 4 ，「」；app，
-      // （ 7.2s → 3s）。
-      // await：，complete。
+      // app,  4 "". 
+      // 4 , ""; app, 
+      // ( 7.2s → 3s). 
+      // await: , complete. 
       onAppUp: () => {
         attachDoneEarly = true;
         mark('app up (early attach)');
@@ -1344,72 +1344,72 @@ async function launchOne(pkg) {
             earlyAttachOk = ok;
             mark(`early attach=${ok}`);
             if (!ok) return;
-            // ≠ first frame：Android 12+ Activity first frame
-            // Splash（app + ）。boot，
-            // ，。 Splash （first frame），
-            // timeout（failure）。
+            // ≠ first frame: Android 12+ Activity first frame
+            // Splash(app + ). boot, 
+            // , .  Splash (first frame), 
+            // timeout(failure). 
             let painted = true;
             try {
               const c = runtime.client();
               if (c && typeof c.waitForAppFirstFrame === 'function') {
-                // app am start first frame 15 ，
-              // 12 boot、 Splash 。
-              // 20 ；，。
+                // app am start first frame 15 , 
+              // 12 boot,  Splash . 
+              // 20 ; , . 
               painted = await c.waitForAppFirstFrame(pkg, { timeoutMs: 20000 });
               }
             } catch (_) { /* failure */ }
             mark(`first frame=${painted}`);
-            // first frame（ 20 fallback）： splash windowappwindow
-            // boot ，applaunch Splash 。
+            // first frame( 20 fallback):  splash windowappwindow
+            // boot , applaunch Splash . 
             finishBootAnimation();
           })
           .catch(() => { earlyAttachOk = false; finishBootAnimation(); });
-        // app Activity ，orientation（portrait），
-        // orientation —— 「/landscape 90 」。
-        // orientationself-healing（ init/cur，）。
+        // app Activity , orientation(portrait), 
+        // orientation -- "/landscape 90 ". 
+        // orientationself-healing( init/cur, ). 
         setTimeout(() => {
           runtime._healOrientation?.().catch(() => {});
-          // apporientation（ sensor app）
+          // apporientation( sensor app)
           learnAppOrientation(pkg).catch(() => {});
         }, 1800);
       },
-      // launchorientationsettings。
-      // landscape（hw.lcd.width/height ）+ restart，
-      // boot config.ini 。「landscape」settings、portrait
-      // （）， wm size / wm user-rotation 。
-      // restart，reloadApp=false launchapp。
+      // launchorientationsettings. 
+      // landscape(hw.lcd.width/height )+ restart, 
+      // boot config.ini . "landscape"settings, portrait
+      // (),  wm size / wm user-rotation . 
+      // restart, reloadApp=false launchapp. 
       beforeStart: async (rt) => {
         mark('engine ready');
-        // orientationapporientation， Android
-        // （）。wantLandscapeFor 「settings / app /
-        // APK orientation」，。
+        // orientationapporientation,  Android
+        // (). wantLandscapeFor "settings / app /
+        // APK orientation", . 
         const wantLand = wantLandscapeFor(pkg);
         const cur = runtime.emulator && typeof runtime.emulator.panelLandscape === 'function'
           ? runtime.emulator.panelLandscape()
           : null;
         if (cur !== null && cur !== wantLand) {
           mark(`orientation mismatch (panel=${cur ? 'landscape' : 'portrait'}, want=${wantLand}) correcting via restart`);
-          appWin.setState({ tip: wantLand ? 'Switching to landscape…' : 'Switching to portrait…' });
-          // restartForOrientation restartruntime rt（ client ）。
-          // installer.launch， resetDisplayOverrides / startApp
-          // client，failure（catch ，app）。
+          appWin.setState({ tip: wantLand ? 'Switching to landscape...' : 'Switching to portrait...' });
+          // restartForOrientation restartruntime rt( client ). 
+          // installer.launch,  resetDisplayOverrides / startApp
+          // client, failure(catch , app). 
           const newRt = await restartForOrientation(wantLand, { reloadApp: false }).catch(() => null);
           mark('orientation fixed');
           if (newRt && newRt.ok) return newRt;
         }
-        appWin.setState({ tip: 'Opening app…' });
-        // + + ：，launch
+        appWin.setState({ tip: 'Opening app...' });
+        // + + : , launch
         await rt.client.prepareForeground().catch(() => {});
         mark('foreground ready');
-        // restart null（installer rt）
+        // restart null(installer rt)
         return null;
       },
     });
     mark('app started');
 
-    // 2) app，（desktop/）
-    // onAppUp （），「」， ——
-    // windowwindow/，。
+    // 2) app, (desktop/)
+    // onAppUp (), "",  --
+    // windowwindow/, . 
     let embedded;
     if (attachDoneEarly) {
       embedded = !!earlyAttachOk;
@@ -1417,16 +1417,16 @@ async function launchOne(pkg) {
     } else {
       embedded = await attachAppWindow();
     }
-    // log：window embedded=true
-    // 「（emulatorwindow）」，「window」。
-    // logsettings。
+    // log: window embedded=true
+    // "(emulatorwindow)", "window". 
+    // logsettings. 
     const attachMode = displaySettings().windowEmbed === false ? 'detached' : 'embed';
     if (!embedded) appLog(`attach failed (${attachMode}): ${appWin.lastEmbedError || 'unknown'}`);
     mark(`${attachMode}=${embedded}`);
-    // completewindowwindow。window（）Android，
-    // 「black screen / 」，mouseapp（window）。
-    // topmost ， Z ，。
-    // window：emulatorwindow，window。
+    // completewindowwindow. window()Android, 
+    // "black screen / ", mouseapp(window). 
+    // topmost ,  Z , . 
+    // window: emulatorwindow, window. 
     const detachedMode = displaySettings().windowEmbed === false;
     if (appWin.isOpen && !detachedMode) {
       try {
@@ -1441,43 +1441,43 @@ async function launchOne(pkg) {
         }, 700);
       } catch (_) { /* window */ }
     }
-    // 「」path。 onAppUp ，
-    // first frame， finishBootAnimation（first framecomplete/timeout/），
-    // Splash boot ， Splash 。
+    // ""path.  onAppUp , 
+    // first frame,  finishBootAnimation(first framecomplete/timeout/), 
+    // Splash boot ,  Splash . 
     if (!attachDoneEarly) finishBootAnimation();
-    // ：，「app + 」，
-    // App Android。mousekeymaphookwindow focus
-    // settings，uninstall。
+    // : , "app + ", 
+    // App Android. mousekeymaphookwindow focus
+    // settings, uninstall. 
     deviceSize.value = null;
     appWin.refreshPointer();
     await runtime.beginApp(pkg, { onActive: onContainerActive }).catch(() => {});
-    // /：window，desktop EnumWindows stutter
+    // /: window, desktop EnumWindows stutter
     if (winAgent) {
       const game = store.getSettings().engine?.priorityMode === 'game';
       winAgent.setPerformanceMode(game).catch(() => {});
     }
     send('app:launched', { package: pkg, engine: r.engine });
     appLog(`launch ok ${pkg} ${attachMode}=${embedded}`);
-    // software emulationlaunchapp：，/
-    // settings，。appwindow，。
+    // software emulationlaunchapp: , /
+    // settings, . appwindow, . 
     if (!accelWarned) {
       runtime.provisioner.emulatorAccel().then((a) => {
         if (!a || a.ok) return;
         accelWarned = true;
         notify('Running in software simulation mode (slow)', store.STORE_BUILD
-          ? 'Enable Windows Hypervisor Platform and reboot for 5–10x faster performance.'
+          ? 'Enable Windows Hypervisor Platform and reboot for 5-10x faster performance.'
             + 'Open Settings → Diagnostics → Fix to open system configuration.'
           : 'Open Settings → Diagnostics → Fix to enable with one click (requires UAC), then restart PC.');
       }).catch(() => {});
     }
-    // fallback： early attach （embedded mode），。，。
+    // fallback:  early attach (embedded mode), . , . 
     finishBootAnimation();
     return { ok: true, embedded };
   } catch (e) {
     appLog(`launch failed ${pkg}: ${e && (e.stack || e.message)}`);
     try { appWin.close({ keepApp: true }); } catch (_) { /* ignore */ }
-    // launchfailureemulatorwindow（「emulatorwindow」），
-    // app → embed path。
+    // launchfailureemulatorwindow("emulatorwindow"), 
+    // app → embed path. 
     if (winAgent) armAgent(winAgent).catch(() => {});
     showWindow();
     send('toast', { type: 'error', message: `Launch failed: ${e.message}` });
@@ -1486,10 +1486,10 @@ async function launchOne(pkg) {
 }
 
 /**
- * /appwindow。
- * 8 directory adb find/stat，；
- * ApkStart launch， Android app。
- * app，window。
+ * /appwindow. 
+ * 8 directory adb find/stat, ; 
+ * ApkStart launch,  Android app. 
+ * app, window. 
  */
 function onContainerActive(on) {
   if (on) {
@@ -1502,13 +1502,13 @@ function onContainerActive(on) {
 }
 
 /**
- * Androidapp —— path。
+ * Androidapp -- path. 
  *
- * ：
- * 1. forceStop app（endApp ）
- * 2. ：embedded modewindow；emulatorwindow
- * （：windowemulatorwindowdesktop park）
- * 3. currentAppPkg，「app」
+ * : 
+ * 1. forceStop app(endApp )
+ * 2. : embedded modewindow; emulatorwindow
+ * (: windowemulatorwindowdesktop park)
+ * 3. currentAppPkg, "app"
  *
  * @param {string} pkg app
  * @param {object} [opts] { keepWindow } keepWindow=true window
@@ -1523,8 +1523,8 @@ async function stopApp(pkg, opts = {}) {
     appLog(`stop ${target}`);
 
     if (!opts.keepWindow) {
-      // window：emulatorwindow，window。
-      // desktopemulatorwindow。
+      // window: emulatorwindow, window. 
+      // desktopemulatorwindow. 
       if (detached && appWin && appWin.isOpen) {
         try { await appWin.agent.hide(); } catch (_) { /* ignore */ }
       }
@@ -1533,7 +1533,7 @@ async function stopApp(pkg, opts = {}) {
       }
     }
 
-    // app：、「app」
+    // app: , "app"
     if (currentAppPkg === target) currentAppPkg = null;
 
     try { send('apps:changed'); } catch (_) { /* ignore */ }
@@ -1544,7 +1544,7 @@ async function stopApp(pkg, opts = {}) {
   }
 }
 
-/** ：appwindow，window， */
+/** : appwindow, window,  */
 function startNotifier() {
   if (!notifier) {
     notifier = new NotifyBridge({
@@ -1578,7 +1578,7 @@ function registerIpc() {
     packaged: app.isPackaged,
   }));
 
-  // launch（boot / ）：
+  // launch(boot / ): 
   ipcMain.handle('app:startupInfo', () => {
     const a = parseArgs(process.argv);
     return {
@@ -1590,7 +1590,7 @@ function registerIpc() {
     };
   });
 
-  // （runtime/system image/app）
+  // (runtime/system image/app)
   ipcMain.handle('dialog:openDir', async (_e, defaultPath) => {
     const r = await dialog.showOpenDialog(mainWindow, {
       title: 'Select Data Directory',
@@ -1641,11 +1641,11 @@ function registerIpc() {
   ipcMain.handle('app:launch', async (_e, pkg) => runLaunch(pkg));
 
   /**
- * Androidapp。
+ * Androidapp. 
    *
- * ：endApp 「appwindow」，window
- * window、，app，
- * exit ApkStart（）。
+ * : endApp "appwindow", window
+ * window, , app, 
+ * exit ApkStart(). 
    */
   ipcMain.handle('app:stop', async (_e, pkg, opts = {}) => stopApp(pkg, opts));
 
@@ -1675,10 +1675,10 @@ function registerIpc() {
   });
 
   /**
- * appportrait（app）。
- * apps.json orientationOverride，restartruntime ——
- * app wantLandscapeFor orientation。
- * null ， APK orientation。
+ * appportrait(app). 
+ * apps.json orientationOverride, restartruntime --
+ * app wantLandscapeFor orientation. 
+ * null ,  APK orientation. 
    */
   ipcMain.handle('app:setOrientation', async (_e, { pkg, orientation: value }) => {
     if (!pkg) return { ok: false, error: 'Missing package name' };
@@ -1701,9 +1701,9 @@ function registerIpc() {
   });
 
   /**
- * memory / CPU / data partition、，
- * ： settings.json、version，
- * boot qemu -memory 32 exit，disk。
+ * memory / CPU / data partition, , 
+ * :  settings.json, version, 
+ * boot qemu -memory 32 exit, disk. 
    */
   const sanitizeResourcePatch = (patch) => {
     if (!patch || !patch.engine) return patch;
@@ -1728,21 +1728,21 @@ function registerIpc() {
     const next = store.saveSettings(patch);
     if (patch && patch.autoStart !== undefined) applyAutoStart();
     if (patch && patch.display && appWin && appWin.isOpen) {
-      // portrait：window，app
+      // portrait: window, app
       appWin.portrait = portraitSize();
     }
-    // 「shortcut」，install
+    // "shortcut", install
     if (patch && (patch.createStartMenuShortcut === true || patch.createShortcutOnInstall === true)) {
       installer.ensureShortcuts().catch(() => {});
     }
-    // mousekeymap：/uninstallhook，window
+    // mousekeymap: /uninstallhook, window
     if (patch && patch.engine && (
       'mouseRightBack' in patch.engine || 'mouseWheelMode' in patch.engine || 'mouseSideButtons' in patch.engine
     )) {
       refreshPointerMapping();
     }
-    // update / system image / ：「」，cache；
-    // runtime / / system imagecache provisioner._cache ，restart。
+    // update / system image / : "", cache; 
+    // runtime / / system imagecache provisioner._cache , restart. 
     if (patch && patch.runtime && (
       'sourcePreference' in patch.runtime || 'mirrorPrefix' in patch.runtime
       || 'autoMirror' in patch.runtime || 'runtimePackUrl' in patch.runtime
@@ -1758,8 +1758,8 @@ function registerIpc() {
   });
 
   /**
- * directory：directorydirectory（best-effort，），
- * settings。Sharer store.getSettings().sharedDir，restart。
+ * directory: directorydirectory(best-effort, ), 
+ * settings. Sharer store.getSettings().sharedDir, restart. 
    */
   ipcMain.handle('settings:setSharedDir', async (_e, dir) => {
     if (!dir || !dir.trim()) return { ok: false, error: 'Directory cannot be empty' };
@@ -1790,7 +1790,7 @@ function registerIpc() {
       const full = next.display.mode === 'fullscreen';
       if (full && !appWin.win.isMaximized()) appWin.win.maximize();
       if (!full && appWin.win.isMaximized()) appWin.win.unmaximize();
-      // = landscape（ toggleDisplayMode ）
+      // = landscape( toggleDisplayMode )
       appWin.setLandscape(full).catch(() => {});
       appWin.scheduleFit();
     }
@@ -1800,18 +1800,18 @@ function registerIpc() {
   ipcMain.handle('display:toggle', () => toggleDisplayMode());
 
   ipcMain.handle('shortcut:rebuild', async () => ({ ok: true, fixed: await installer.ensureShortcuts() }));
-  // 「」retry，failure
+  // ""retry, failure
   ipcMain.handle('runtime:autoDeploy', (_e, opts = {}) => autoDeploy({ force: !!opts.force }));
-  // 「」 pm disable-user
+  // "" pm disable-user
   ipcMain.handle('settings:restoreSystem', async () => runtime.restoreSystemApps());
-  // mousekeymap：configuration，uninstall（/wheelhook）
+  // mousekeymap: configuration, uninstall(/wheelhook)
   ipcMain.handle('settings:refreshPointer', async () => { refreshPointerMapping(); return true; });
-  // ：「settings」
+  // : "settings"
   ipcMain.handle('settings:unhook', async () => { refreshPointerMapping(); return true; });
 
   // ---------------- checkup / configuration ----------------
-  // probe（memory、、、）；
-  // （ Windows 、 AEHD）； BIOS 。
+  // probe(memory, , , ); 
+  // ( Windows ,  AEHD);  BIOS . 
 
   ipcMain.handle('preflight:run', async () => {
     const preflight = require('./core/preflight');
@@ -1824,8 +1824,8 @@ function registerIpc() {
   });
 
   /**
- * appcheckuprecommended：settings + patchdriver。
- * preflight （memory / / / / software emulation）。
+ * appcheckuprecommended: settings + patchdriver. 
+ * preflight (memory / / / / software emulation). 
    */
   ipcMain.handle('preflight:apply', async () => {
     const preflight = require('./core/preflight');
@@ -1838,13 +1838,13 @@ function registerIpc() {
     const patch = sanitizeResourcePatch(report.patch);
     const next = store.saveSettings(patch);
 
-    // parametersdriver：boot，checkup。
-    // verify —— checkupwhitelist。
+    // parametersdriver: boot, checkup. 
+    // verify -- checkupwhitelist. 
     let driverFile = '';
     let driverError = '';
     try {
       const v = drv.validateDriver(report.driver);
-      if (!v.ok) throw new Error(v.errors.join('；'));
+      if (!v.ok) throw new Error(v.errors.join('; '));
       const dir = drv.userDir(store);
       fs.mkdirSync(dir, { recursive: true });
       driverFile = path.join(dir, `${v.driver.id}.json`);
@@ -1866,11 +1866,11 @@ function registerIpc() {
     };
   });
 
-  // ---------------- driver（patch） ----------------
-  // driver JSON：「」+「launchparameters」。
-  // 「directory / verify / / / / 」，。
+  // ---------------- driver(patch) ----------------
+  // driver JSON: ""+"launchparameters". 
+  // "directory / verify / / / / ", . 
 
- /** + driver + （settings） */
+ /** + driver + (settings) */
   async function driverOverview() {
     const drv = require('./core/drivers');
     const doctor = require('./core/doctor');
@@ -1941,7 +1941,7 @@ function registerIpc() {
     if (r.canceled || !r.filePaths.length) return { ok: false, canceled: true };
     const out = drv.importDriver(r.filePaths[0], drv.userDir(store));
     if (out.ok) {
-      // ：patch，default
+      // : patch, default
       const s = store.getSettings();
       store.saveSettings({ drivers: { state: { ...(s.drivers.state || {}), [out.driver.id]: true } } });
       send('runtime:log', `Driver imported: ${out.driver.name} v${out.driver.version}`);
@@ -1989,8 +1989,8 @@ function registerIpc() {
 
   ipcMain.handle('doctor:profile', async () => {
     const doctor = require('./core/doctor');
-    // bootparameters；boot「version + 」，
-    // settings swiftshader_indirect / software emulation，。
+    // bootparameters; boot"version + ", 
+    // settings swiftshader_indirect / software emulation, . 
     let p = runtime.emulator.profile;
     if (!p) {
       const env = await runtime.provisioner.checkEnv();
@@ -2011,34 +2011,34 @@ function registerIpc() {
   });
 
   /**
- * verify：launch/「、」，
- * repair（ + settings，repair）。
+ * verify: launch/", ", 
+ * repair( + settings, repair). 
    */
   ipcMain.handle('doctor:selfCheck', async () => {
     const doctor = require('./core/doctor');
     const issues = [];
-    // try 、 try ，
+    // try ,  try , 
     let accel = { ok: false };
     let free = 0;
     try {
       if (!doctor.vcRedistOk()) {
         issues.push({
           code: 'vcRedist', severity: 'error', title: 'Missing VC++ Runtime (x64)',
-          // dll ，。：0xC0000135
-          // VC++——store version WindowsApps 。
-          // ，manual 6.8 ，。
+          // dll , . : 0xC0000135
+          // VC++--store version WindowsApps . 
+          // , manual 6.8 , . 
           hint: 'System is missing Microsoft Visual C++ 2015-2022 (x64), which Android runtime requires.'
             + 'Can be installed automatically. If error 0xC0000135 persists, see User Guide.', fix: 'vcRedist',
         });
       }
       accel = await runtime.provisioner.emulatorAccel().catch(() => ({ ok: false }));
       if (!accel.ok) {
-        // store versioninstallpath，hint：
-        // - （MSIX）driver、 →
-        // 「 Windows 」「Windows 」；
-        // - install/portable version（failure AEHD driver）。
-        // version，「install AEHD driver」——
-        // store versiondriver，。
+        // store versioninstallpath, hint: 
+        // - (MSIX)driver,  →
+        // " Windows ""Windows "; 
+        // - install/portable version(failure AEHD driver). 
+        // version, "install AEHD driver"--
+        // store versiondriver, . 
         issues.push(store.STORE_BUILD
           ? {
             code: 'accel',
@@ -2063,7 +2063,7 @@ function registerIpc() {
       if (free && free < 8192) {
         issues.push({
           code: 'disk', severity: free < 2048 ? 'error' : 'warn', title: 'Runtime Disk Space Running Low',
-          hint: `「${runtime.provisioner.paths().root}」drive has only ${free} MB free; runtime and images require more space.`, fix: 'disk',
+          hint: `"${runtime.provisioner.paths().root}"drive has only ${free} MB free; runtime and images require more space.`, fix: 'disk',
         });
       }
       const rtDir = runtime.provisioner.paths().root;
@@ -2083,7 +2083,7 @@ function registerIpc() {
       if (!env.sysimg || !env.sysimg.ok) {
         issues.push({ code: 'sysimg', severity: 'warn', title: 'System Image Not Ready', hint: 'Android system image needs to be downloaded (~1.5 GB).', fix: 'deploy' });
       }
-      // lock file：launch「AVD 」 FATAL
+      // lock file: launch"AVD " FATAL
       const avdHome = runtime.provisioner.paths().avdHome;
       let locked = false;
       try { for (const f of fs.readdirSync(avdHome)) { if (/\.lock$/i.test(f)) { locked = true; break; } } } catch (_) { /* ignore */ }
@@ -2094,12 +2094,12 @@ function registerIpc() {
     return { issues, accel, free };
   });
 
-  // ---------------- check（ debug）----------------
+  // ---------------- check( debug)----------------
 
- /** check（settings「check」 / ） */
+ /** check(settings"check" / ) */
   ipcMain.handle('autodebug:run', () => runAutodebug({ force: true }));
 
- /** （settings，） */
+ /** (settings, ) */
   ipcMain.handle('autodebug:state', () => autodebugState);
 
  /** */
@@ -2116,7 +2116,7 @@ function registerIpc() {
     return next;
   });
 
- /** emulator（emulator.exe launch，qemu detached ） */
+ /** emulator(emulator.exe launch, qemu detached ) */
   ipcMain.handle('app:clearOrphans', async () => {
     try {
       const r = await runtime.killOrphanEmulators({ onLog: (m) => appLog(`orphan: ${m}`) });
@@ -2126,7 +2126,7 @@ function registerIpc() {
     }
   });
 
- /** launchsnapshot（snapshotbootcold boot） */
+ /** launchsnapshot(snapshotbootcold boot) */
   ipcMain.handle('app:clearSnapshot', async () => {
     try {
       const ok = runtime.emulator.invalidateSnapshot();
@@ -2136,7 +2136,7 @@ function registerIpc() {
     }
   });
 
- /** restartruntime：self-healing unauthorized / / */
+ /** restartruntime: self-healing unauthorized / / */
   ipcMain.handle('runtime:restart', async () => {
     try {
       await runtime.stop({ onLog: (m) => appLog(`restart-stop: ${m}`) }).catch(() => {});
@@ -2147,8 +2147,8 @@ function registerIpc() {
     }
   });
 
-  // VC++ 2015-2022 x64 ：Androidemulator（Qt6） qemu 。
-  // 「」（0xc0000135 / MSVCP140 ）。
+  // VC++ 2015-2022 x64 : Androidemulator(Qt6) qemu . 
+  // ""(0xc0000135 / MSVCP140 ). 
   function vcRedistInstaller() {
     const p = runtime.provisioner.paths();
     const cands = [
@@ -2166,7 +2166,7 @@ function registerIpc() {
     if (!file) return { ok: false, reason: 'no-installer' };
     const { spawn } = require('child_process');
     await new Promise((resolve) => {
-      // RunAs install（VC++ ，）；/quiet /norestart restart
+      // RunAs install(VC++ , ); /quiet /norestart restart
       const ps = spawn('powershell.exe', ['-NoProfile', '-Command',
         `Start-Process -FilePath "${file}" -ArgumentList '/quiet','/norestart' -Verb RunAs -Wait`],
       { windowsHide: true, stdio: 'ignore' });
@@ -2179,7 +2179,7 @@ function registerIpc() {
 
   ipcMain.handle('runtime:usage', () => runtime.usage());
 
-  // （， dialog ）
+  // (,  dialog )
   ipcMain.handle('app:confirm', async (_e, opts = {}) => {
     const { response } = await dialog.showMessageBox(mainWindow || undefined, {
       type: opts.type || 'question',
@@ -2195,8 +2195,8 @@ function registerIpc() {
   });
 
   /**
- * ：、、。
- * runtime resources() ，。
+ * : , , . 
+ * runtime resources() , . 
    */
   ipcMain.handle('engine:resources', async () => {
     try {
@@ -2209,8 +2209,8 @@ function registerIpc() {
   });
 
   /**
- * （quickboot ）：capacity /data。
- * app —— 。
+ * (quickboot ): capacity /data. 
+ * app -- . 
    */
   ipcMain.handle('runtime:resetAndResize', async (_e, gb) => {
     const res = require('./core/resources');
@@ -2225,8 +2225,8 @@ function registerIpc() {
     return { ok: !!(r && r.ok), wantGB: want, ...r };
   });
 
-  // data partition（/data）capacity：app、update。
-  // 「updatehintspace」，，。
+  // data partition(/data)capacity: app, update. 
+  // "updatehintspace", , . 
   ipcMain.handle('runtime:dataInfo', () => {
     const doctor = require('./core/doctor');
     const b = runtime.backend;
@@ -2248,7 +2248,7 @@ function registerIpc() {
       return { ok: true, auto: true, ...info };
     }
     const mb = Math.round(want * 1024);
-    // system image qemu ，（appexit，）
+    // system image qemu , (appexit, )
     let stopped = false;
     try {
       const online = await runtime.client().isOnline().catch(() => false);
@@ -2268,7 +2268,7 @@ function registerIpc() {
   });
 
   ipcMain.handle('runtime:cleanup', async (_e, opts = {}) => {
-    // ：，；clean ApkStart runtimedirectory
+    // : , ; clean ApkStart runtimedirectory
     const pass = { apply: false, aggressive: !!opts.aggressive, includeSnapshots: !!opts.includeSnapshots };
     if (!opts.apply) return runtime.cleanup(pass);
     const preview = await runtime.cleanup(pass);
@@ -2288,8 +2288,8 @@ function registerIpc() {
     return runtime.cleanup({ apply: true, aggressive: !!opts.aggressive, includeSnapshots: !!opts.includeSnapshots });
   });
 
-  // Android： /data + app + launchsnapshot，
-  // AVD 「」。 GB ，UI 。
+  // Android:  /data + app + launchsnapshot, 
+  // AVD "".  GB , UI . 
   ipcMain.handle('runtime:resetData', async () => {
     try {
       const r = await runtime.resetAndroidData();
@@ -2300,8 +2300,8 @@ function registerIpc() {
     }
   });
 
-  // repairnetwork： /data（app，app）。
-  // ：Androidblack screen， wlan0 、default。
+  // repairnetwork:  /data(app, app). 
+  // : Androidblack screen,  wlan0 , default. 
   ipcMain.handle('runtime:repairNetwork', async () => {
     try {
       const r = await runtime.repairNetwork({
@@ -2313,7 +2313,7 @@ function registerIpc() {
     }
   });
 
-  // networkcheckup，（settings）
+  // networkcheckup, (settings)
   ipcMain.handle('runtime:checkNetwork', async () => {
     try {
       const network = await runtime.emulator.checkNetwork(runtime.adbPath());
@@ -2325,7 +2325,7 @@ function registerIpc() {
 
   // ---------------- version ----------------
 
- /** 、：「」， */
+ /** , : "",  */
   ipcMain.handle('leftovers:scan', () => {
     try {
       const installDir = path.dirname(app.getPath('exe'));
@@ -2395,7 +2395,7 @@ function registerIpc() {
     }
   });
 
- /** install AEHD driver： UAC，install */
+ /** install AEHD driver:  UAC, install */
   ipcMain.handle('provision:enableAccel', async () => {
     try {
       const p = runtime.provisioner.paths();
@@ -2428,20 +2428,20 @@ function registerIpc() {
   });
 
   /**
- * ：「Windows 」。
- * 「」（WHPX）； DLL （），
- * install Google AEHD driver。。
+ * : "Windows ". 
+ * ""(WHPX);  DLL (), 
+ * install Google AEHD driver. . 
    */
   ipcMain.handle('provision:enableVirtualization', async () => {
     try {
       const accel = await runtime.provisioner.emulatorAccel();
       if (accel.ok) return { ok: true, already: true, accel, note: 'Hardware acceleration is already available' };
 
-      // ---------------- （MSIX）： WHPX ----------------
-      // MSIX AppX ， mediumIL，driver（AEHD），
-      // 。 WHPX，「」
-      // —— Start-Process -Verb RunAs，
-      // failure，「Hardware Acceleration Not Enabled」。
+      // ---------------- (MSIX):  WHPX ----------------
+      // MSIX AppX ,  mediumIL, driver(AEHD), 
+      // .  WHPX, ""
+      // -- Start-Process -Verb RunAs, 
+      // failure, "Hardware Acceleration Not Enabled". 
       if (store.STORE_BUILD) {
         const whpx = await enableWhpxFeatures();
         runtime.provisioner.invalidateEnvCache?.();
@@ -2463,8 +2463,8 @@ function registerIpc() {
       }
 
       // ---------------- install / portable version ----------------
-      // WHPX（，download）；failure（ / ） AEHD driver。
-      // AEHD driver，。
+      // WHPX(, download); failure( / ) AEHD driver. 
+      // AEHD driver, . 
       const whpx = await enableWhpxFeatures();
       runtime.provisioner.invalidateEnvCache?.();
       if (whpx.ok) {
@@ -2484,7 +2484,7 @@ function registerIpc() {
         };
       }
 
-      // WHPX ： Google AEHD driver（，restart）
+      // WHPX :  Google AEHD driver(, restart)
       const ae = await runtime.provisioner.installAehd(
         (x) => send('provision:progress', { ...x, component: 'aehd' }),
       ).catch((e) => ({ ok: false, error: e.message }));
@@ -2598,7 +2598,7 @@ function registerIpc() {
   });
 
   ipcMain.handle('assoc:status', () => {
-    // / shell ：probe（reg.exe ）
+    // / shell : probe(reg.exe )
     if (NO_SHELL_PROBE) return { registered: false, skipped: true };
     const { execFileSync } = require('child_process');
     try {
@@ -2613,7 +2613,7 @@ function registerIpc() {
     const l = launcherInfo();
     const icoPath = path.join(store.ICON_DIR, 'apkstart.ico');
     if (!fs.existsSync(icoPath)) {
-      // ICO， Logo PNG
+      // ICO,  Logo PNG
       if (fs.existsSync(APPICON_FILE)) fs.copyFileSync(APPICON_FILE, icoPath);
       else {
         const { pngToIco } = require('./core/shortcut');
@@ -2633,7 +2633,7 @@ function registerIpc() {
     shell.openPath(dir);
   });
 
- /** clean AVD lock file：launch「AVD 」 FATAL */
+ /** clean AVD lock file: launch"AVD " FATAL */
   ipcMain.handle('app:clearLocks', async () => {
     try {
       const avdHome = runtime.provisioner.paths().avdHome;
@@ -2650,29 +2650,29 @@ function registerIpc() {
   });
 
   /**
- * uninstall ApkStart ：
- * 1) .apk （uninstall APK ）
- * 2) install：launch NSIS uninstall（/），exit
- * 3) portable version（ / install）： uninstaller.exe，hintdirectory
+ * uninstall ApkStart : 
+ * 1) .apk (uninstall APK )
+ * 2) install: launch NSIS uninstall(/), exit
+ * 3) portable version( / install):  uninstaller.exe, hintdirectory
    */
   ipcMain.handle('app:removeSelf', async () => {
     try {
       try { await assoc.unregisterAssociation(); } catch (_) { /* failureuninstall */ }
       const exeDir = path.dirname(process.execPath);
-      // updater.flavor ：electron-builder
-      // "Uninstall ApkStart.exe"， "uninstaller.exe"，
-      // install「uninstall」portable version、hintuninstall（issue #51）。
+      // updater.flavor : electron-builder
+      // "Uninstall ApkStart.exe",  "uninstaller.exe", 
+      // install"uninstall"portable version, hintuninstall(issue #51). 
       const unName = findUninstaller(exeDir);
       if (!unName) {
         return { ok: true, portable: true, dataDir: store.DATA_DIR, exeDir };
       }
       const uninstaller = path.join(exeDir, unName);
       const { spawn } = require('child_process');
-      // uninstallresidentemulator：qemu resources\runtime exe/dll，
-      // NSIS installdirectory。「uninstall」，exit。
+      // uninstallresidentemulator: qemu resources\runtime exe/dll, 
+      // NSIS installdirectory. "uninstall", exit. 
       try { await runtime?.emulator?.killOrphanProcesses(); } catch (_) { /* ignore */ }
-      // exit， 2 uninstall：
-      // exe installdirectory，uninstall。
+      // exit,  2 uninstall: 
+      // exe installdirectory, uninstall. 
       const cmd = `ping 127.0.0.1 -n 3 >nul & start "" "${uninstaller}"`;
       spawn('cmd.exe', ['/c', cmd], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
       setTimeout(() => app.quit(), 300);
@@ -2683,16 +2683,16 @@ function registerIpc() {
   });
 
   ipcMain.handle('shell:open', (_e, url) => shell.openExternal(url));
-  // manual：「/」，
+  // manual: "/", 
   ipcMain.handle('manual:open', (_e, payload) => openManual(payload || {}));
 
   /**
- * 「 Windows 」。
+ * " Windows ". 
    *
- * ms-settings:optionalfeatures：Win11 「」，
- * ****「Windows 」，。
- * optionalfeatures.exe （WHPX ）。
- * ，「」 UAC。
+ * ms-settings:optionalfeatures: Win11 "", 
+ * ****"Windows ", . 
+ * optionalfeatures.exe (WHPX ). 
+ * , "" UAC. 
    */
   ipcMain.handle('provision:openWindowsFeatures', () => {
     try {
@@ -2701,7 +2701,7 @@ function registerIpc() {
       spawn(exe, [], { detached: true, stdio: 'ignore' }).unref();
       return { ok: true };
     } catch (e) {
-      // ： / 。settings，
+      // :  / . settings, 
       shell.openExternal('ms-settings:optionalfeatures').catch(() => {});
       return { ok: false, error: e.message };
     }
@@ -2716,34 +2716,34 @@ function registerIpc() {
   ipcMain.handle('window:close', () => mainWindow?.close());
   ipcMain.handle('window:hide', () => mainWindow?.hide());
 
-  // ---------------- appwindow（ rotate / / / ） ----------------
+  // ---------------- appwindow( rotate / / / ) ----------------
 
   const winOf = (e) => BrowserWindow.fromWebContents(e.sender);
 
   ipcMain.handle('shell:state', () => ({ ...appWin.state, iconUrl: appWin.iconUrl || '' }));
-  // windowemulatorwindow，window ——
-  // 。 appWin ，window maximize/minimize。
+  // windowemulatorwindow, window --
+  // .  appWin , window maximize/minimize. 
   ipcMain.handle('shell:minimize', () => appWin.minimize());
   ipcMain.handle('shell:maximize', () => appWin.toggleMaximize());
-  // appWin.close()：emulatorwindow、Androidapp。
-  // win.close()， —— window，Android，
-  // 「app」。
+  // appWin.close(): emulatorwindow, Androidapp. 
+  // win.close(),  -- window, Android, 
+  // "app". 
   ipcMain.handle('shell:close', () => {
     if (appWin && appWin.isOpen) { appWin.close(); return { ok: true }; }
     return { ok: false };
   });
-  // rotate = 「app/」。
-  // rotateCurrentApp： wantLandscapeFor(pkg) orientation，
-  // next per-app + 。 appWin.rotate
-  // （ display.landscape， state.landscape），
-  // ，「rotate → landscape → portrait → portrait」，
-  // app。
+  // rotate = "app/". 
+  // rotateCurrentApp:  wantLandscapeFor(pkg) orientation, 
+  // next per-app + .  appWin.rotate
+  // ( display.landscape,  state.landscape), 
+  // , "rotate → landscape → portrait → portrait", 
+  // app. 
   ipcMain.handle('shell:rotate', () => rotateCurrentApp());
 
   ipcMain.handle('shell:back', async () => { await runtime.client().keyBack(); });
   ipcMain.handle('shell:forward', async () => { await runtime.client().keyForward(); });
 
-  // ---------------- Androidsettings（Androiddesktop） ----------------
+  // ---------------- Androidsettings(Androiddesktop) ----------------
 
   ipcMain.handle('android:status', async () => {
     try { return { ok: true, ...(await androidSet.status()) }; } catch (e) { return { ok: false, error: e.message }; }
@@ -2825,7 +2825,7 @@ function registerIpc() {
 
   ipcMain.handle('app:updateCheck', async (_e, opts = {}) => {
     try {
-      // 「update」→ cache，
+      // "update"→ cache, 
       const info = await updater.check({ force: opts.force !== false });
       updateInfo = info;
       return { ok: true, ...info };
@@ -2835,8 +2835,8 @@ function registerIpc() {
   });
 
   ipcMain.handle('app:updateOpen', (_e, url) => {
-    // GitHub Gitee ：updatefailure
-    // download， github.com 。
+    // GitHub Gitee : updatefailure
+    // download,  github.com . 
     const raw = String(url || '');
     const ok = /^https:\/\/(github\.com|gitee\.com)\//i.test(raw);
     const target = ok ? raw : Updater.repoUrl();
@@ -2870,34 +2870,34 @@ if (!gotLock) {
   app.whenReady().then(async () => {
     store.ensureDirs();
     /**
- * 「runtime」。
+ * "runtime". 
      *
- * releaseRuntime()：app，
- * exit（single instance），emulatorlaunchapp；
- * runtime.dispose()， `device 'emulator-5554' not found`。
- * 「app」。launch，
- * pid runtime。
+ * releaseRuntime(): app, 
+ * exit(single instance), emulatorlaunchapp; 
+ * runtime.dispose(),  `device 'emulator-5554' not found`. 
+ * "app". launch, 
+ * pid runtime. 
      */
     try { fs.writeFileSync(path.join(store.DATA_DIR, 'owner.pid'), String(process.pid)); } catch (_) { /* ignore */ }
-    // Windows taskbar（AppUserModelID）
-    // Windows exe path：taskbar、、
-    // "Electron" —— 「/default」。
-    // note「」，Androidappapp
-    // AUMID（ openAppWindow），taskbarwindow，
-    // ApkStart 。
+    // Windows taskbar(AppUserModelID)
+    // Windows exe path: taskbar, , 
+    // "Electron" -- "/default". 
+    // note"", Androidappapp
+    // AUMID( openAppWindow), taskbarwindow, 
+    // ApkStart . 
     setAumid(APP_AUMID);
     runtime = new Runtime(APP_ROOT);
-    // launch： app.log versiondirectory
+    // launch:  app.log versiondirectory
     appLog(`start v${app.getVersion()} data=${store.DATA_DIR} pid=${process.pid}`);
 
     // ---- bootwindow ----
-    // DSH ：Logo + + 。
-    // installconfiguration；。
-    // Android，app。
+    // DSH : Logo + + . 
+    // installconfiguration; . 
+    // Android, app. 
     const isFirstRun = !store.getSettings().runtime.installed;
-    // splash ： fadeUp .95s 、 .85s， 1.8s 。
-    // show ，splashDone ，「」。
-    // 「launchapp」path；cold boot >1.8s，。
+    // splash :  fadeUp .95s ,  .85s,  1.8s . 
+    // show , splashDone , "". 
+    // "launchapp"path; cold boot >1.8s, . 
     let splashShownAt = Date.now();
     try {
       // Note
@@ -2919,15 +2919,15 @@ if (!gotLock) {
           contextIsolation: true, nodeIntegration: false, sandbox: false,
         },
       });
-      // screen-saver emulatorwindow（ alwaysOnTop default level
-      // agent SetForegroundWindow z-order， splash ）
+      // screen-saver emulatorwindow( alwaysOnTop default level
+      // agent SetForegroundWindow z-order,  splash )
       splashWin.setAlwaysOnTop(true, 'screen-saver');
       splashWin.loadFile(path.join(__dirname, 'ui', 'splash.html'));
       splashWin.once('ready-to-show', () => { splashShownAt = Date.now(); splashWin.show(); });
-      // IPC：version、、
+      // IPC: version, , 
       ipcMain.handle('splash:version', () => app.getVersion());
       ipcMain.handle('splash:isFirstRun', () => isFirstRun);
-      // ：boot，system image「download」
+      // : boot, system image"download"
       ipcMain.handle('splash:bundled', () => !!bundledRuntimeDir);
       ipcMain.on('splash:close', () => {
         if (splashWin && !splashWin.isDestroyed()) splashWin.close();
@@ -2937,12 +2937,12 @@ if (!gotLock) {
       appLog(`splash window failed: ${e.message}`);
       splashWin = null;
     }
-    // splash / complete（，）
+    // splash / complete(, )
     splashProgress = (p) => {
       if (splashWin && !splashWin.isDestroyed()) splashWin.webContents.send('splash:progress', p);
     };
-    // ；「」：splash 2.5
-    // （ / IPC ），launchdesktop。
+    // ; "": splash 2.5
+    // ( / IPC ), launchdesktop. 
     let splashDoneSent = false;
     let splashDoneScheduled = false;
     const SPLASH_MIN_MS = 1800;   // 
@@ -2962,16 +2962,16 @@ if (!gotLock) {
       if (splashDoneSent || splashDoneScheduled) return;
       const waited = Date.now() - splashShownAt;
       if (waited < SPLASH_MIN_MS) {
-        // ： fadeUp ，。
-        // ，，。
+        // :  fadeUp , . 
+        // , , . 
         splashDoneScheduled = true;
         setTimeout(doSplashDone, SPLASH_MIN_MS - waited).unref?.();
       } else {
         doSplashDone();
       }
     };
-    // fallbacktimeout：path splashDone（launchfailure），
-    // splash —— 「window」。
+    // fallbacktimeout: path splashDone(launchfailure), 
+    // splash -- "window". 
     setTimeout(() => { if (!splashDoneSent) splashDone(); }, 180000).unref?.();
 
     const l = launcherInfo();
@@ -2981,8 +2981,8 @@ if (!gotLock) {
       cwd: l.cwd,
       isDev: IS_DEV,
       desktopDir: app.getPath('desktop'),
-      // Windows .lnk，desktop「app」；
-      // Linux freedesktop appdirectory。
+      // Windows .lnk, desktop"app"; 
+      // Linux freedesktop appdirectory. 
       startMenuDir: process.platform === 'win32'
         ? path.join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs')
         : path.join(process.env.HOME || app.getPath('home'), '.local', 'share', 'applications'),
@@ -2995,7 +2995,7 @@ if (!gotLock) {
     const keymapEngine = new KeymapEngine({
       execInput: (cmd) => runtime.client().shell(cmd, { timeout: 4000 }),
       getSize: () => {
-        // （landscape 1280x720 / portrait 720x1280）
+        // (landscape 1280x720 / portrait 720x1280)
         const land = !!(store.getSettings().display || {}).landscape;
         return land ? { width: 1280, height: 720 } : { width: 720, height: 1280 };
       },
@@ -3005,7 +3005,7 @@ if (!gotLock) {
     for (const [pkg, mappings] of Object.entries(savedMaps)) {
       if (Array.isArray(mappings) && mappings.length) keymapEngine.setMap(pkg, mappings);
     }
-    // default（settings）
+    // default(settings)
     keymapEngine.enable(store.getSettings().engine.keymapEnabled !== false);
 
     updater = new Updater({
@@ -3013,64 +3013,64 @@ if (!gotLock) {
       exePath: process.execPath,
       isPackaged: app.isPackaged,
       dataDir: store.DATA_DIR,
-      // incrementalupdate： Electron version，
+      // incrementalupdate:  Electron version, 
       electronVersion: process.versions.electron,
-      // update「 GitHub / Gitee / 」system imagesettings
+      // update" GitHub / Gitee / "system imagesettings
       settings: () => store.getSettings(),
       onProgress: (p) => send('update:progress', p),
     });
 
-    // wheel： input swipe，resident adb shell。
+    // wheel:  input swipe, resident adb shell. 
     wheelRouter = new pointer.WheelRouter({
       getSize: getDeviceSize,
       inject: (cmd) => runtime.client().input(cmd),
     });
 
-    // window：emulatorwindow。mousehookappwindowconfigurationinstall。
+    // window: emulatorwindow. mousehookappwindowconfigurationinstall. 
     winAgent = new WinAgent();
     appWin = new AppWindow({
       agent: winAgent,
-      // rotate Android ， adb
+      // rotate Android ,  adb
       setOrientation: async (landscape) => {
         deviceSize.value = null;
         return runtime.client().setOrientation(landscape);
       },
-      // getter：settingskeymap，window focus / ，restart
+      // getter: settingskeymap, window focus / , restart
       pointerConfig: () => pointer.pointerOptions(store.getSettings()),
-      // windowwindow（ emulator window）
+      // windowwindow( emulator window)
       windowTargets: () => null,
     });
     appWin.onCloseApp((pkg) => {
-      // window = app；window（、），
-      // Android ，cold boot。
+      // window = app; window(, ), 
+      // Android , cold boot. 
       runtime?.endApp(pkg, { onIdle: onContainerActive }).catch(() => {});
-      // （Alt+F4 / taskbar）app，
-      // 「app（xxx）」（app）。
+      // (Alt+F4 / taskbar)app, 
+      // "app(xxx)"(app). 
       if (currentAppPkg === pkg) currentAppPkg = null;
       try { send('apps:changed'); } catch (_) { /* ignore */ }
     });
 
-    // 「window」= runtimedirectory + engine directory。
-    // windowwindow —— Qt app（ 4.x Qt6，
-    // windowemulator）， agent.ps1 SetScope。
+    // "window"= runtimedirectory + engine directory. 
+    // windowwindow -- Qt app( 4.x Qt6, 
+    // windowemulator),  agent.ps1 SetScope. 
     const agentScope = () => {
       const dirs = [];
       try { dirs.push(runtime.provisioner.root); } catch (_) { /* ignore */ }
       try { dirs.push(path.join(APP_ROOT, 'engine')); } catch (_) { /* ignore */ }
       return dirs.filter(Boolean);
     };
-    // memory， —— boot。
+    // memory,  -- boot. 
     armAgent = async (agent) => {
       if (!agent) return { ok: false };
       const dirs = agentScope();
-      // parameters pid：window「」window
+      // parameters pid: window""window
       await agent.scope(dirs, process.pid).catch(() => null);
       if (!dirs.length) appLog('agent scope is empty: suppressing no windows');
       return agent.bootHide().catch(() => ({ ok: false }));
     };
 
-    // exit，（
-    // wheel，「」）。
+    // exit, (
+    // wheel, ""). 
     const attachAgentEvents = (agent) => {
       agent.on('back', () => { runtime.client().keyBack().catch(() => {}); });
       agent.on('forward', () => { runtime.client().keyForward().catch(() => {}); });
@@ -3082,21 +3082,21 @@ if (!gotLock) {
         winAgent = next;
         appWin.agent = next;
         attachAgentEvents(next);
-        // ，window
+        // , window
         armAgent(next).catch(() => {});
       });
     };
     attachAgentEvents(winAgent);
 
-    // 「」emulator。
-    // 「 ApkStart 4 」，emulator
-    // qemu window —— 。
+    // ""emulator. 
+    // " ApkStart 4 ", emulator
+    // qemu window -- . 
     runtime.emulator.onBeforeSpawn = async () => {
       if (!winAgent) return;
       await armAgent(winAgent);
     };
-    // window PowerShell resident，cold boot 300~600ms。
-    // ，window。
+    // window PowerShell resident, cold boot 300~600ms. 
+    // , window. 
     winAgent.ensure().then(() => armAgent(winAgent)).catch(() => {});
 
     registerIpc();
@@ -3104,16 +3104,16 @@ if (!gotLock) {
     buildTray();
     applyAutoStart();
 
-    // check：，launch 25 。
-    // boot adb / disk / snapshot，
-    // （「」）。
+    // check: , launch 25 . 
+    // boot adb / disk / snapshot, 
+    // (""). 
     scheduleAutodebug();
     setTimeout(() => { runAutodebug().catch(() => {}); }, 25000).unref?.();
 
-    // versioninstallapp orientation （）。
-    // 「app」「orientation」，portraitapp
-    // landscape。 APK ，
-    // directory + AndroidManifest，。
+    // versioninstallapp orientation (). 
+    // "app""orientation", portraitapp
+    // landscape.  APK , 
+    // directory + AndroidManifest, . 
     try {
       const { parseApk } = require('./core/apk');
       const filled = [];
@@ -3126,13 +3126,13 @@ if (!gotLock) {
             store.upsertApp({ package: app.package, orientation: meta.orientation });
             filled.push(`${app.label}=${meta.orientation}`);
           }
-        } catch (_) { /* failureapp，launch */ }
+        } catch (_) { /* failureapp, launch */ }
       }
       if (filled.length) appLog(`orientation backfill: ${filled.join(', ')}`);
     } catch (_) { /* ignore */ }
 
-    // disk： 3GB Android（system image/snapshotfailure）。
-    // 「」，。
+    // disk:  3GB Android(system image/snapshotfailure). 
+    // "", . 
     {
       const doctor = require('./core/doctor');
       const freeMB = doctor.freeDiskMB(store.DATA_DIR);
@@ -3145,21 +3145,21 @@ if (!gotLock) {
       }
     }
 
-    // versiondesktopshortcut / null：launch，
+    // versiondesktopshortcut / null: launch, 
     installer.ensureShortcuts().then((fixed) => {
       if (fixed && fixed.length) {
         windowctl.refreshShell().catch(() => {});
-        notify('Shortcuts rebuilt successfully', fixed.join('、'));
+        notify('Shortcuts rebuilt successfully', fixed.join(', '));
       }
     }).catch(() => {});
 
-    // F11 / window； ApkStart
+    // F11 / window;  ApkStart
     try {
       globalShortcut.register('F11', () => { toggleDisplayMode(); });
     } catch (_) { /* ignore */ }
-    // rotate：windowwindow， Ctrl+R ，
-    // 。 Ctrl+Alt+R Ctrl+R ——
-    // /「」，。
+    // rotate: windowwindow,  Ctrl+R , 
+    // .  Ctrl+Alt+R Ctrl+R --
+    // /"", . 
     try {
       globalShortcut.register('CommandOrControl+Alt+R', () => {
         if (currentAppPkg) rotateCurrentApp().catch(() => {});
@@ -3170,19 +3170,19 @@ if (!gotLock) {
     if (args.apk) runInstall(args.apk).catch(() => {});
     else if (args.launch) await runLaunch(args.launch);
     else {
-      // launchapp：splash window ready
+      // launchapp: splash window ready
       if (typeof splashDone === 'function') {
         setTimeout(() => splashDone(), 800);
       }
     }
 
-    // ： WSA / appAndroidresident。
-    // ApkStart （window），app am start。
-    // 「app + runtime」，/memory。
+    // :  WSA / appAndroidresident. 
+    // ApkStart (window), app am start. 
+    // "app + runtime", /memory. 
     const prewarmEnabled = store.getSettings().engine.prewarm !== false;
     if (prewarmEnabled && !args.launch && store.getApps().length > 0) {
-      // 1.2 window。 4 ，app，
-      // 「」「」 AVD ，。
+      // 1.2 window.  4 , app, 
+      // """" AVD , . 
       setTimeout(async () => {
         try {
           const env = await runtime.provisioner.checkEnv();
@@ -3190,8 +3190,8 @@ if (!gotLock) {
             appLog(`prewarm skipped: not ready (adb=${env.adb.ok} emu=${env.emulator.ok} img=${env.sysimg.ok})`);
             return;
           }
-          // bootemulatorwindow qemu ，
-          // note await： spawn，。
+          // bootemulatorwindow qemu , 
+          // note await:  spawn, . 
           if (winAgent) { try { await armAgent(winAgent); } catch (_) { /* ignore */ } }
           const t0 = Date.now();
           appLog('prewarm start');
@@ -3199,8 +3199,8 @@ if (!gotLock) {
           if (r && r.ok) appLog(`prewarm ready in ${Date.now() - t0}ms`);
           else {
             appLog(`prewarm failed: ${r && (r.error || r.skipped)}`);
-            // failureemulatorwindow：，，
-            // 「failure」desktopemulator。
+            // failureemulatorwindow: , , 
+            // "failure"desktopemulator. 
             if (winAgent) armAgent(winAgent).catch(() => {});
           }
         } catch (e) { appLog(`prewarm error: ${e && e.message}`); /* failure */ }
@@ -3209,58 +3209,58 @@ if (!gotLock) {
       appLog(`prewarm off (enabled=${prewarmEnabled} launch=${!!args.launch} apps=${store.getApps().length})`);
     }
 
-    // 20 ：cold bootdisk/CPU ，
-    // downloadextractdesktop。app ensure() 。
+    // 20 : cold bootdisk/CPU , 
+    // downloadextractdesktop. app ensure() . 
     setTimeout(() => {
       autoDeploy().then((r) => {
         if (r && r.ok) send('toast', { type: 'ok', message: 'Runtime auto-preparation complete' });
       }).catch(() => {});
     }, 20000).unref?.();
 
-    // launch 8 version（）。versionhint，
-    // download —— update「update」。
-    // （MSIX）：installdirectory WindowsApps，update
-    // ，update Microsoft Store 。
+    // launch 8 version(). versionhint, 
+    // download -- update"update". 
+    // (MSIX): installdirectory WindowsApps, update
+    // , update Microsoft Store . 
     if (app.isPackaged && !store.STORE_BUILD) {
-      // issue #98：「downloadextract、/restartupdate」。
-      // +restart，——update。
-      // version， resumable check 。
+      // issue #98: "downloadextract, /restartupdate". 
+      // +restart, --update. 
+      // version,  resumable check . 
       let resuming = false;
       try {
         const job = updater.findResumableJob();
         if (job) {
           resuming = true;
           appLog(`resuming pending update ${job.version} from cached payload`);
-          send('update:progress', { stage: 'apply', percent: 100, message: 'Completing pending update…' });
+          send('update:progress', { stage: 'apply', percent: 100, message: 'Completing pending update...' });
           updater.apply(job);
           setTimeout(() => { quitting = true; app.quit(); }, 900);
         }
       } catch (e) { appLog(`resume check failed: ${e.message}`); }
-      // version； return launch。
+      // version;  return launch. 
       if (!resuming) setTimeout(() => {
         updater.check().then((info) => {
           updateInfo = info;
           send('update:state', info);
           if (info.hasUpdate) {
             appLog(`update available ${info.tag} (current v${app.getVersion()}, asset=${info.asset ? info.asset.name : 'none'})`);
-            // ：launchapp「」，
-            // boot（「」）。
+            // : launchapp"", 
+            // boot(""). 
           }
         }).catch((e) => appLog(`update check failed: ${e.message}`));
       }, 8000).unref?.();
     }
 
-    // / resident：appwindow
-    // （ onContainerActive）。
+    // / resident: appwindow
+    // ( onContainerActive). 
 
-    // ：exit，
+    // : exit, 
     if (process.argv.includes('--smoke') && mainWindow) {
       const out = process.argv[process.argv.indexOf('--smoke') + 1] || 'smoke.png';
       mainWindow.webContents.once('did-finish-load', () => {
         setTimeout(async () => {
           try {
             if (process.argv.includes('--setup')) {
-              // runtimesettings：--setup --settings ，settings
+              // runtimesettings: --setup --settings , settings
               await mainWindow.webContents.executeJavaScript(
                 "document.getElementById('btnSettings').click(); true;",
               );
@@ -3284,7 +3284,7 @@ if (!gotLock) {
               );
               console.log('[smoke] dom =', dbg);
             }
-            // window： +
+            // window:  +
             const snap = async (file) => {
               mainWindow.webContents.invalidate();
               await mainWindow.webContents.capturePage().catch(() => null);
@@ -3295,21 +3295,21 @@ if (!gotLock) {
             };
             await snap(out);
             if (process.argv.includes('--perf')) {
-              // 「」（settings）
+              // ""(settings)
               await mainWindow.webContents.executeJavaScript(
                 "document.getElementById('perfGroup').scrollIntoView({ block: 'start' }); true;",
               );
               await snap(out.replace(/\.png$/i, '-perf.png'));
             }
             if (process.argv.includes('--download')) {
-              // 「downloadupdate」
+              // "downloadupdate"
               await mainWindow.webContents.executeJavaScript(
                 "document.getElementById('downloadGroup').scrollIntoView({ block: 'start' }); true;",
               );
               await snap(out.replace(/\.png$/i, '-download.png'));
             }
             if (process.argv.includes('--settings')) {
-              // 「about」（ / GitHub / Powered by）
+              // "about"( / GitHub / Powered by)
               await mainWindow.webContents.executeJavaScript(
                 "document.getElementById('aboutGroup').scrollIntoView({ block: 'center' }); true;",
               );
@@ -3328,16 +3328,16 @@ if (!gotLock) {
   });
 
   app.on('window-all-closed', () => {
-    // window（close ），
-    // exit，，single instance。
-    // ：「appwindow，ApkStart 」，
-    // 「window」「」。
+    // window(close ), 
+    // exit, , single instance. 
+    // : "appwindow, ApkStart ", 
+    // "window""". 
     appLog(`window-all-closed quitting=${quitting}`);
     if (quitting) app.exit(0);
   });
 
-  // / GPU ，Electron defaultwindow，exit；
-  // 「」，log。
+  // / GPU , Electron defaultwindow, exit; 
+  // "", log. 
   app.on('child-process-gone', (_e, d) => {
     try {
       appLog(`child-process-gone type=${d && d.type} reason=${d && d.reason} exit=${d && d.exitCode}`);
@@ -3346,13 +3346,13 @@ if (!gotLock) {
 
   let quitReady = false;
   /**
- * 「runtime」。
+ * "runtime". 
    *
- * ：app → 。launch
- * single instance，emulator am start；
- * dispose()，emulator ——
- * log「runtimeexit（code=0）」「device 'emulator-5554' not found」。
- * owner.pid launch，launch。
+ * : app → . launch
+ * single instance, emulator am start; 
+ * dispose(), emulator --
+ * log"runtimeexit(code=0)""device 'emulator-5554' not found". 
+ * owner.pid launch, launch. 
    */
   const releaseRuntime = () => {
     let mine = true;
@@ -3369,10 +3369,10 @@ if (!gotLock) {
   app.on('before-quit', (e) => {
     quitting = true;
     appLog(`before-quit ready=${quitReady}`);
-    // exitwindowemulatorwindow「 + 」。
-    // （）， before-quit ，completeexit。
-    // ，window，Windows emulatorwindowdesktop——
-    // 「 ApkStart ，desktop Android Emulator 」。
+    // exitwindowemulatorwindow" + ". 
+    // (),  before-quit , completeexit. 
+    // , window, Windows emulatorwindowdesktop--
+    // " ApkStart , desktop Android Emulator ". 
     if (!quitReady) {
       e.preventDefault();
       quitReady = true;
@@ -3383,7 +3383,7 @@ if (!gotLock) {
         try { winAgent?.dispose(); } catch (_) { /* ignore */ }
         try { wheelRouter?.dispose(); } catch (_) { /* ignore */ }
         releaseRuntime();
-        // windowwindow， window-all-closed
+        // windowwindow,  window-all-closed
         try { if (decodeWindow && !decodeWindow.isDestroyed()) decodeWindow.destroy(); } catch (_) { /* ignore */ }
         app.quit();
       };

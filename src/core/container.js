@@ -1,26 +1,26 @@
 'use strict';
 /**
- * app（）
+ * app()
  *
- * ApkStart QEMU ， WSA / 「 App
- * 」——Linux 、zygote、system_server 。
- * 「」resident，：
- * 1. App Android（ 40~142 ，CPU/disk）；
- * 2. App memory、network、；
- * 3. App ，qemu Normal desktop CPU；
- * 4. 、 App 。
+ * ApkStart QEMU ,  WSA / " App
+ * "--Linux , zygote, system_server . 
+ * ""resident, : 
+ * 1. App Android( 40~142 , CPU/disk); 
+ * 2. App memory, network, ; 
+ * 3. App , qemu Normal desktop CPU; 
+ * 4. ,  App . 
  *
- * 、：
- * - ，「 App」= am start + window（ Runtime.beginApp ）；
- * - App App ，；
- * - App Android idle、、qemu ；
- * - default（ GMS / App ），
- * 「」。
+ * , : 
+ * - , " App"= am start + window( Runtime.beginApp ); 
+ * - App App , ; 
+ * - App Android idle, , qemu ; 
+ * - default( GMS / App ), 
+ * "". 
  *
- * adb / Electron，，。
+ * adb / Electron, , . 
  */
 
-/** ：black screenapp */
+/** : black screenapp */
 const NEVER_TRIM = [
   'android',
   'com.android.systemui',
@@ -35,9 +35,9 @@ const NEVER_TRIM = [
   'com.android.server.telecom',
 ];
 
-/** 「」：update//， App */
+/** "": update//,  App */
 const OPTIONAL_SYSTEM = [
-  'com.android.vending',                    // Play （update）
+  'com.android.vending',                    // Play (update)
   'com.google.android.setupwizard',         // settings
   'com.android.printspooler',               // 
   'com.android.wallpapercropper',
@@ -49,13 +49,13 @@ const OPTIONAL_SYSTEM = [
   'com.android.backupconfirm',
 ];
 
-/** /：， */
+/** /: ,  */
 const SYSTEM_PREFIXES = [
   'android', 'com.android.', 'com.google.android.',
   'com.qualcomm.', 'com.qti.', 'vendor.', 'com.mediatek.',
 ];
 
-/** Android shell ， */
+/** Android shell ,  */
 const SAFE_PKG = /^[A-Za-z][A-Za-z0-9_.]+$/;
 
 function isSystemPackage(pkg) {
@@ -66,13 +66,13 @@ function isSystemPackage(pkg) {
 }
 
 /**
- * launch App 。
+ * launch App . 
  * @param {object} o
  * @param {string} o.pkg 
- * @param {string[]} o.installed App （store ）
- * @param {boolean} o.deep （），default false
- * @param {boolean} o.killBackground cache，default false
- * （launch App，clean endApp ）
+ * @param {string[]} o.installed App (store )
+ * @param {boolean} o.deep (), default false
+ * @param {boolean} o.killBackground cache, default false
+ * (launch App, clean endApp )
  * @returns {{commands:string[], stopped:string[], disabled:string[], kept:string[]}}
  */
 function buildSessionCommands({
@@ -94,8 +94,8 @@ function buildSessionCommands({
     commands.push(`am force-stop ${p}`);
   }
 
-  // cache（、 persistent ），
-  // 「 App」 force-stop ，memory。
+  // cache(,  persistent ), 
+  // " App" force-stop , memory. 
   if (killBackground) commands.push('am kill-all 2>/dev/null || true');
 
   if (deep) {
@@ -104,7 +104,7 @@ function buildSessionCommands({
       disabled.push(p);
       commands.push(`pm disable-user --user 0 ${p} 2>/dev/null || true`);
     }
-    // network，/
+    // network, /
     commands.push('settings put global restricted_background_data 1 2>/dev/null || true');
   }
 
@@ -112,8 +112,8 @@ function buildSessionCommands({
 }
 
 /**
- * App 「」。
- * shutdown、 AVD：， CPU/memory Windows。
+ * App "". 
+ * shutdown,  AVD: ,  CPU/memory Windows. 
  */
 function buildIdleCommands({ deep = false } = {}) {
   const commands = [
@@ -124,7 +124,7 @@ function buildIdleCommands({ deep = false } = {}) {
   return commands;
 }
 
-/** （，） */
+/** (, ) */
 function buildRestoreCommands() {
   return [
     ...OPTIONAL_SYSTEM.map((p) => `pm enable ${p} 2>/dev/null || true`),
@@ -133,8 +133,8 @@ function buildRestoreCommands() {
 }
 
 /**
- * ： launch/close 。
- * ，「window」「window」。
+ * :  launch/close . 
+ * , "window""window". 
  */
 function nextSessionState(active, event, pkg) {
   const set = new Set(active || []);
@@ -156,16 +156,16 @@ function describeSession(state, plan) {
 }
 
 /**
- * window（B ）。
+ * window(B ). 
  *
- * window nextSessionState ： active app，
- * 「」「」。appmemory，：
- * - foreground：window、；
- * - background：""window， force-stop（），
- * launch，，/。
+ * window nextSessionState :  active app, 
+ * """". appmemory, : 
+ * - foreground: window, ; 
+ * - background: ""window,  force-stop(), 
+ * launch, , /. 
  *
  * @param {string[]} active app
- * @param {string} foreground （ null）
+ * @param {string} foreground ( null)
  * @returns {{foreground:string|null, background:string[], count:number}}
  */
 function sessionRoles(active = [], foreground = null) {
@@ -179,27 +179,27 @@ function sessionRoles(active = [], foreground = null) {
 }
 
 /**
- * app（force-stop reclaimmemory）。
+ * app(force-stop reclaimmemory). 
  *
- * （，）：
- * - background， foreground；
- * - / NEVER_TRIM ；
- * - N （default 1），；
- * - tombstoneLimit<=0 「」，（memory）。
+ * (, ): 
+ * - background,  foreground; 
+ * - / NEVER_TRIM ; 
+ * - N (default 1), ; 
+ * - tombstoneLimit<=0 "", (memory). 
  *
  * @param {object} o { background, installedSystem?, keepRecent?, tombstone? }
  * @returns {{tombstone:string[], keep:string[]}}
  */
 function planTombstones({ background = [], keepRecent = 1 } = {}) {
   const bg = (background || []).filter((p) => p && !isSystemPackage(p) && !NEVER_TRIM.includes(p));
-  // background ， keepRecent ，
+  // background ,  keepRecent , 
   const keepCount = Math.max(0, Number(keepRecent) || 0);
   const keep = bg.slice(Math.max(0, bg.length - keepCount));
   const tombstone = bg.filter((p) => !keep.includes(p));
   return { tombstone, keep };
 }
 
-/** ：force-stop ，reclaimmemory/ */
+/** : force-stop , reclaimmemory/ */
 function buildTombstoneCommands(pkgs = []) {
   return pkgs.filter((p) => SAFE_PKG.test(String(p))).map((p) => `am force-stop ${p}`);
 }

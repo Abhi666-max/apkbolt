@@ -1,19 +1,19 @@
 'use strict';
 /**
- * Android → Windows 。
+ * Android → Windows . 
  *
- * emulator Windows ， 2.5 `dumpsys notification`（、），
- * 「」 Electron Notification / 。
- * appwindow。
+ * emulator Windows ,  2.5 `dumpsys notification`(, ), 
+ * "" Electron Notification / . 
+ * appwindow. 
  */
 const { Notification, nativeImage } = require('electron');
 
 const POLL_MS = 2500;
 
 /**
- * resident Windows 。
- * 「check SD 」「configuration」「Google Play 」
- * ， Windows 。
+ * resident Windows . 
+ * "check SD ""configuration""Google Play "
+ * ,  Windows . 
  */
 const SYSTEM_PKGS = [
   'android',
@@ -97,7 +97,7 @@ class NotifyBridge {
       const dump = await client.shell('dumpsys notification --noredact', { timeout: 12000 });
       const list = parseRecords(dump);
       if (!this.primed) {
-        // ，launch
+        // , launch
         for (const n of list) this.seen.add(`${n.pkg}|${n.key}|${n.title}`);
         this.primed = true;
         return;
@@ -109,7 +109,7 @@ class NotifyBridge {
         this.seen.add(id);
         fresh.push(n);
       }
-      // memory： 500
+      // memory:  500
       if (this.seen.size > 500) this.seen = new Set([...this.seen].slice(-300));
       for (const n of fresh) this._show(n);
     } catch (_) { /* runtimeignore */ }
@@ -119,7 +119,7 @@ class NotifyBridge {
     try {
       if (!Notification.isSupported()) return;
       const label = this.getAppLabel ? this.getAppLabel(n.pkg) : n.pkg;
-      const body = [n.title, n.text].filter(Boolean).join(' · ') || 'New Notification';
+      const body = [n.title, n.text].filter(Boolean).join('  -  ') || 'New Notification';
       const iconPath = this.getAppIcon ? this.getAppIcon(n.pkg) : '';
       const note = new Notification({
         title: label || 'Android App',

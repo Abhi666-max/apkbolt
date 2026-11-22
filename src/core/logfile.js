@@ -1,11 +1,11 @@
 'use strict';
 /**
- * log + 。
+ * log + . 
  *
- * app.log / emulator.log append，：
- * emulator bootlog KB，、 qemu 
- * verbose ， MB —— disk。
- * ， .1.log ，settings「log」。
+ * app.log / emulator.log append, : 
+ * emulator bootlog KB, ,  qemu 
+ * verbose ,  MB -- disk. 
+ * ,  .1.log , settings"log". 
  */
 const fs = require('fs');
 const path = require('path');
@@ -17,8 +17,8 @@ function rotate(file, limitKB) {
     const st = fs.statSync(file);
     if (st.size < limitKB * 1024) return false;
     const bak = file.replace(/\.log$/i, '.1.log');
-    // .log bak ： rename log。
-    // ，log。
+    // .log bak :  rename log. 
+    // , log. 
     if (path.resolve(bak) === path.resolve(file)) return false;
     try { fs.rmSync(bak, { force: true }); } catch (_) { /* ignore */ }
     fs.renameSync(file, bak);
@@ -30,7 +30,7 @@ function rotate(file, limitKB) {
 
 /**
  * @param {string} file log
- * @param {string} line （）
+ * @param {string} line ()
  * @param {number} [limitKB] 
  */
 function append(file, line, limitKB = 2048) {
@@ -38,7 +38,7 @@ function append(file, line, limitKB = 2048) {
     fs.mkdirSync(path.dirname(file), { recursive: true });
     const n = (counters.get(file) || 0) + 1;
     counters.set(file, n);
-    // launch， 200 （statSync ，）
+    // launch,  200 (statSync , )
     if (n === 1 || n % 200 === 0) rotate(file, Math.max(256, Number(limitKB) || 2048));
     fs.appendFileSync(file, line.endsWith('\n') ? line : `${line}\n`);
     return true;
@@ -47,7 +47,7 @@ function append(file, line, limitKB = 2048) {
   }
 }
 
-/** launchclean：log（） */
+/** launchclean: log() */
 function trimNow(file, limitKB = 2048) {
   return rotate(file, Math.max(256, Number(limitKB) || 2048));
 }

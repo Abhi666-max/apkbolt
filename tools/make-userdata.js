@@ -1,6 +1,6 @@
 'use strict';
 /**
- * userdata system image（）。
+ * userdata system image(). 
  * : node tools/make-userdata.js <> [MB]
  */
 const fs = require('fs');
@@ -14,4 +14,4 @@ if (!out) {
 const sizeMB = Number(process.argv[3] || 64);
 const img = buildEmptyExt4({ sizeMB });
 fs.writeFileSync(out, img);
-console.log(` ${out}（${(img.length / 1024 / 1024).toFixed(0)}MB，ext4/4KB block）`);
+console.log(` ${out}(${(img.length / 1024 / 1024).toFixed(0)}MB, ext4/4KB block)`);

@@ -45,14 +45,14 @@ function relTime(ts) {
 /**
  * toast
  *
- * + ：
- * installfailure「runtimelaunchlog」， toast，
- * error，「failure」。
+ * + : 
+ * installfailure"runtimelaunchlog",  toast, 
+ * error, "failure". 
  */
 let _toastSeq = 0;
 function toast({ title, body = '', type = 'info', progress = null, sticky = false, spinner = false }) {
   const wrap = $('toastWrap');
-  // ① ： + （4 ），
+  // ① :  + (4 ), 
   const key = `${title}|${body}`;
   const dup = [...wrap.children].find((n) => n.dataset.key === key && Date.now() - Number(n.dataset.at || 0) < 4000);
   if (dup) {
@@ -66,7 +66,7 @@ function toast({ title, body = '', type = 'info', progress = null, sticky = fals
       },
     };
   }
-  // ② ： 4 ，
+  // ② :  4 , 
   while (wrap.children.length >= 4) wrap.firstElementChild.remove();
 
   const el = document.createElement('div');
@@ -113,13 +113,13 @@ function toast({ title, body = '', type = 'info', progress = null, sticky = fals
 
 /* ---------------- manual ---------------- */
 
-/** manual； */
+/** manual;  */
 function openManual(payload) {
   if (!api || typeof api.openManual !== 'function') return Promise.resolve(null);
   return api.openManual(payload || { topic: 'overview' }).catch(() => null);
 }
 
-/** check → guide。reason 。 */
+/** check → guide. reason .  */
 function openManualForIssue(issue, reason = 'clicked') {
   if (!issue) return openManual({ topic: 'overview', reason });
   return openManual({
@@ -159,16 +159,16 @@ function renderGrid() {
     const s = state.status;
     $('emptyHint').textContent = s && s.adbOk === false
       ? 'First time: open Settings → Runtime → One-Click Setup, then install apps.'
-      : 'Tip: All apps share one Android runtime — launching subsequent apps is nearly instantaneous.';
+      : 'Tip: All apps share one Android runtime - launching subsequent apps is nearly instantaneous.';
     grid.innerHTML = '';
     return;
   }
 
-  // 「app」。
-  // ：app，；
-  // 「 APK 」，。
+  // "app". 
+  // : app, ; 
+  // " APK ", . 
   grid.innerHTML = apps.map((a) => `
-    <div class="card" data-pkg="${esc(a.package)}" title="${esc(a.label)} · ${esc(a.package)}">
+    <div class="card" data-pkg="${esc(a.package)}" title="${esc(a.label)}  -  ${esc(a.package)}">
       ${a.pinned ? '<span class="pin">★</span>' : ''}
       ${a.running ? '<span class="badge-run" title="Running"></span>' : ''}
       <div class="icon">
@@ -177,7 +177,7 @@ function renderGrid() {
           : `<div class="fallback" style="background:${esc(a.accent || '#9aa6b2')}">${esc(initialOf(a.label))}</div>`}
       </div>
       <div class="name">${esc(a.label)}</div>
-      <div class="meta">${a.running ? 'Running' : `v${esc(a.versionName)}${a.lastLaunchAt ? ' · ' + relTime(a.lastLaunchAt) : ''}`}</div>
+      <div class="meta">${a.running ? 'Running' : `v${esc(a.versionName)}${a.lastLaunchAt ? '  -  ' + relTime(a.lastLaunchAt) : ''}`}</div>
       <div class="open-hint">${a.running ? 'Bring to Front' : 'Open'}</div>
     </div>
   `).join('') + `
@@ -219,54 +219,54 @@ async function refreshStatus() {
 
     if (!s.adbOk) {
       dot.className = 'dot err';
-      text.textContent = 'Runtime not deployed — Open Settings → Runtime to set up';
+      text.textContent = 'Runtime not deployed - Open Settings → Runtime to set up';
       tag.textContent = 'Setup needed';
       tag.className = 'brand-tag';
     } else if (s.deviceOnline) {
       dot.className = 'dot ok';
-      text.textContent = `Runtime ready · Android ${s.android || '?'}${s.freeform ? ' · Standalone windows active' : ''}`;
+      text.textContent = `Runtime ready  -  Android ${s.android || '?'}${s.freeform ? '  -  Standalone windows active' : ''}`;
       tag.textContent = `Android ${s.android || ''}`.trim();
       tag.className = 'brand-tag ok';
     } else if (s.phase === 'booting' || s.vmStarting) {
       dot.className = 'dot warn';
-      text.textContent = 'Booting Android…';
+      text.textContent = 'Booting Android...';
       tag.textContent = 'Booting';
       tag.className = 'brand-tag';
     } else if (s.needsSetup === 'accel') {
       dot.className = 'dot warn';
-      // 「」「」——
+      // """"--
       text.textContent = 'Hardware acceleration off: running in software mode (slow). Use Diagnostics to fix.';
       tag.textContent = 'Software Mode';
       tag.className = 'brand-tag';
     } else if (s.needsSetup === 'sysimg') {
       dot.className = 'dot err';
-      text.textContent = 'Missing Android 14 system image — download in Settings → Runtime (~1.5 GB, one-time)';
+      text.textContent = 'Missing Android 14 system image - download in Settings → Runtime (~1.5 GB, one-time)';
       tag.textContent = 'Image needed';
       tag.className = 'brand-tag';
     } else if (s.needsSetup === 'emulator') {
       dot.className = 'dot err';
-      text.textContent = 'Runtime engine not installed — open Settings → Runtime';
+      text.textContent = 'Runtime engine not installed - open Settings → Runtime';
       tag.textContent = 'Setup needed';
       tag.className = 'brand-tag';
     } else if (s.needsSetup === 'boot') {
       dot.className = 'dot warn';
-      text.textContent = 'Runtime ready — install an APK or double-click a shortcut to launch';
+      text.textContent = 'Runtime ready - install an APK or double-click a shortcut to launch';
       tag.textContent = 'Ready';
       tag.className = 'brand-tag';
     } else if (s.installing) {
       dot.className = 'dot warn';
-      text.textContent = 'Installer running — complete installation in VM window';
+      text.textContent = 'Installer running - complete installation in VM window';
       tag.textContent = 'Installing';
       tag.className = 'brand-tag';
     } else {
       dot.className = 'dot';
-      text.textContent = s.installed ? 'Runtime idle (auto-starts when launching apps)' : 'Android system not installed — open Settings → Runtime';
+      text.textContent = s.installed ? 'Runtime idle (auto-starts when launching apps)' : 'Android system not installed - open Settings → Runtime';
       tag.textContent = s.installed ? 'Idle' : 'Not installed';
       tag.className = 'brand-tag';
     }
     $('statusDevice').textContent = s.deviceOnline ? (s.serial || '') : '';
-    // network：（app「networkerror」，）。
-    // ，，log。
+    // network: (app"networkerror", ). 
+    // , , log. 
     const netEl = $('statusNet');
     const netSep = $('statusNetSep');
     if (netEl) {
@@ -288,11 +288,11 @@ async function refreshStatus() {
   }
 }
 
-/* ---------------- runtime（settings） ---------------- */
+/* ---------------- runtime(settings) ---------------- */
 
 /**
- * runtime//「settings」，installapp。
- * showSetup ui:navigate ，「settingsruntime」。
+ * runtime//"settings", installapp. 
+ * showSetup ui:navigate , "settingsruntime". 
  */
 function showSetup(on) {
   if (!on) { $('setupGuide').hidden = true; return; }
@@ -325,8 +325,8 @@ function renderSetup(s) {
   const hv = env.hypervisor || {};
   const accel = env.accel || s.accel || {};
 
-  // launchinstallapp：，
-  // settingsruntime + 。
+  // launchinstallapp: , 
+  // settingsruntime + . 
   const accelOk = accel.ok || hv.whpx;
   const adbDone = !!(env.adb && env.adb.ok);
   const emuDone0 = !!(env.emulator && env.emulator.ok);
@@ -339,12 +339,12 @@ function renderSetup(s) {
     if (!emuDone0) missing.push('engine');
     if (!imgDone0) missing.push('system image');
     stateText.textContent = s.deviceOnline
-      ? `Ready · Android ${s.android || ''}`
+      ? `Ready  -  Android ${s.android || ''}`
       : s.phase === 'booting' || s.vmStarting
-        ? 'Booting Android…'
+        ? 'Booting Android...'
         : allDone0
-          ? 'All components ready · Idle (auto-starts on launch)'
-          : `Missing: ${missing.join(', ')}${accelOk ? '' : ' (no hardware acceleration — will use software mode)'}`;
+          ? 'All components ready  -  Idle (auto-starts on launch)'
+          : `Missing: ${missing.join(', ')}${accelOk ? '' : ' (no hardware acceleration - will use software mode)'}`;
     stateText.title = s.autoProfile || accel.note || hv.note || '';
   }
 
@@ -353,8 +353,8 @@ function renderSetup(s) {
   const busy = state.setupBusy;
   const booting = s.phase === 'booting';
 
-  // ：download、parameters、boot「complete」，
-  // launch，。
+  // : download, parameters, boot"complete", 
+  // launch, . 
   const allDone = !!(env.adb && env.adb.ok) && emuDone && imgDone;
   const left = [];
   if (!(env.adb && env.adb.ok)) left.push('adb toolchain');
@@ -368,11 +368,11 @@ function renderSetup(s) {
     done: allDone,
     busy: !!busy,
     desc: s.deviceOnline
-      ? `Android ${s.android || ''} ready · Windows adapt automatically to screen`
+      ? `Android ${s.android || ''} ready  -  Windows adapt automatically to screen`
       : booting
-        ? 'Booting Android…'
+        ? 'Booting Android...'
         : allDone
-          ? 'All components ready — double-click any APK or shortcut to boot'
+          ? 'All components ready - double-click any APK or shortcut to boot'
           : `Missing ${left.join(', ')}; click One-Click Setup below to install automatically`,
     actions: s.deviceOnline
       ? '<button class="btn ghost sm" data-act="vmStop">Stop Runtime</button>'
@@ -381,9 +381,9 @@ function renderSetup(s) {
 
   $('setupSteps').innerHTML = stepRow(step);
   $('btnDeployAll').disabled = !!busy;
-  $('btnDeployAll').textContent = busy ? 'Preparing…' : (allDone ? 'Ready · Re-check' : 'One-Click Setup');
-  // 「」failure：restartmemory diagnosis ，
-  // autoProfile （issue #20/#25 ）。
+  $('btnDeployAll').textContent = busy ? 'Preparing...' : (allDone ? 'Ready  -  Re-check' : 'One-Click Setup');
+  // ""failure: restartmemory diagnosis , 
+  // autoProfile (issue #20/#25 ). 
   const lf = s.lastFailure;
   const lastMsg = (lf && lf.diagnosis && lf.diagnosis.title)
     ? `Last launch failed: ${lf.diagnosis.title}`
@@ -398,7 +398,7 @@ function store_getDiskSize() {
 
 function setStepBusy(key, on) {
   state.setupBusy = on ? key : null;
-  // ，
+  // , 
   const row = $('setupSteps').querySelector('[data-step="all"]');
   if (row) {
     row.classList.toggle('busy', !!on);
@@ -427,15 +427,15 @@ async function deployAll() {
   if (state.setupBusy) return;
   setStepBusy('all', true);
   try {
-    // adb / / system image，
-    // 「」retry，failure
+    // adb / / system image, 
+    // ""retry, failure
     const r = await api.autoDeploy({ force: true });
     if (!r || !r.ok) {
       toast({ title: 'Setup Failed', body: (r && r.error) || 'Please check your internet connection and retry', type: 'error', sticky: true });
       return;
     }
     await refreshStatus();
-    toast({ title: 'Components ready, booting…', body: 'First boot takes 1–3 minutes; subsequent launches take seconds.', type: 'info' });
+    toast({ title: 'Components ready, booting...', body: 'First boot takes 1-3 minutes; subsequent launches take seconds.', type: 'info' });
     const started = await api.runtimeStart();
     await refreshStatus();
     toast(started && started.ok
@@ -460,7 +460,7 @@ async function runStep(key) {
     else if (key === 'sysimg') r = await api.installSysimg();
     else if (key === 'accel') {
       const t = toast({
-        title: 'Installing hardware acceleration driver…',
+        title: 'Installing hardware acceleration driver...',
         body: 'Click Yes in the UAC elevation prompt',
         sticky: true,
         spinner: true,
@@ -503,14 +503,14 @@ async function markInstalled() {
 
 /* ---------------- install ---------------- */
 
-/** installfailure「」，hint， */
+/** installfailure"", hint,  */
 function friendlyInstallErrorText(msg) {
   const s = String(msg || 'Unknown error');
   if (/INSUFFICIENT_STORAGE|not enough space|insufficient space|ENOSPC/i.test(s)) {
     return `${s}\nAndroid data partition is full: go to Settings → Performance & Resources, increase partition size, and click "Expand Partition Now".`;
   }
-  // failure：system image「」hint（install:progress），
-  // failure「retry」——，failure。
+  // failure: system image""hint(install:progress), 
+  // failure"retry"--, failure. 
   if (/NO_MATCHING_ABIS/i.test(s)) {
     return /fallback.*still failed|abiRetried/i.test(s)
       ? `${s}\nARM compatible image is active but installation still failed. Please export a diagnostic report in Settings → Diagnostics.`
@@ -527,9 +527,9 @@ function friendlyInstallErrorText(msg) {
   return s;
 }
 
-/* 「install…」 sticky hint。install:error ：
- * send('install:error') invoke failure，，
- * catch 「error」。 */
+/* "install..." sticky hint. install:error : 
+ * send('install:error') invoke failure, , 
+ * catch "error".  */
 let installToast = null;
 
 async function installFiles(paths) {
@@ -544,7 +544,7 @@ async function installFiles(paths) {
 
   for (const p of paths) {
     const name = p.split(/[\\/]/).pop();
-    const t = toast({ title: `Installing ${name}`, body: 'Parsing APK…', progress: 8, sticky: true, spinner: true });
+    const t = toast({ title: `Installing ${name}`, body: 'Parsing APK...', progress: 8, sticky: true, spinner: true });
     installToast = t;
     let off = () => {};
     try {
@@ -554,7 +554,7 @@ async function installFiles(paths) {
         t.update({ title: pr.meta ? `Installing ${pr.meta.label}` : `Installing ${name}`, body: pr.message, progress: pct });
       });
       const r = await api.installApk(p);
-      t.update({ title: `${r.app.label} Installed`, body: r.app.shortcutPath ? 'Desktop shortcut created — double-click to launch.' : 'Right-click the app card to create a desktop shortcut.', progress: 100, type: 'ok' });
+      t.update({ title: `${r.app.label} Installed`, body: r.app.shortcutPath ? 'Desktop shortcut created - double-click to launch.' : 'Right-click the app card to create a desktop shortcut.', progress: 100, type: 'ok' });
       t.el.querySelector('.spinner')?.remove();
       setTimeout(t.dismiss, 3600);
       if (r.warnings && r.warnings.length) {
@@ -563,10 +563,10 @@ async function installFiles(paths) {
       ok++;
     } catch (e) {
       failed++;
-      // 「install…」 sticky hint，、
-      // runtimelog —— 「failure」。
-      // errorhint install:error （），
-      // 。
+      // "install..." sticky hint, , 
+      // runtimelog -- "failure". 
+      // errorhint install:error (), 
+      // . 
       try { off(); } catch (_) { /* ignore */ }
       t.dismiss();
       if (installToast === t) installToast = null;
@@ -587,13 +587,13 @@ async function launchApp(pkg) {
   state.launchPkg = pkg;
   const t = toast({
     title: `Opening ${app ? app.label : pkg}`, 
-    body: 'Warming up Android runtime for launch, please wait…', 
+    body: 'Warming up Android runtime for launch, please wait...', 
     sticky: true,
     spinner: true,
   });
   const r = await api.launch(pkg);
   if (r.ok) {
-    // appwindow，；hint，window
+    // appwindow, ; hint, window
     t.update({ title: 'Launched', body: 'App is running in a standalone window (use titlebar to rotate).', type: 'ok' });
     setTimeout(t.dismiss, 1600);
     setTimeout(() => api.winHide(), 900);
@@ -632,14 +632,14 @@ async function uninstall(pkg) {
 
 const MENU_ITEMS = [
   { key: 'open', label: 'Open App', kbd: 'Enter' },
-  // appruntime（ showMenu ）。
-  // ，window，
-  // app，exit ApkStart。
+  // appruntime( showMenu ). 
+  // , window, 
+  // app, exit ApkStart. 
   { key: 'stop', label: 'Close App', onlyRunning: true },
   { key: 'shortcut', label: 'Create Desktop Shortcut' },
   { key: 'orientation', label: 'Rotate Orientation' },
   { key: 'pin', label: 'Pin to Top' },
-  { key: 'keymap', label: 'Key Mapping…' },
+  { key: 'keymap', label: 'Key Mapping...' },
   { divider: true },
   { key: 'reveal', label: 'Show APK in Explorer' },
   { key: 'clear', label: 'Clear App Data' },
@@ -697,14 +697,14 @@ async function handleMenu(act) {
     }
     case 'shortcut': return createShortcut(pkg);
     case 'orientation': {
-      // ：app → landscape → portrait → app
-      // portraitapp，landscape。
+      // : app → landscape → portrait → app
+      // portraitapp, landscape. 
       const cur = app.orientationOverride;
       const next = cur === 'landscape' ? 'portrait' : (cur === 'portrait' ? null : 'landscape');
       try {
         const r = await api.setAppOrientation(pkg, next);
         const txt = next === 'landscape' ? 'Launch in Landscape' : (next === 'portrait' ? 'Launch in Portrait' : 'Follow App');
-        toast({ title: `Orientation: ${txt}`, body: 'Takes effect on next launch — no full restart needed.', type: 'ok' });
+        toast({ title: `Orientation: ${txt}`, body: 'Takes effect on next launch - no full restart needed.', type: 'ok' });
         if (r && typeof r.landscape === 'boolean' && state.apps) {
           const rec = state.apps.find((a) => a.package === pkg);
           if (rec) rec.orientationOverride = next;
@@ -733,15 +733,15 @@ async function handleMenu(act) {
 }
 
 /**
- * key。 confirm + prompt （ UI ）。
- * 。
+ * key.  confirm + prompt ( UI ). 
+ * . 
  */
 async function showKeymapPicker(pkg, label) {
   try {
     const presets = await api.keymap.getPresets();
     const current = await api.keymap.getMap(pkg);
     const hasCurrent = current && current.length > 0;
-    const lines = presets.map((p, i) => `${i + 1}. ${p.label} — ${p.desc}`);
+    const lines = presets.map((p, i) => `${i + 1}. ${p.label} - ${p.desc}`);
     if (hasCurrent) lines.unshift('0. Clear current mapping');
     const msg = `Choose key mapping preset for "${label}":\n\n${lines.join('\n')}\n\nEnter number:`;
     const input = window.prompt(msg, hasCurrent ? '0' : '1');
@@ -759,7 +759,7 @@ async function showKeymapPicker(pkg, label) {
     }
     const chosen = presets[presetIdx - 1];
     await api.keymap.applyPreset(pkg, chosen.id);
-    toast({ title: `Applied "${chosen.label}"`, body: `${label} · Keyboard is active in app`, type: 'ok' });
+    toast({ title: `Applied "${chosen.label}"`, body: `${label}  -  Keyboard is active in app`, type: 'ok' });
   } catch (e) {
     toast({ title: 'Key mapping setup failed', body: e.message, type: 'error' });
   }
@@ -774,14 +774,14 @@ let volumeTimer = null;
 async function refreshAndroid() {
   const el = $('androidStatus');
   if (!el) return;
-  el.textContent = 'Loading…';
+  el.textContent = 'Loading...';
   const r = await api.android.status().catch(() => null);
   if (!r || !r.ok) {
     el.textContent = r && r.error ? `Runtime not ready (${String(r.error).slice(0, 36)})` : 'Runtime not running';
     return;
   }
-  el.textContent = `Android ${r.sdk || '?'} · ${r.wifi ? 'Wi-Fi On' : 'Wi-Fi Off'}` +
-    `${r.airplane ? ' · Airplane Mode' : ''} · Volume ${r.volume}%`;
+  el.textContent = `Android ${r.sdk || '?'}  -  ${r.wifi ? 'Wi-Fi On' : 'Wi-Fi Off'}` +
+    `${r.airplane ? '  -  Airplane Mode' : ''}  -  Volume ${r.volume}%`;
   $('setAndroidWifi').checked = !!r.wifi;
   $('setAndroidAirplane').checked = !!r.airplane;
   $('setAndroidAnim').checked = !r.animationsOff;
@@ -816,7 +816,7 @@ function bindAndroid() {
   $('btnAndroidRefresh').addEventListener('click', () => refreshAndroid());
   $('btnAndroidTune').addEventListener('click', async () => {
     const r = await api.android.tune(state.launchPkg || '').catch(() => null);
-    toast({ type: r && r.ok ? 'ok' : 'error', title: r && r.ok ? 'Optimized: animations off, background relaxed, battery whitelist active' : 'Optimization failed — runtime may not be running' });
+    toast({ type: r && r.ok ? 'ok' : 'error', title: r && r.ok ? 'Optimized: animations off, background relaxed, battery whitelist active' : 'Optimization failed - runtime may not be running' });
     if (r && r.ok) refreshAndroid();
   });
   const open = async (action) => {
@@ -832,14 +832,14 @@ function bindAndroid() {
   $('btnAndroidApps').addEventListener('click', () => open('apps'));
 }
 
-/** settings：runtime，， */
+/** settings: runtime, ,  */
 function syncBackendFields() {
   const perf = $('perfGroup');
   if (perf) perf.hidden = false;
   refreshResources();
 }
 
-/** + （settings） */
+/** + (settings) */
 async function refreshResources() {
   const bNote = $('builtinResNote');
   if (!bNote) return;
@@ -858,7 +858,7 @@ async function refreshResources() {
     + (r.verdict && r.verdict.note ? ` ${r.verdict.note}` : '');
 }
 
-/** checkup：（） */
+/** checkup: () */
 function renderPreflight(res) {
   const list = $('preflightList');
   const sum = $('preflightSummary');
@@ -897,7 +897,7 @@ function renderPreflight(res) {
       btn.addEventListener('click', async () => {
         btn.disabled = true;
         const old = btn.textContent;
-        btn.textContent = 'Processing…';
+        btn.textContent = 'Processing...';
         let r = null;
         if (it.action.id === 'accel') r = await api.enableAccel().catch(() => null);
         else r = await api.enableVirtualization().catch(() => null);
@@ -909,7 +909,7 @@ function renderPreflight(res) {
           const reboot = r.restartNeeded === true;
           toast({
             type: 'ok',
-            title: r.already ? 'Hardware acceleration already active' : (reboot ? 'Submitted — reboot required' : 'Applied'),
+            title: r.already ? 'Hardware acceleration already active' : (reboot ? 'Submitted - reboot required' : 'Applied'),
             body: r.already ? '' : (reboot ? 'Reboot PC for acceleration to take effect, then run Diagnostics' : 'Run Diagnostics to confirm results'),
           });
           if (r.already || !reboot) setTimeout(() => runPreflight().catch(() => {}), 1200);
@@ -930,7 +930,7 @@ function renderPreflight(res) {
   const rec = report.recommended || {};
   if (sum) {
     sum.textContent = `${report.summary}. Recommended: ${Math.round((rec.memoryMB || 0) / 1024)} GB RAM / `
-      + `${rec.cores || 2} cores / ${rec.renderSize || 'auto'} · Renderer: ${rec.gpuMode || 'auto'}`
+      + `${rec.cores || 2} cores / ${rec.renderSize || 'auto'}  -  Renderer: ${rec.gpuMode || 'auto'}`
       + (edition === 'store' ? ' (Store edition: system features must be enabled in Windows Features manually)' : '');
   }
   if (applyBtn) applyBtn.hidden = false;
@@ -942,8 +942,8 @@ async function runPreflight() {
   if (!btn) return null;
   const old = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Checking…';
-  if (sum) sum.textContent = 'Checking virtualization, GPU, RAM… (first run takes ~2–3 s)';
+  btn.textContent = 'Checking...';
+  if (sum) sum.textContent = 'Checking virtualization, GPU, RAM... (first run takes ~2-3 s)';
   let r = null;
   try {
     r = await api.preflightRun();
@@ -956,7 +956,7 @@ async function runPreflight() {
   return r;
 }
 
-/** driver（patch）： + */
+/** driver(patch):  + */
 function renderDrivers(r) {
   const list = $('drvList');
   const sum = $('drvSummary');
@@ -967,8 +967,8 @@ function renderDrivers(r) {
   const onCount = drivers.filter((d) => d.enabled && d.matched).length;
   if (sum) {
     const accel = host.accel === 'none' ? 'No hardware acceleration' : (host.accel || 'Unknown');
-    sum.textContent = `Host: ${host.platform || ''}/${host.arch || ''} · ${host.gpuVendor || 'Unknown'} GPU · ${accel}`
-      + ` · emulator ${host.emulatorVersion || 'Unknown'}; ${drivers.length} drivers, ${onCount} active on this PC.`
+    sum.textContent = `Host: ${host.platform || ''}/${host.arch || ''}  -  ${host.gpuVendor || 'Unknown'} GPU  -  ${accel}`
+      + `  -  emulator ${host.emulatorVersion || 'Unknown'}; ${drivers.length} drivers, ${onCount} active on this PC.`
       + (errors.length ? ` ${errors.length} file(s) failed to load (see below).` : '');
   }
   list.textContent = '';
@@ -1008,9 +1008,9 @@ function renderDrivers(r) {
     const meta = document.createElement('div');
     meta.className = 'drv-meta';
     meta.textContent = `v${d.version || '?'}`
-      + (d.author ? ` · ${d.author}` : '')
-      + ` · priority ${d.priority}`
-      + (d.hits && d.hits.length ? ` · Matched: ${d.hits.join(' / ')}` : ' · Not matched on this PC');
+      + (d.author ? `  -  ${d.author}` : '')
+      + `  -  priority ${d.priority}`
+      + (d.hits && d.hits.length ? `  -  Matched: ${d.hits.join(' / ')}` : '  -  Not matched on this PC');
     item.append(meta);
 
     if (d.description) {
@@ -1024,7 +1024,7 @@ function renderDrivers(r) {
   for (const e of errors) {
     const err = document.createElement('div');
     err.className = 'drv-err';
-    err.textContent = `${String(e.file || '').split(/[\\/]/).pop()}：${(e.errors || []).join('；')}`;
+    err.textContent = `${String(e.file || '').split(/[\\/]/).pop()}: ${(e.errors || []).join('; ')}`;
     list.append(err);
   }
   if (!drivers.length && !errors.length) {
@@ -1069,7 +1069,7 @@ function fillSettings(s) {
     ? s.engine.mouseWheelMode : 'smooth';
   $('setMouseSideButtons').checked = !!s.engine.mouseSideButtons;
   if ($('setKeymapEnabled')) $('setKeymapEnabled').checked = s.engine.keymapEnabled !== false;
-  // ：window（）
+  // : window()
   if ($('setMultiWindow')) $('setMultiWindow').checked = !!s.engine.multiWindow;
   if ($('setKeepBackground')) $('setKeepBackground').value = String(
     Number(s.engine.keepBackground) >= 0 ? Number(s.engine.keepBackground) : 1,
@@ -1097,36 +1097,36 @@ function fillSettings(s) {
   if ($('setAutoRotate')) $('setAutoRotate').value = d.autoRotate === false ? 'off' : 'on';
   if ($('setTabletMode')) $('setTabletMode').value = d.tabletMode === false ? 'off' : 'on';
   $('setPortrait').value = d.portrait || '900x1600';
-  // 0.6.0 defaultwindow： true embedded mode（configuration undefined ）
+  // 0.6.0 defaultwindow:  true embedded mode(configuration undefined )
   if ($('setWindowEmbed')) $('setWindowEmbed').value = d.windowEmbed === true ? 'embed' : 'detached';
   $('portraitField').hidden = $('setDisplayMode').value === 'fullscreen';
 }
 
-/** data partition + disk，settingscapacity */
+/** data partition + disk, settingscapacity */
 async function refreshDataInfo() {
   const el = $('dataNote');
   if (!el) return;
   const info = await api.dataInfo().catch(() => null);
   if (!info) { el.textContent = 'Failed to read data partition info'; return; }
   const auto = Number(($('setDataGB') || {}).value || 0) === 0;
-  // quickboot system image guest capacity（ 8GB system image、guest 5.7GB），
-  // ，「runtime」。
+  // quickboot system image guest capacity( 8GB system image, guest 5.7GB), 
+  // , "runtime". 
   const img = info.overlay ? 'Fast-boot overlay disk (actual capacity reported by Android /data)' : (info.fsGB ? `Filesystem: ${info.fsGB} GB` : (info.imageGB ? `${info.imageGB} GB` : 'Not yet created'));
   const free = info.freeDiskMB ? `${(info.freeDiskMB / 1024).toFixed(1)} GB` : 'Unknown';
   const pending = Number(info.pendingGB) > 0
     ? ` Target ${info.configuredGB} GB not yet applied: Android is using an overlay disk; "Reset Android Data" is required to expand.`
     : '';
-  el.textContent = `Data partition: ${img}${auto ? ' (Auto)' : ''} · Disk free: ${free}. ${pending}` + ' If an app reports storage full, increase this value and click "Expand Partition Now".';
+  el.textContent = `Data partition: ${img}${auto ? ' (Auto)' : ''}  -  Disk free: ${free}. ${pending}` + ' If an app reports storage full, increase this value and click "Expand Partition Now".';
 }
 
-/* ---------------- settings： + ---------------- */
+/* ---------------- settings:  + ---------------- */
 
 /**
- * settings，（ 0.6.0 ：
- * 「settings」）。settings 8 ，。
+ * settings, ( 0.6.0 : 
+ * "settings"). settings 8 , . 
  *
- * index.html data-cat ——
- * test/settings-categories-test.js verify。
+ * index.html data-cat --
+ * test/settings-categories-test.js verify. 
  */
 const SETTINGS_CATS = [
   { id: 'basic', name: 'General & Install' },
@@ -1142,12 +1142,12 @@ const SETTINGS_CATS = [
 
 const settingsCatState = { cat: 'basic', query: '' };
 
-/** settings（.group details.advanced-group ） */
+/** settings(.group details.advanced-group ) */
 function settingsGroups() {
   return Array.from(document.querySelectorAll('#settingsBody [data-cat]'));
 }
 
-/** ：、、 */
+/** : , ,  */
 function groupMatches(group, q) {
   if (!q) return true;
   const text = (group.textContent || '').toLowerCase();
@@ -1173,8 +1173,8 @@ function switchSettingsCat(cat, { keepQuery = false } = {}) {
 }
 
 /**
- * app：（，
- * 「」）；。
+ * app: (, 
+ * ""); . 
  */
 function applySettingsFilter() {
   const q = settingsCatState.query.trim().toLowerCase();
@@ -1186,20 +1186,20 @@ function applySettingsFilter() {
     g.hidden = q ? !hit : !inCat;
     if (hit) hitPerCat[g.dataset.cat] = (hitPerCat[g.dataset.cat] || 0) + 1;
   }
-  // ：
+  // : 
   document.querySelectorAll('#setNav .set-nav-item').forEach((b) => {
     const n = hitPerCat[b.dataset.cat] || 0;
     b.classList.toggle('dim', !!q && n === 0);
     b.title = q ? `${n} match(es)` : '';
   });
-  // （ :last-child ）
+  // ( :last-child )
   const visible = groups.filter((g) => !g.hidden);
   visible.forEach((g) => g.classList.remove('last-visible'));
   if (visible.length) visible[visible.length - 1].classList.add('last-visible');
   updateCatBadges();
 }
 
-/** ：， */
+/** : ,  */
 function focusGroup(el) {
   if (!el) return;
   const cat = el.dataset && el.dataset.cat;
@@ -1231,7 +1231,7 @@ function bindSettingsCategory() {
       if (clear) clear.hidden = !settingsCatState.query;
       applySettingsFilter();
     });
-    // ：
+    // : 
     search.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       e.preventDefault();
@@ -1256,9 +1256,9 @@ function bindSettingsCategory() {
   switchSettingsCat(settingsCatState.cat);
 }
 
-/* ---------------- check（ debug）---------------- */
+/* ---------------- check( debug)---------------- */
 
-/** check（ src/core/autodebug.js CATEGORIES ） */
+/** check( src/core/autodebug.js CATEGORIES ) */
 const DEBUG_CATS = [
   { id: 'runtime', name: 'Runtime' },
   { id: 'device', name: 'Device Connection' },
@@ -1279,10 +1279,10 @@ function renderAutodebug(res) {
   const at = res && res.at;
 
   if (txt) {
-    if (res && res.running) txt.textContent = 'Checking…';
+    if (res && res.running) txt.textContent = 'Checking...';
     else if (!at) txt.textContent = 'Not checked yet';
-    else if (!issues.length) txt.textContent = `Last check ${relTime(at)} · All systems healthy`;
-    else txt.textContent = `Last check ${relTime(at)} · ${issues.length} issue(s) to address`;
+    else if (!issues.length) txt.textContent = `Last check ${relTime(at)}  -  All systems healthy`;
+    else txt.textContent = `Last check ${relTime(at)}  -  ${issues.length} issue(s) to address`;
   }
 
   if (!issues.length) {
@@ -1341,12 +1341,12 @@ function renderAutodebug(res) {
   updateCatBadges();
 }
 
-/** ： */
+/** :  */
 function updateCatBadges() {
   const issues = (autodebugLast && autodebugLast.issues) || [];
   document.querySelectorAll('#setNav .set-nav-badge').forEach((el) => {
     const cat = el.dataset.badge;
-    // checksettings，settings「diagnoserepair」
+    // checksettings, settings"diagnoserepair"
     const n = cat === 'diag' ? issues.filter((i) => i.severity === 'error').length : 0;
     el.hidden = n === 0;
     el.textContent = n ? String(n) : '';
@@ -1360,7 +1360,7 @@ function bindAutodebug() {
     btn.addEventListener('click', async () => {
       btn.disabled = true;
       const old = btn.textContent;
-      btn.textContent = 'Checking…';
+      btn.textContent = 'Checking...';
       try {
         const r = await api.autodebugRun().catch(() => null);
         if (r) renderAutodebug(r);
@@ -1438,7 +1438,7 @@ async function openSettings() {
   if (curVerEl && info.version) curVerEl.textContent = `v${info.version}`;
   const assoc = await api.assocStatus();
   const btn = $('btnAssoc');
-  btn.textContent = assoc.registered ? 'Associated · Click to Unlink' : 'Not Associated · Click to Enable';
+  btn.textContent = assoc.registered ? 'Associated  -  Click to Unlink' : 'Not Associated  -  Click to Enable';
   btn.dataset.on = assoc.registered ? '1' : '0';
 
   api.doctorProfile().then((r) => {
@@ -1446,7 +1446,7 @@ async function openSettings() {
   }).catch(() => { $('autoProfileText').textContent = 'Automatic Mode'; });
   api.runtimeUsage().then((u) => {
     $('usageText').textContent = u
-      ? `Total: ${u.totalText}${u.reclaimable ? ` · Reclaimable: ${u.reclaimableText} (${u.count} items)` : ' · Clean'}`
+      ? `Total: ${u.totalText}${u.reclaimable ? `  -  Reclaimable: ${u.reclaimableText} (${u.count} items)` : '  -  Clean'}`
       : 'Usage stats unavailable';
   }).catch(() => { $('usageText').textContent = 'Usage stats unavailable'; });
 
@@ -1454,7 +1454,7 @@ async function openSettings() {
   refreshAndroid();
   refreshDataInfo();
   applySettingsFilter();
-  // check（），
+  // check(), 
   api.autodebugState().then((r) => { if (r) renderAutodebug(r); }).catch(() => {});
 }
 
@@ -1466,7 +1466,7 @@ function closeSettings() {
 
 let lastUpdate = null;
 
-/** settings（launch） */
+/** settings(launch) */
 function renderUpdate(info) {
   lastUpdate = info || null;
   const cur = $('updateCurrent');
@@ -1479,8 +1479,8 @@ function renderUpdate(info) {
 
   if (info.ok === false) {
     st.textContent = `Check failed: ${info.error || 'Network unavailable'}`;
-    // failure：，download。
-    // 「」，「update」。
+    // failure: , download. 
+    // "", "update". 
     showUpdateBtn(true);
     btn.textContent = 'Open Releases';
     btn.dataset.mode = 'manual';
@@ -1489,10 +1489,10 @@ function renderUpdate(info) {
     return;
   }
   if (info.hasUpdate) {
-    // version、 ——
-    // 「update」，log。
+    // version,  --
+    // "update", log. 
     const src = (info.sources || []).map((x) => `${x.name} ${x.tag || ''}`.trim()).join(' / ');
-    const bad = (info.unreachable || []).map((x) => x.name).join('、');
+    const bad = (info.unreachable || []).map((x) => x.name).join(', ');
     const stale = info.stale ? ' (offline cache, may not be latest)' : '';
     st.textContent = `New version found: ${info.tag}${src ? ` (${src})` : ''}${bad ? `; unreachable: ${bad}` : ''}${stale}`;
     showUpdateBtn(true);
@@ -1507,13 +1507,13 @@ function renderUpdate(info) {
   } else {
     const src = (info.sources || []).map((x) => x.name).join(' / ');
     const stale = info.stale ? ' (offline cache)' : '';
-    st.textContent = `Up to date (v${info.current})${src ? ` · via ${src}` : ''}${stale}`;
+    st.textContent = `Up to date (v${info.current})${src ? `  -  via ${src}` : ''}${stale}`;
     showUpdateBtn(false);
     if (bar) bar.hidden = true;
   }
 }
 
-/** .btn display:inline-flex， hidden ， display */
+/** .btn display:inline-flex,  hidden ,  display */
 function showUpdateBtn(on) {
   const btn = $('btnDoUpdate');
   if (!btn) return;
@@ -1532,7 +1532,7 @@ function renderUpdateProgress(p) {
     toast({ title: 'Update failed', body: p.message || '', type: 'error' });
     return;
   }
-  if (st) st.textContent = p.message || 'Updating…';
+  if (st) st.textContent = p.message || 'Updating...';
   if (bar && fill) {
     bar.hidden = false;
     fill.style.width = `${Math.max(0, Math.min(100, p.percent || 0))}%`;
@@ -1548,8 +1548,8 @@ function bindUpdate() {
     if (!silent) {
       check.disabled = true;
       const old = check.textContent;
-      check.textContent = 'Checking…';
-      $('updateState').textContent = 'Connecting to GitHub…';
+      check.textContent = 'Checking...';
+      $('updateState').textContent = 'Connecting to GitHub...';
       try {
         const info = await api.updateCheck();
         renderUpdate(info);
@@ -1575,7 +1575,7 @@ function bindUpdate() {
       return;
     }
     go.disabled = true;
-    go.textContent = 'Updating…';
+    go.textContent = 'Updating...';
     const r = await api.updateApply().catch((e) => ({ ok: false, error: e.message }));
     if (!r || !r.ok) {
       go.disabled = false;
@@ -1585,11 +1585,11 @@ function bindUpdate() {
         toast({ title: 'Update failed', body: r.error, type: 'error' });
       }
     } else {
-      $('updateState').textContent = `Downloaded v${r.version}, restarting to apply…`;
+      $('updateState').textContent = `Downloaded v${r.version}, restarting to apply...`;
     }
   });
 
-  // settings，（，）
+  // settings, (, )
   runCheck(true).catch(() => {});
 }
 
@@ -1652,9 +1652,9 @@ function bindSettings() {
 
   $('setAdbPath').addEventListener('change', (e) => save({ adbPath: e.target.value.trim() }));
   $('setSystemImage').addEventListener('change', (e) => save({ runtime: { isoPath: e.target.value.trim() } }));
-  // memory / ：「」， 0 。
-  // memoryMB， overridesFromSettings autoMemory=false ，
-  // 「memory」ignore —— settings“”。
+  // memory / : "",  0 . 
+  // memoryMB,  overridesFromSettings autoMemory=false , 
+  // "memory"ignore -- settings"". 
   $('setMemory').addEventListener('change', (e) => {
     const v = Number(e.target.value) || 0;
     save(v > 0 ? { engine: { memoryMB: v, autoMemory: false } } : { engine: { memoryMB: 0, autoMemory: true } });
@@ -1665,7 +1665,7 @@ function bindSettings() {
   });
   if ($('setResourceMode')) {
     $('setResourceMode').addEventListener('change', async (e) => {
-      // liteMode / priorityMode / renderSize（）
+      // liteMode / priorityMode / renderSize()
       state.settings = await api.setSettings({ engine: { resourceMode: e.target.value } });
       fillSettings(state.settings);
       toast({ title: 'Resource policy updated', body: 'Takes effect on next launch', type: 'ok' });
@@ -1715,13 +1715,13 @@ function bindSettings() {
       if (response !== 1) return;
       $('btnGrowData').disabled = true;
       const old = $('btnGrowData').textContent;
-      $('btnGrowData').textContent = 'Expanding…';
+      $('btnGrowData').textContent = 'Expanding...';
       const r = await api.setDataSize(gb).catch((e) => ({ ok: false, error: e.message }));
       $('btnGrowData').disabled = false;
       $('btnGrowData').textContent = old;
       if (r && !r.ok && r.needsReset) {
-        // launch：，capacity /data。
-        // ，。
+        // launch: , capacity /data. 
+        // , . 
         const again = await api.confirm({
           title: 'Reset Required to Expand Partition',
           message: `Android is using an overlay disk. Expanding to ${gb} GB requires resetting /data.`, 
@@ -1730,7 +1730,7 @@ function bindSettings() {
         });
         if (again.response !== 1) { refreshDataInfo(); return; }
         $('btnGrowData').disabled = true;
-        $('btnGrowData').textContent = 'Rebuilding…';
+        $('btnGrowData').textContent = 'Rebuilding...';
         const rr = await api.resetAndResize(gb).catch((e) => ({ ok: false, error: e.message }));
         $('btnGrowData').disabled = false;
         $('btnGrowData').textContent = old;
@@ -1778,7 +1778,7 @@ function bindSettings() {
   $('setPriorityMode').addEventListener('change', (e) => save({ engine: { priorityMode: e.target.value } }));
   const savePointer = async (patch) => {
     await save({ engine: patch });
-    // window/uninstallhook，window
+    // window/uninstallhook, window
     api.refreshPointerMapping().catch(() => {});
   };
   $('setMouseRightBack').addEventListener('change', (e) => savePointer({ mouseRightBack: e.target.checked }));
@@ -1790,7 +1790,7 @@ function bindSettings() {
       toast({ title: e.target.checked ? 'Keyboard mapping enabled' : 'Keyboard mapping disabled', type: 'ok' });
     });
   }
-  // ：。hintapp（apppath）。
+  // : . hintapp(apppath). 
   if ($('setMultiWindow')) {
     $('setMultiWindow').addEventListener('change', (e) => {
       save({ engine: { multiWindow: e.target.checked } });
@@ -1808,7 +1808,7 @@ function bindSettings() {
   }
   $('setDeepTrim').addEventListener('change', async (e) => {
     await save({ engine: { deepTrim: e.target.checked } });
-    // pm disable-user ，
+    // pm disable-user , 
     if (!e.target.checked) {
       api.restoreSystemApps().catch(() => {});
       toast({ title: 'System components restored', body: 'Deep trim disabled, background packages restored', type: 'info' });
@@ -1893,7 +1893,7 @@ function bindSettings() {
   });
   $('setWindowEmbed').addEventListener('change', async (e) => {
     const embed = e.target.value === 'embed';
-    // windowEmbedChosen 「」：upgradedefault。
+    // windowEmbedChosen "": upgradedefault. 
     state.settings = await api.setSettings({
       display: { windowEmbed: embed, windowEmbedChosen: true },
     });
@@ -1909,7 +1909,7 @@ function bindSettings() {
     const r = await api.rebuildShortcuts();
     toast({
       title: r && r.fixed && r.fixed.length ? 'Shortcuts rebuilt' : 'Shortcuts verified',
-      body: r && r.fixed && r.fixed.length ? r.fixed.join('、') : 'Desktop and Start Menu shortcuts are healthy',
+      body: r && r.fixed && r.fixed.length ? r.fixed.join(', ') : 'Desktop and Start Menu shortcuts are healthy',
       type: 'ok',
     });
   });
@@ -1917,7 +1917,7 @@ function bindSettings() {
   $('btnDiagnostics').addEventListener('click', async () => {
     try {
       const r = await api.doctorReport();
-      toast({ title: 'Diagnostic report exported', body: `${r.diagnosis.title} · ${r.file}`, type: 'ok', sticky: true });
+      toast({ title: 'Diagnostic report exported', body: `${r.diagnosis.title}  -  ${r.file}`, type: 'ok', sticky: true });
     } catch (e) {
       toast({ title: 'Export failed', body: e.message, type: 'error' });
     }
@@ -1937,11 +1937,11 @@ function bindSettings() {
       if (r.cancelled) return;
       toast({
         title: 'Cleanup Complete',
-        body: `Freed ~${(r.saved / 1048576).toFixed(0)} MB (${r.removed.length} items)，installed apps are preserved.`,
+        body: `Freed ~${(r.saved / 1048576).toFixed(0)} MB (${r.removed.length} items), installed apps are preserved.`,
         type: 'ok',
       });
       const u = await api.runtimeUsage();
-      $('usageText').textContent = `Total: ${u.totalText} · Reclaimable: ${u.reclaimableText} (${u.count} items)`;
+      $('usageText').textContent = `Total: ${u.totalText}  -  Reclaimable: ${u.reclaimableText} (${u.count} items)`;
     } catch (e) {
       toast({ title: 'Cleanup failed', body: e.message, type: 'error' });
     } finally {
@@ -1949,7 +1949,7 @@ function bindSettings() {
     }
   });
 
-  // Android：（，），
+  // Android: (, ), 
   $('btnResetData').addEventListener('click', async () => {
     const btn = $('btnResetData');
     btn.disabled = true;
@@ -1984,11 +1984,11 @@ function bindSettings() {
       }
       toast({
         title: 'Android Data Reset',
-        body: `Freed ~${r.reclaimedMB} MB，installed app records cleared.`,
+        body: `Freed ~${r.reclaimedMB} MB, installed app records cleared.`,
         type: 'ok',
       });
       const u = await api.runtimeUsage();
-      $('usageText').textContent = `Total: ${u.totalText} · Reclaimable: ${u.reclaimableText} (${u.count} items)`;
+      $('usageText').textContent = `Total: ${u.totalText}  -  Reclaimable: ${u.reclaimableText} (${u.count} items)`;
     } catch (e) {
       toast({ title: 'Reset Failed', body: e.message, type: 'error' });
     } finally {
@@ -1996,9 +1996,9 @@ function bindSettings() {
     }
   });
 
-  // repairnetwork：Androidblack screen（「」）。
-  // /data Wi-Fi configuration，wlan0 、default。
-  // Play Store system image root， /data；app，。
+  // repairnetwork: Androidblack screen(""). 
+  // /data Wi-Fi configuration, wlan0 , default. 
+  // Play Store system image root,  /data; app, . 
   $('btnRepairNetwork').addEventListener('click', async () => {
     const btn = $('btnRepairNetwork');
     btn.disabled = true;
@@ -2008,10 +2008,10 @@ function bindSettings() {
         title: 'Repair Virtual Machine Network?',
         message: 'Network-dependent pages failing to load is usually caused by VM network issues.',
         detail: 'Repair will attempt progressive recovery steps:\n\n'
-          + '1. Cold-boot VM (bypass snapshot) and wait for network — preserves all data\n'
-          + '2. Reset Android data if issue persists — app list preserved and auto-reinstalled\n'
+          + '1. Cold-boot VM (bypass snapshot) and wait for network - preserves all data\n'
+          + '2. Reset Android data if issue persists - app list preserved and auto-reinstalled\n'
           + '   (local app states will be reset)\n\n'
-          + 'Affects current AVD only. Process takes ~1–5 minutes. Continue?',
+          + 'Affects current AVD only. Process takes ~1-5 minutes. Continue?',
         buttons: ['Cancel', 'Start Repair'],
         defaultId: 0,
         cancelId: 0,
@@ -2038,7 +2038,7 @@ function bindSettings() {
     }
   });
 
-  // cleanversion：directory / uninstall / updatetemporary，。
+  // cleanversion: directory / uninstall / updatetemporary, . 
   $('btnLeftovers').addEventListener('click', async () => {
     const btn = $('btnLeftovers');
     btn.disabled = true;
@@ -2054,7 +2054,7 @@ function bindSettings() {
         return;
       }
       const mb = Math.round((r.totalBytes || 0) / 1048576);
-      const lines = items.slice(0, 8).map((x) => `• ${x.note}：${x.path}`);
+      const lines = items.slice(0, 8).map((x) => `• ${x.note}: ${x.path}`);
       if (items.length > 8) lines.push(`...and ${items.length - 8} more item(s)`);
       const ok = await api.confirm({
         type: 'warning',
@@ -2079,7 +2079,7 @@ function bindSettings() {
         type: 'ok',
       });
       const u = await api.runtimeUsage();
-      $('usageText').textContent = `Total: ${u.totalText} · Reclaimable: ${u.reclaimableText} (${u.count} items)`;
+      $('usageText').textContent = `Total: ${u.totalText}  -  Reclaimable: ${u.reclaimableText} (${u.count} items)`;
     } catch (e) {
       toast({ title: 'Cleanup failed', body: e.message, type: 'error' });
     } finally {
@@ -2089,7 +2089,7 @@ function bindSettings() {
 
   $('btnOpenShared').addEventListener('click', () => api.openSharedDir());
 
-  // shortcut：desktop / fallback
+  // shortcut: desktop / fallback
   $('btnRebuildShortcuts').addEventListener('click', async () => {
     const btn = $('btnRebuildShortcuts');
     btn.disabled = true;
@@ -2097,14 +2097,14 @@ function bindSettings() {
       const r = await api.rebuildShortcuts().catch(() => ({ ok: false }));
       const fixed = (r && r.fixed) || [];
       toast(fixed.length
-        ? { title: 'Shortcuts rebuilt', body: fixed.join('、'), type: 'ok' }
+        ? { title: 'Shortcuts rebuilt', body: fixed.join(', '), type: 'ok' }
         : { title: 'Shortcuts intact', body: 'No missing shortcuts found', type: 'info' });
     } finally {
       btn.disabled = false;
     }
   });
 
-  // directory：directory，「」directory
+  // directory: directory, ""directory
   $('btnBrowseShared').addEventListener('click', async () => {
     const picked = await api.openDir();
     if (!picked) return;
@@ -2126,7 +2126,7 @@ function bindSettings() {
     }
   });
 
-  // uninstall ApkStart （ .apk + launchuninstall；portable version）
+  // uninstall ApkStart ( .apk + launchuninstall; portable version)
   $('btnUninstall').addEventListener('click', async () => {
     const ok = window.confirm('Are you sure you want to uninstall ApkBolt?\n\nThis will remove file associations and app data. Continue?');
     if (!ok) return;
@@ -2147,14 +2147,14 @@ function bindSettings() {
       toast({ title: 'Uninstall failed', body: r.error, type: 'error' });
       return;
     }
-    toast({ title: 'Uninstalling…', body: 'Uninstaller launched. ApkBolt will now exit.', type: 'ok', sticky: true });
+    toast({ title: 'Uninstalling...', body: 'Uninstaller launched. ApkBolt will now exit.', type: 'ok', sticky: true });
   });
 
-  // ARM system imagedownload（ toast）
+  // ARM system imagedownload( toast)
   $('btnInstallPlay').addEventListener('click', async () => {
     const btn = $('btnInstallPlay');
     btn.disabled = true;
-    const t = toast({ title: 'Downloading ARM Compatibility Image', body: 'Preparing…', sticky: true, spinner: true, progress: 3 });
+    const t = toast({ title: 'Downloading ARM Compatibility Image', body: 'Preparing...', sticky: true, spinner: true, progress: 3 });
     const un = api.on('provision:progress', (p) => {
       if (p.component !== 'playimg') return;
       t.update({ title: 'Downloading ARM Image', body: p.message || '', progress: p.percent });
@@ -2206,7 +2206,7 @@ function bindSettings() {
     toast({ title: 'Data Directory Updated', body: 'Please restart ApkBolt for changes to take effect', type: 'ok', sticky: true });
   });
 
-  // Androiddirectory（AVD + snapshot）：，
+  // Androiddirectory(AVD + snapshot): , 
   if ($('btnBrowseAvdDir')) {
     $('btnBrowseAvdDir').addEventListener('click', async () => {
       const picked = await api.openDir();
@@ -2231,7 +2231,7 @@ function bindSettings() {
 
   $('btnRuntimeStart').addEventListener('click', async () => {
     const el = $('probeResult');
-    el.textContent = 'Starting…';
+    el.textContent = 'Starting...';
     const r = await api.runtimeStart();
     el.textContent = r.ok ? `Ready: ${r.engine}` : `Launch failed: ${r.error}`;
     refreshStatus();
@@ -2247,12 +2247,12 @@ function bindSettings() {
     const btn = $('btnAssoc');
     if (btn.dataset.on === '1') {
       await api.assocUnregister();
-      btn.textContent = 'Not associated · Click to register';
+      btn.textContent = 'Not associated  -  Click to register';
       btn.dataset.on = '0';
       toast({ title: '.apk file association removed' });
     } else {
       const r = await api.assocRegister();
-      btn.textContent = 'Associated · Click to unregister';
+      btn.textContent = 'Associated  -  Click to unregister';
       btn.dataset.on = '1';
       toast({ title: '.apk association enabled', body: r.ok ? 'Double-clicking any APK will now open ApkBolt' : '', type: r.ok ? 'ok' : 'error' });
     }
@@ -2272,7 +2272,7 @@ function bindEvents() {
 
   $('btnSettings').addEventListener('click', openSettings);
   $('btnRestartEngine')?.addEventListener('click', async () => {
-    toast({ title: 'Restarting Engine…', body: 'Restarting background Android runtime', type: 'info' });
+    toast({ title: 'Restarting Engine...', body: 'Restarting background Android runtime', type: 'info' });
     try {
       const r = await api.runtimeRestart();
       toast({ title: r.ok ? 'Engine Restarted' : 'Restart Failed', body: r.error || '', type: r.ok ? 'ok' : 'error' });
@@ -2283,10 +2283,10 @@ function bindEvents() {
   });
   $('dropHero')?.addEventListener('click', () => api.pickApk().then((files) => files && installFiles(files)));
   $('btnBrowseHero')?.addEventListener('click', (e) => { e.stopPropagation(); api.pickApk().then((files) => files && installFiles(files)); });
-  // 0.6.2：manual「about」
+  // 0.6.2: manual"about"
   $('btnManual')?.addEventListener('click', () => openManual({ topic: 'overview', reason: 'toolbar' }));
   $('btnOpenManual')?.addEventListener('click', () => openManual({ topic: 'overview', reason: 'about' }));
-  // ：「 / / Android 14」settingsruntime
+  // : " / / Android 14"settingsruntime
   $('engineTag').addEventListener('click', () => showSetup(true));
   $('btnCloseSettings').addEventListener('click', closeSettings);
   $('btnDoneSettings').addEventListener('click', closeSettings);
@@ -2294,7 +2294,7 @@ function bindEvents() {
     if (e.target === $('settingsMask')) closeSettings();
   });
 
-  // runtime：settings，
+  // runtime: settings, 
   $('btnDeployAll').addEventListener('click', deployAll);
   $('btnMarkInstalled').addEventListener('click', markInstalled);
   $('btnGuideClose').addEventListener('click', () => { $('setupGuide').hidden = true; });
@@ -2306,7 +2306,7 @@ function bindEvents() {
     }
   });
 
-  // ：settingsruntime
+  // : settingsruntime
   $('envChip').addEventListener('click', () => {
     openSettings().then(() => {
       const box = $('envCheck');
@@ -2339,7 +2339,7 @@ function bindEvents() {
     }
     if (act === 'install') { await startInstall(); return; }
     if (act === 'vmStart') {
-      const t = toast({ title: 'Starting runtime…', body: 'First boot: initializing Android system', sticky: true, spinner: true });
+      const t = toast({ title: 'Starting runtime...', body: 'First boot: initializing Android system', sticky: true, spinner: true });
       const r = await api.runtimeStart();
       if (r.ok) { t.update({ title: 'Runtime ready', type: 'ok' }); setTimeout(t.dismiss, 2200); }
       else t.update({ title: 'Launch Failed', body: r.error, type: 'error' });
@@ -2359,7 +2359,7 @@ function bindEvents() {
   };
   $('btnInstall').addEventListener('click', pick);
   $('btnInstall2').addEventListener('click', pick);
-  // directorysettings： + 「sharing」
+  // directorysettings:  + "sharing"
   const btnSync = $('btnSyncShared');
   if (btnSync) btnSync.addEventListener('click', async () => {
     btnSync.disabled = true;
@@ -2381,8 +2381,8 @@ function bindEvents() {
   $('grid').addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
-    // 「app」 data-pkg，installlaunch。
-    // 「install APK」，。
+    // "app" data-pkg, installlaunch. 
+    // "install APK", . 
     if (card.classList.contains('card-add')) { $('btnInstall').click(); return; }
     if (card.dataset.pkg) launchApp(card.dataset.pkg);
   });
@@ -2446,7 +2446,7 @@ function bindEvents() {
 
   // Note
   api.on('install:error', (p) => {
-    // error「install…」（ APK ）
+    // error"install..."( APK )
     if (installToast) { try { installToast.dismiss(); } catch (_) { /* ignore */ } installToast = null; }
     const name = p && p.file ? String(p.file).split(/[\\/]/).pop() : '';
     const raw = (p && p.message) || 'Unknown error';
@@ -2455,12 +2455,12 @@ function bindEvents() {
       body: friendlyInstallErrorText(raw),
       type: 'error',
     });
-    // 0.6.2：installfailure（ARM / signature / space…）
+    // 0.6.2: installfailure(ARM / signature / space...)
     openManualForError(raw, 'install-failed');
   });
   api.on('toast', (p) => toast({ title: p.message, type: p.type === 'error' ? 'error' : 'info' }));
   api.on('app:launched', () => setTimeout(refreshApps, 800));
-  // app（「app」、、window）「」
+  // app("app", , window)""
   api.on('apps:changed', () => setTimeout(refreshApps, 300));
   api.on('runtime:log', (m) => console.log('[runtime]', m));
   api.on('ui:navigate', (v) => {
@@ -2471,16 +2471,16 @@ function bindEvents() {
   api.on('update:state', (info) => {
     if (!info) return;
     renderUpdate(info);
-    // launch 8 update：，「version」
+    // launch 8 update: , "version"
     const wm = $('welcomeMask');
     if (wm && !wm.hidden) renderWelcomeTips();
   });
   api.on('update:progress', (p) => renderUpdateProgress(p));
-  // check：，settings
+  // check: , settings
   api.on('autodebug:state', (r) => {
     if (r && r.running) {
       const txt = $('autodebugStateText');
-      if (txt) txt.textContent = 'Checking…';
+      if (txt) txt.textContent = 'Checking...';
       return;
     }
     renderAutodebug(r);
@@ -2539,17 +2539,17 @@ async function maybeShowWelcome() {
   return;
 }
 
-/** hint：launch 8 update，， */
+/** hint: launch 8 update, ,  */
 function renderWelcomeTips() {
   const box = $('welcomeTips');
   if (!box) return;
   const apps = (state.apps || []).length;
   const tips = [];
   if (lastUpdate && lastUpdate.hasUpdate) {
-    tips.push(`New version available: <b>${esc(lastUpdate.tag || '')}</b> — update via Settings → Updates.`);
+    tips.push(`New version available: <b>${esc(lastUpdate.tag || '')}</b> - update via Settings → Updates.`);
   }
   if (!apps) {
-    tips.push('Drag and drop an APK anywhere to install — desktop shortcuts are created automatically.');
+    tips.push('Drag and drop an APK anywhere to install - desktop shortcuts are created automatically.');
   } else {
     tips.push('Click any app card to launch in a standalone window with rotation and scaling controls.');
   }
@@ -2563,7 +2563,7 @@ function renderWelcomeTips() {
 
 let envBusy = false;
 
-/** doctor:selfCheck：settings， */
+/** doctor:selfCheck: settings,  */
 async function selfCheck() {
   if (envBusy) return;
   envBusy = true;
@@ -2577,18 +2577,18 @@ async function selfCheck() {
 function renderEnvCheck(r) {
   const box = $('envCheck');
   if (!box) return;
-  // 「」complete，
+  // ""complete, 
   const needDeploy = !!(state.status && state.status.needsSetup);
   const issues = (r.issues || []).filter((i) => !(needDeploy && i.fix === 'deploy'));
 
-  // ：，settings
+  // : , settings
   const chip = $('envChip');
   if (chip) {
     const errs = issues.filter((i) => i.severity === 'error').length;
     chip.hidden = issues.length === 0;
     chip.textContent = errs ? `${errs} issue(s) to fix` : `${issues.length} notice(s)`;
     chip.className = `status-chip${errs ? ' err' : ''}`;
-    chip.title = issues.map((i) => i.title).join('；');
+    chip.title = issues.map((i) => i.title).join('; ');
   }
 
   if (!issues.length) {
@@ -2596,7 +2596,7 @@ function renderEnvCheck(r) {
     box.innerHTML = `
       <div class="env-check-ok">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-        <span>System check passed — no issues affecting runtime were found.</span>
+        <span>System check passed - no issues affecting runtime were found.</span>
         <span style="flex:1"></span>
         <button class="btn ghost sm" id="btnEnvRecheck">Re-check</button>
       </div>`;
@@ -2646,7 +2646,7 @@ function renderEnvCheck(r) {
   });
 }
 
-/** repairsuccess：error，guide（ 60 ） */
+/** repairsuccess: error, guide( 60 ) */
 function failFix(issue, ctl, body) {
   const msg = body || 'Please follow manual instructions';
   if (ctl && typeof ctl.update === 'function') ctl.update({ body: msg, type: 'error', sticky: true });
@@ -2660,7 +2660,7 @@ async function fixIssue(issue) {
       const r = await api.installVcRedist().catch(() => ({ ok: false }));
       if (!r.ok && r.reason === 'no-installer') {
         api.openExternal('https://learn.microsoft.com/zh-CN/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022');
-        toast({ title: 'Built-in installer package not found', body: 'Opened Microsoft official download page — download x64 version', type: 'info' });
+        toast({ title: 'Built-in installer package not found', body: 'Opened Microsoft official download page - download x64 version', type: 'info' });
         break;
       }
       toast(r.ok
@@ -2669,15 +2669,15 @@ async function fixIssue(issue) {
       break;
     }
     case 'virtualization': {
-      const t = toast({ title: 'Enabling hardware acceleration…', body: 'Click Yes in the UAC elevation prompt', sticky: true, spinner: true });
+      const t = toast({ title: 'Enabling hardware acceleration...', body: 'Click Yes in the UAC elevation prompt', sticky: true, spinner: true });
       const r = await api.enableVirtualization().catch(() => ({ ok: false }));
       if (r.ok) {
         t.update({ title: 'Hardware Acceleration Enabled', body: r.restartNeeded ? 'Please reboot your PC for optimal performance' : (r.note || ''), type: 'ok' });
         setTimeout(t.dismiss, 3200);
       } else if (r.manual) {
-        // （MSIX）： mediumIL，。
-        // failure，「 Windows 」
-        // ，。
+        // (MSIX):  mediumIL, . 
+        // failure, " Windows "
+        // , . 
         t.dismiss();
         await api.openWindowsFeatures?.().catch(() => null);
         toast({
@@ -2686,7 +2686,7 @@ async function fixIssue(issue) {
           type: 'info',
           sticky: true,
         });
-        // ，guide，window
+        // , guide, window
         openManualForIssue(issue, 'fix-failed');
       } else if (r.cancelled) {
         t.update({ title: 'Cancelled', body: r.error || 'UAC permission not granted. Settings unchanged.', type: 'info', spinner: false });
@@ -2697,7 +2697,7 @@ async function fixIssue(issue) {
       break;
     }
     case 'disk': {
-      // （space）， confirm
+      // (space),  confirm
       const r = await api.runtimeCleanup({ apply: true }).catch(() => null);
       if (!r) { toast({ title: 'Cleanup failed', body: 'Please retry', type: 'error' }); break; }
       if (r.cancelled) break;
@@ -2710,7 +2710,7 @@ async function fixIssue(issue) {
       break;
     }
     case 'deploy': {
-      toast({ title: 'Deploying missing runtime components…', type: 'info', sticky: true, spinner: true });
+      toast({ title: 'Deploying missing runtime components...', type: 'info', sticky: true, spinner: true });
       await deployAll();
       break;
     }
@@ -2719,10 +2719,10 @@ async function fixIssue(issue) {
       toast(r.ok ? { title: 'Residual lock files cleaned', type: 'ok' } : { title: 'Cleanup failed', body: r.error, type: 'error' });
       break;
     }
-    // ---- check（ debug）repair ----
+    // ---- check( debug)repair ----
     case 'restartRuntime': {
-      // unauthorized / / self-healing：（cold boot）
-      const t = toast({ title: 'Restarting Android runtime…', body: 'Rebooting runtime (~15 seconds)', type: 'info', sticky: true, spinner: true });
+      // unauthorized / / self-healing: (cold boot)
+      const t = toast({ title: 'Restarting Android runtime...', body: 'Rebooting runtime (~15 seconds)', type: 'info', sticky: true, spinner: true });
       const r = await api.restartRuntime().catch(() => ({ ok: false }));
       if (r && r.ok) {
         t.update({ title: 'Android runtime restarted', body: 'Click Allow in debugging authorization prompt', type: 'ok' });
@@ -2747,7 +2747,7 @@ async function fixIssue(issue) {
       break;
     }
     case 'dataReset': {
-      // ：app，、。
+      // : app, , . 
       toast({
         title: 'Android data partition rebuild required',
         body: 'In Settings → Performance, click "Expand Partition Now" and confirm reset.',
@@ -2758,7 +2758,7 @@ async function fixIssue(issue) {
       break;
     }
     case 'orientation': {
-      // orientation：landscapelandscape，portraitportrait
+      // orientation: landscapelandscape, portraitportrait
       const s = (state.settings && state.settings.display) || {};
       const mode = s.orientationMode || 'auto';
       if (mode === 'auto') {
@@ -2782,7 +2782,7 @@ async function fixIssue(issue) {
     }
     // ---- 0.6.2 checkrepair ----
     case 'audio': {
-      const t = toast({ title: 'Enabling audio in Android runtime…', body: 'Restarting runtime to re-enable audio', type: 'info', sticky: true, spinner: true });
+      const t = toast({ title: 'Enabling audio in Android runtime...', body: 'Restarting runtime to re-enable audio', type: 'info', sticky: true, spinner: true });
       const s = await api.setSettings({ engine: { audio: true } }).catch(() => null);
       if (!s) { failFix(issue, t, 'Failed to save audio settings. Opened guide.'); break; }
       state.settings = s;
@@ -2797,13 +2797,13 @@ async function fixIssue(issue) {
       break;
     }
     case 'audioService': {
-      // MSIX / ，guide
+      // MSIX / , guide
       toast({ title: 'Windows Audio service must be started', body: 'Opened instructions', type: 'info', sticky: true });
       openManualForIssue(issue, 'clicked');
       break;
     }
     case 'repairNetwork': {
-      const t = toast({ title: 'Resetting Android network…', body: 'Installed app list is preserved', type: 'info', sticky: true, spinner: true });
+      const t = toast({ title: 'Resetting Android network...', body: 'Installed app list is preserved', type: 'info', sticky: true, spinner: true });
       const r = await api.runtimeRepairNetwork().catch(() => ({ ok: false }));
       if (r && r.ok !== false) {
         t.update({ title: 'Android network reset', body: 'Will reconnect on next app launch', type: 'ok' });
@@ -2827,7 +2827,7 @@ async function fixIssue(issue) {
     default:
       toast({ title: 'Automatic fix not supported for this item', body: issue.hint || '', type: 'info' });
   }
-  // repair，
+  // repair, 
   setTimeout(selfCheck, 600);
   setTimeout(refreshStatus, 600);
 }

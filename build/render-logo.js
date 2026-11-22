@@ -1,10 +1,10 @@
 'use strict';
 /**
- * Logo ： Electron build/logo.html → PNG + ICO
+ * Logo :  Electron build/logo.html → PNG + ICO
  *   node_modules/electron/dist/electron.exe build/render-logo.js
- * ：src/ui/assets/logo.png（512，/window）
- * build/appicon.ico（16~256 ， .apk shortcut）
- * docs/images/logo.png（README ）
+ * : src/ui/assets/logo.png(512, /window)
+ * build/appicon.ico(16~256 ,  .apk shortcut)
+ * docs/images/logo.png(README )
  */
 const { app, BrowserWindow } = require('electron');
 const fs = require('fs');

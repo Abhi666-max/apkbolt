@@ -1,25 +1,25 @@
 'use strict';
 /**
- * window： emulator，「desktopwindow」。
+ * window:  emulator, "desktopwindow". 
  *
- * window：
- * 1. "Android Emulator - apkstart5554"（QWindowIcon，emulator）
- * —— embed windowwindow，desktop；
- * 2. （conhost ConsoleWindowClass / CASCADIA_HOSTING_WINDOW_CLASS）
- * —— qemu、netsimd ，launch exe path。
+ * window: 
+ * 1. "Android Emulator - apkstart5554"(QWindowIcon, emulator)
+ * -- embed windowwindow, desktop; 
+ * 2. (conhost ConsoleWindowClass / CASCADIA_HOSTING_WINDOW_CLASS)
+ * -- qemu, netsimd , launch exe path. 
  *
  * : node tools/check-windows.js [runtimeRoot]
- * runtimeRoot default engine/（downloadruntime），installdirectory
- *   resources/runtime。
+ * runtimeRoot default engine/(downloadruntime), installdirectory
+ *   resources/runtime. 
  */
 const path = require('path');
 const { spawn } = require('child_process');
 const { WinAgent } = require('../src/core/agent');
 
-// runtimedirectory：parameters > > engine/
+// runtimedirectory: parameters > > engine/
 const ROOT = path.resolve(process.argv[2] || process.env.APKSTART_RUNTIME || path.join(__dirname, '..', 'engine'));
 const EMU = path.join(ROOT, 'emulator', 'emulator.exe');
-// AVD （settings runtime.avdDir），；
+// AVD (settings runtime.avdDir), ; 
 const AVD_HOME = process.env.APKSTART_AVD_HOME
   || path.join(process.env.APPDATA || '', 'apkstart', 'avd');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -42,7 +42,7 @@ const bad = (w) => {
     return (r && r.list) || [];
   };
 
-  // 「runtimedirectory」window：，
+  // "runtimedirectory"window: , 
   await agent.scope([ROOT]);
   await agent.bootHide();
   console.log('');
@@ -78,16 +78,16 @@ const bad = (w) => {
   }
 
   const probe = await agent.probe().catch(() => null);
-  console.log('probe（）:', JSON.stringify(probe));
+  console.log('probe():', JSON.stringify(probe));
 
   const left = (await windows()).filter(bad);
   console.log(':', JSON.stringify(left));
 
   const okProbe = !!(probe && Number(probe.emu) !== 0);
-  // 「 400ms 」， 0
+  // " 400ms ",  0
   const ok = left.length === 0 && okProbe;
   console.log('');
-  console.log(`：${ok ? '' : ''}（ ${leaked} ， ${left.length} ）`);
+  console.log(`: ${ok ? '' : ''}( ${leaked} ,  ${left.length} )`);
 
   try { proc.kill(); } catch (_) { /* ignore */ }
   agent.dispose();

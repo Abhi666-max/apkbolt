@@ -1,8 +1,8 @@
 'use strict';
 /**
- * Electron ： ICO 、、
- * ：electron test/electron-integration.js
- * ：test/out/result.json
+ * Electron :  ICO , , 
+ * : electron test/electron-integration.js
+ * : test/out/result.json
  */
 const { app } = require('electron');
 const fs = require('fs');
@@ -30,8 +30,8 @@ app.whenReady().then(async () => {
     fs.writeFileSync(path.join(OUT, 'icon.ico'), ico);
     step('ICO', !!ico && ico.length > 1000, `${ico ? ico.length : 0} bytes`);
 
-    // 1b. WebP ：nativeImage  WebP， decode ，
-    // ****（）。
+    // 1b. WebP : nativeImage  WebP,  decode , 
+    // ****(). 
     {
       // 1x1  WebP
       const webp = Buffer.from('UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA', 'base64');
@@ -44,11 +44,11 @@ app.whenReady().then(async () => {
       let decoded = 0;
       const viaDecode = await iconToIco(webp, {
         decode: async () => { decoded++; return png; },
-        onFallback: (why) => { throw new Error(`：${why}`); },
+        onFallback: (why) => { throw new Error(`: ${why}`); },
       });
-      // nativeImage  WebP，decoded  0，； ICO
+      // nativeImage  WebP, decoded  0, ;  ICO
       step('WebP ICO', !!viaDecode && viaDecode.readUInt16LE(2) === 1,
-        `decode  ${decoded} ，${viaDecode ? viaDecode.length : 0} bytes`);
+        `decode  ${decoded} , ${viaDecode ? viaDecode.length : 0} bytes`);
     }
 
     // 2.
@@ -79,7 +79,7 @@ app.whenReady().then(async () => {
         fs.writeFileSync(path.join(OUT, 'app.ico'), iconIco);
         step('APK → ICO', true, `${meta.label}: ${iconIco.length} bytes`);
       } else {
-        step('APK → ICO', false, 'pngToIco （ webp/jpg ）');
+        step('APK → ICO', false, 'pngToIco ( webp/jpg )');
       }
     }
 

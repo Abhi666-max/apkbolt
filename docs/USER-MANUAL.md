@@ -1,6 +1,6 @@
 # ApkBolt User Manual & Troubleshooting Guide
 
-**Version**: v0.6.3 · **Platform**: Windows 10/11 x64 · **Author**: Abhijeet Kangane
+**Version**: v0.6.3  -  **Platform**: Windows 10/11 x64  -  **Author**: Abhijeet Kangane
 
 ApkBolt is a native Windows application launcher for Android apps. Install Android applications directly onto Windows, integrate them into your Start Menu and Desktop, and launch them instantly in standalone windows.
 
@@ -101,7 +101,7 @@ Then reboot your PC.
 - `INSTALL_FAILED_INSUFFICIENT_STORAGE`: Expand the virtual data partition in Settings → General.
 
 ### 6.3 Visual C++ Runtime (0xC0000135)
-Install the Microsoft Visual C++ 2015–2022 x64 Redistributable via Settings → Diagnostics → Install VC++ Redistributable.
+Install the Microsoft Visual C++ 2015-2022 x64 Redistributable via Settings → Diagnostics → Install VC++ Redistributable.
 
 ---
 

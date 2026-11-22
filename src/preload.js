@@ -49,7 +49,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   // checkup / configuration
   preflightRun: () => invoke('preflight:run'),
   preflightApply: () => invoke('preflight:apply'),
-  // check（ debug）： + ，
+  // check( debug):  + , 
   autodebugRun: () => invoke('autodebug:run'),
   autodebugState: () => invoke('autodebug:state'),
   autodebugConfig: (patch) => invoke('autodebug:config', patch || {}),
@@ -57,7 +57,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   clearOrphans: () => invoke('app:clearOrphans'),
   clearSnapshot: () => invoke('app:clearSnapshot'),
   restartRuntime: () => invoke('runtime:restart'),
-  // driver（patch）： / / directory / /
+  // driver(patch):  / / directory / /
   driversList: () => invoke('drivers:list'),
   driversImport: () => invoke('drivers:import'),
   driversOpenFolder: () => invoke('drivers:openFolder'),
@@ -85,7 +85,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   installAehd: () => invoke('provision:installAehd'),
   enableAccel: () => invoke('provision:enableAccel'),
   enableVirtualization: () => invoke('provision:enableVirtualization'),
-  // 「 Windows 」（store version）
+  // " Windows "(store version)
   openWindowsFeatures: () => invoke('provision:openWindowsFeatures'),
   downloadIso: () => invoke('provision:downloadIso'),
   createDisk: (gb) => invoke('provision:createDisk', gb),
@@ -97,7 +97,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   removeSelf: () => invoke('app:removeSelf'),
   setSharedDir: (dir) => invoke('settings:setSharedDir', dir),
 
-  // update（GitHub Releases）
+  // update(GitHub Releases)
   updateCheck: (opts) => invoke('app:updateCheck', opts || {}),
   updateApply: () => invoke('app:updateApply'),
   updateCancel: () => invoke('app:updateCancel'),
@@ -112,7 +112,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   openSharedDir: () => invoke('share:open'),
 
   openExternal: (url) => invoke('shell:open', url),
-  // 0.6.2 manual： { topic } / { issue } / { error }
+  // 0.6.2 manual:  { topic } / { issue } / { error }
   openManual: (payload) => invoke('manual:open', payload || {}),
   winMinimize: () => invoke('window:minimize'),
   winMaximize: () => invoke('window:maximize'),
@@ -120,7 +120,7 @@ contextBridge.exposeInMainWorld('apkstart', {
   winHide: () => invoke('window:hide'),
   bringAppToFront: () => invoke('app:foreground'),
 
-  // appwindow（ rotate / / / ）
+  // appwindow( rotate / / / )
   shell: {
     state: () => invoke('shell:state'),
     minimize: () => invoke('shell:minimize'),
@@ -137,7 +137,7 @@ contextBridge.exposeInMainWorld('apkstart', {
     },
   },
 
-  // Androidsettings（WiFi / / / / …）
+  // Androidsettings(WiFi / / / / ...)
   android: {
     status: () => invoke('android:status'),
     set: (key, value) => invoke('android:set', { key, value }),
@@ -147,7 +147,7 @@ contextBridge.exposeInMainWorld('apkstart', {
     grantAll: (pkg) => invoke('android:grantAll', pkg),
   },
 
-  // key（→）
+  // key(→)
   keymap: {
     getPresets: () => invoke('keymap:getPresets'),
     getMap: (pkg) => invoke('keymap:getMap', pkg),

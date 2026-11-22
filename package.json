@@ -2,7 +2,7 @@
   "name": "apkbolt",
   "productName": "ApkBolt",
   "version": "0.6.3",
-  "description": "Lightning-fast Android app launcher for Windows — drag, drop, and run APKs instantly in standalone windows",
+  "description": "Lightning-fast Android app launcher for Windows - drag, drop, and run APKs instantly in standalone windows",
   "main": "src/main.js",
   "author": "Abhijeet Kangane <abhijeet666k@gmail.com>",
   "contributors": [

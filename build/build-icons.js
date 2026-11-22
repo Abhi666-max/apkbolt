@@ -3,15 +3,15 @@
  * 
  *   node_modules/electron/dist/electron.exe build/build-icons.js
  *
- * ，（，）：
- * 1. ≥64px build/logo.html 「APK start」（Chromium ）
- * 2. ≤48px + Android（ JS ，16px ）
- * 3. ， Windows 
+ * , (, ): 
+ * 1. ≥64px build/logo.html "APK start"(Chromium )
+ * 2. ≤48px + Android( JS , 16px )
+ * 3. ,  Windows 
  *
- * ：
- * src/ui/assets/logo.png (512) / logo-256 / logo-128 / logo-64 window、about、Linux
- * src/ui/assets/tray-16|20|24|32.png （）
- * src/ui/assets/appicon.ico 16–256 
+ * : 
+ * src/ui/assets/logo.png (512) / logo-256 / logo-128 / logo-64 window, about, Linux
+ * src/ui/assets/tray-16|20|24|32.png ()
+ * src/ui/assets/appicon.ico 16-256 
  *   build/store-assets/StoreLogo 50 / Square44 / Square71 /
  *                      Square150 / Square310 / Wide310x150 / Splash 620x300
  *   docs/images/logo.png (1024)
@@ -26,7 +26,7 @@ const UI = path.join(ROOT, 'src', 'ui', 'assets');
 const STORE = path.join(ROOT, 'build', 'store-assets');
 const DOCS = path.join(ROOT, 'docs', 'images');
 
-// 1:1 ， DPI 1024 1280
+// 1:1 ,  DPI 1024 1280
 app.commandLine.appendSwitch('force-device-scale-factor', '1');
 app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 app.disableHardwareAcceleration();
@@ -53,7 +53,7 @@ function save(file, buf) {
   return { file, buf, dim };
 }
 
-/** PNG-in-ICO：Vista ICO PNG，、 alpha。 */
+/** PNG-in-ICO: Vista ICO PNG, ,  alpha.  */
 function icoFrom(entries) {
   const items = entries.slice().sort((a, b) => a.size - b.size);
   const head = Buffer.alloc(6);
@@ -77,9 +77,9 @@ function icoFrom(entries) {
   return Buffer.concat([head, dir, ...items.map((i) => i.buf)]);
 }
 
-// window，。
-// BrowserWindow：offscreen destroy/create ，
-// loadFile ERR_FAILED（Electron 33 ）。
+// window, . 
+// BrowserWindow: offscreen destroy/create , 
+// loadFile ERR_FAILED(Electron 33 ). 
 const CANVAS = 1240;
 let _win = null;
 
@@ -98,7 +98,7 @@ async function ensureWindow() {
   await _win.loadFile(path.join(__dirname, 'logo.html'));
   try {
     await _win.webContents.executeJavaScript('document.fonts.ready.then(() => true)');
-  } catch (_) { /* version fonts API， */ }
+  } catch (_) { /* version fonts API,  */ }
   await new Promise((r) => setTimeout(r, 900));
   return _win;
 }
@@ -113,7 +113,7 @@ async function render(layout, w, h) {
   const full = nativeImage.createFromBuffer((await win.webContents.capturePage()).toPNG());
   const got = full.getSize();
   if (got.width < w || got.height < h) {
-    console.log(`  []  ${got.width}x${got.height}  ${w}x${h}，`);
+    console.log(`  []  ${got.width}x${got.height}  ${w}x${h}, `);
     return full.resize({ width: w, height: h, quality: 'best' });
   }
   const x = Math.round((got.width - w) / 2);
@@ -126,41 +126,41 @@ function resized(img, w, h) {
 }
 
 app.whenReady().then(async () => {
-  console.log('（square 1024）…');
+  console.log('(square 1024)...');
   const square = await render('square', SQ, SQ);
 
-  console.log('（wide 620x300）…');
+  console.log('(wide 620x300)...');
   const wide = await render('wide', 620, 300);
 
-  console.log('（splash 1240x600）…');
+  console.log('(splash 1240x600)...');
   const splash = await render('splash', 1240, 600);
 
-  // ：，，
+  // : , , 
   const tileBox = { x: TILE_PAD, y: TILE_PAD, width: SQ - TILE_PAD * 2, height: SQ - TILE_PAD * 2 };
   const tile = square.crop(tileBox);
   const tileSize = tile.getSize();
-  console.log(` ${tileSize.width}x${tileSize.height}（ 1024 ）`);
+  console.log(` ${tileSize.width}x${tileSize.height}( 1024 )`);
 
-  console.log('\n：');
+  console.log('\n: ');
   save(path.join(DOCS, 'logo.png'), square.toPNG());
   save(path.join(UI, 'logo.png'), resized(square, 512, 512));
   save(path.join(UI, 'logo-256.png'), resized(square, 256, 256));
   save(path.join(UI, 'logo-128.png'), resized(square, 128, 128));
   save(path.join(UI, 'logo-64.png'), resized(square, 64, 64));
 
-  console.log('\n（）：');
+  console.log('\n(): ');
   for (const s of [16, 20, 24, 32]) {
     save(path.join(UI, `tray-${s}.png`), drawAppIcon(s));
   }
 
-  console.log('\n ICO（16–48  / 64–256 ）：');
+  console.log('\n ICO(16-48  / 64-256 ): ');
   const icoEntries = [];
   for (const s of [16, 20, 24, 32, 40, 48]) icoEntries.push({ size: s, buf: drawAppIcon(s) });
   for (const s of [64, 128, 256]) icoEntries.push({ size: s, buf: resized(tile, s, s) });
   const ico = icoFrom(icoEntries);
   save(path.join(UI, 'appicon.ico'), ico);
 
-  console.log('\n：');
+  console.log('\n: ');
   save(path.join(STORE, 'StoreLogo.png'), drawAppIcon(50));
   save(path.join(STORE, 'Square44x44Logo.png'), drawAppIcon(44));
   save(path.join(STORE, 'Square71x71Logo.png'), drawAppIcon(71));
@@ -169,7 +169,7 @@ app.whenReady().then(async () => {
   save(path.join(STORE, 'Wide310x150Logo.png'), resized(wide, 310, 150));
   save(path.join(STORE, 'SplashScreen.png'), resized(splash, 620, 300));
 
-  console.log('\n。：');
+  console.log('\n. : ');
   const check = [
     ['logo-256.png', 256, 256], ['tray-16.png', 16, 16], ['tray-32.png', 32, 32],
     ['StoreLogo.png', 50, 50], ['Square44x44Logo.png', 44, 44], ['Square71x71Logo.png', 71, 71],
@@ -189,6 +189,6 @@ app.whenReady().then(async () => {
   console.log(`  ${icoCount === 9 ? 'OK  ' : 'BAD '} appicon.ico ${icoCount} `);
   app.exit(bad === 0 && icoCount === 9 ? 0 : 1);
 }).catch((e) => {
-  console.error('：', e);
+  console.error(': ', e);
   app.exit(1);
 });

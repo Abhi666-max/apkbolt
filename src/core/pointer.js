@@ -1,15 +1,15 @@
 'use strict';
 /**
- * mousekeymap（， Electron / adb，）
+ * mousekeymap(,  Electron / adb, )
  *
- * appwindow Android Emulator Qt window，：
- * = （「」，）
- * = （，「」）
- * wheel = ， Qt ，
+ * appwindow Android Emulator Qt window, : 
+ * = ("", )
+ * = (, "")
+ * wheel = ,  Qt , 
  *
- * ApkStart 「appwindow」hook，
- * wheel；wheel `input swipe`，
- * adb 。
+ * ApkStart "appwindow"hook, 
+ * wheel; wheel `input swipe`, 
+ * adb . 
  */
 
 const WHEEL_NOTCH = 120;
@@ -23,8 +23,8 @@ function clamp(v, lo, hi) {
 function clampInt(v, lo, hi) { return Math.round(clamp(v, lo, hi)); }
 
 /**
- * settings，hook。
- * configuration，「 + wheel、side buttons」。
+ * settings, hook. 
+ * configuration, " + wheel, side buttons". 
  */
 function pointerOptions(settings = {}) {
   const e = (settings && settings.engine) || {};
@@ -38,7 +38,7 @@ function pointerOptions(settings = {}) {
 /** configuration agent 0/1 */
 function hookOptions(raw = {}) {
   let v = raw;
-  // ：true = side buttons
+  // : true = side buttons
   if (typeof v === 'boolean') v = { enabled: v, rightBack: false, wheel: 'off', side: v };
   if (typeof v === 'function') v = v();
   if (!v || typeof v !== 'object') v = {};
@@ -54,13 +54,13 @@ function hookOptions(raw = {}) {
   };
 }
 
-/** input adb shell， */
+/** input adb shell,  */
 const INPUT_RE = /^input (?:keyevent \d{1,3}|swipe -?\d+ -?\d+ -?\d+ -?\d+ \d{1,4}|tap -?\d+ -?\d+)$/;
 function isInputCommand(cmd) { return INPUT_RE.test(String(cmd || '')); }
 
 /**
- * wheel。
- * @param {object} o { dx, dy, nx, ny, width, height } —— nx/ny LCD 
+ * wheel. 
+ * @param {object} o { dx, dy, nx, ny, width, height } -- nx/ny LCD 
  * @returns {{x1:number,y1:number,x2:number,y2:number,duration:number}|null}
  */
 function wheelToSwipe({ dx = 0, dy = 0, nx = 0.5, ny = 0.5, width = 900, height = 1600 } = {}) {
@@ -70,7 +70,7 @@ function wheelToSwipe({ dx = 0, dy = 0, nx = 0.5, ny = 0.5, width = 900, height 
   const delta = vertical ? (Number(dy) || 0) : (Number(dx) || 0);
   if (!delta) return null;
 
-  // wheel = 30% ；（ 78% ）
+  // wheel = 30% ; ( 78% )
   const steps = clamp(Math.abs(delta) / WHEEL_NOTCH, 0.6, 6);
   const axis = vertical ? h : w;
   const span = clamp(Math.round(axis * 0.30 * steps), 80, Math.round(axis * 0.78));
@@ -80,12 +80,12 @@ function wheelToSwipe({ dx = 0, dy = 0, nx = 0.5, ny = 0.5, width = 900, height 
 
   let x1 = cx, y1 = cy, x2 = cx, y2 = cy;
   if (vertical) {
-    // dy > 0（wheel/）→ ，
+    // dy > 0(wheel/)→ , 
     const dir = delta > 0 ? 1 : -1;
     y1 = clampInt(cy - half * dir, 1, h - 1);
     y2 = clampInt(cy + half * dir, 1, h - 1);
   } else {
-    // dx > 0（wheel）→
+    // dx > 0(wheel)→
     const dir = delta > 0 ? -1 : 1;
     x1 = clampInt(cx - half * dir, 1, w - 1);
     x2 = clampInt(cx + half * dir, 1, w - 1);
@@ -100,9 +100,9 @@ function swipeToCommand(swipe) {
 }
 
 /**
- * wheel：。
- * （adb shell input swipe ），，
- * complete， shell 。
+ * wheel: . 
+ * (adb shell input swipe ), , 
+ * complete,  shell . 
  */
 class WheelRouter {
   constructor({ inject, getSize, flushMs = 80 } = {}) {

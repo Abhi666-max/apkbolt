@@ -1,9 +1,9 @@
 'use strict';
 /**
- * ： emulator，「」window。
+ * :  emulator, ""window. 
  *
- * —— window conhost.exe，pid emulator ，
- * window。
+ * -- window conhost.exe, pid emulator , 
+ * window. 
  *
  * : node tools/check-console.js [appRoot]
  */
@@ -32,7 +32,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const before = await list();
   console.log(':', JSON.stringify(before));
 
-  // ：detached + windowsHide + pipe
+  // : detached + windowsHide + pipe
   const proc = spawn(EMU, [
     '-avd', 'apkstart', '-port', '5554', '-no-boot-anim', '-no-metrics',
     '-crash-report-mode', 'disabled', '-gpu', 'swangle', '-memory', '3072',
@@ -71,8 +71,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   console.log('');
   console.log(afterHide.length === 0
-    ? `：（ ${sawConsole} ，）`
-    : '：（）');
+    ? `: ( ${sawConsole} , )`
+    : ': ()');
 
   try { proc.kill(); } catch (_) { /* ignore */ }
   agent.dispose();

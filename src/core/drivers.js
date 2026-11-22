@@ -1,24 +1,24 @@
 'use strict';
 /**
- * driver（patch）。
+ * driver(patch). 
  *
- * :ApkStart emulator + system image，「」:
- * GLES 3.1、 WHPX TCG、 + driver host ……
- * defaultparameters，。
+ * :ApkStart emulator + system image, "":
+ * GLES 3.1,  WHPX TCG,  + driver host ......
+ * defaultparameters, . 
  *
- * **driver**:driver JSON，「」
- * + 「launchparameters」。、、，。
+ * **driver**:driver JSON, ""
+ * + "launchparameters". , , , . 
  *
  * :
- * 1. ** JSON，**。 require / eval / hook —— driver
- * download、，。
- * 2. **whitelist**。launchparameters:`-gpu=…`、`-accel=…`、
- * config.ini 、。`-wipe-data`、`-datadir`、`-sysdir`、
- * `disk.dataPartition.size` / 。
- * 3. ****。；driver `priority` ，
- * app；boot「driver」logsettings。
+ * 1. ** JSON, **.  require / eval / hook -- driver
+ * download, , . 
+ * 2. **whitelist**. launchparameters:`-gpu=...`, `-accel=...`, 
+ * config.ini , . `-wipe-data`, `-datadir`, `-sysdir`, 
+ * `disk.dataPartition.size` / . 
+ * 3. ****. ; driver `priority` , 
+ * app; boot"driver"logsettings. 
  *
- * docs/drivers.md， src/drivers/。
+ * docs/drivers.md,  src/drivers/. 
  */
 
 const fs = require('fs');
@@ -28,17 +28,17 @@ const DRIVER_FORMAT = 'apkbolt-driver/1';
 const MAX_DRIVER_BYTES = 256 * 1024;
 const MAX_DRIVERS = 200;
 
-/** driverlaunchparameters:`-flag=value` ，value whitelist */
+/** driverlaunchparameters:`-flag=value` , value whitelist */
 const ARG_RULES = {
   '-gpu': /^(auto|host|swiftshader|swiftshader_indirect|swangle|software|angle|angle_indirect|mesa)$/,
   '-accel': /^(auto|off|on|whpx|hax|haxm|aehd|tcg)$/,
   '-feature': /^[A-Za-z0-9_,.\-]{1,160}$/,
   '-gltransport': /^(pipe|asgpu|virtio)$/,
-  // qemu parameters。， -drive/-virtfs /parameters
+  // qemu parameters. ,  -drive/-virtfs /parameters
   '-qemu': /^-?[A-Za-z0-9_+=,.:/\-]{1,120}$/,
 };
 
-/** 「」parameters（） */
+/** ""parameters() */
 const FLAG_ONLY = new Set([
   '-no-audio',
   '-no-boot-anim',
@@ -49,8 +49,8 @@ const FLAG_ONLY = new Set([
 ]);
 
 /**
- * parameters:、、/AVD 。
- * error「」，「whitelist」。
+ * parameters:, , /AVD . 
+ * error"", "whitelist". 
  */
 const FORBIDDEN_ARGS = {
   '-wipe-data': 'Will erase installed apps and user data',
@@ -86,7 +86,7 @@ const ENV_NAME_RULES = [
   /^EMUGL_[A-Z0-9_]{2,40}$/,
 ];
 
-/** match （，） */
+/** match (, ) */
 const MATCH_KEYS = new Set([
   'any', 'platform', 'arch', 'gpuVendor', 'gpuName', 'cpuVendor',
   'osBuild', 'totalMB', 'cores', 'accel', 'emulatorVersion',
@@ -109,7 +109,7 @@ function asArray(v) {
   return Array.isArray(v) ? v : [v];
 }
 
-/** :，failure null（verifyerror） */
+/** :, failure null(verifyerror) */
 function safeRegex(pattern) {
   const s = String(pattern || '');
   if (!s || s.length > 200) return null;
@@ -120,7 +120,7 @@ function safeRegex(pattern) {
   }
 }
 
-/** version，'36.4.9' vs '36.4.10' */
+/** version, '36.4.9' vs '36.4.10' */
 function versionParts(v) {
   return String(v || '')
     .split(/[^\d]+/)
@@ -274,8 +274,8 @@ function validateEnv(env, errors) {
 }
 
 /**
- * verifydriver（ JSON.parse ）。
- * errors ，，「」。
+ * verifydriver( JSON.parse ). 
+ * errors , , "". 
  * @param {object} raw
  * @param {object} [opts] { file } 
  * @returns {{ ok:boolean, errors:string[], driver:object|null }}
@@ -332,7 +332,7 @@ function validateDriver(raw, { file = '' } = {}) {
           .map((n) => String(n).trim())
           .filter(Boolean)
           .slice(0, 8)
-          .map((n) => (n.length > 200 ? `${n.slice(0, 200)}…` : n));
+          .map((n) => (n.length > 200 ? `${n.slice(0, 200)}...` : n));
       }
     }
   }
@@ -350,7 +350,7 @@ function validateDriver(raw, { file = '' } = {}) {
       description: String(raw.description || '').slice(0, 400),
       homepage: String(raw.homepage || '').slice(0, 200),
       priority: Number(raw.priority || 0),
-      // disabled，default
+      // disabled, default
       enabled: raw.enabled !== false,
       match,
       effect,
@@ -362,7 +362,7 @@ function validateDriver(raw, { file = '' } = {}) {
 // ---------------- ----------------
 
 /**
- * 「」， match。
+ * "",  match. 
  * @param {object} o { info, gpuVendor, gpuName, osBuild, accel, emulatorVersion }
  */
 function hostContext({ info = {}, gpuVendor = 'unknown', gpuName = '', osBuild = 0, accel = 'unknown', emulatorVersion = '' } = {}) {
@@ -382,7 +382,7 @@ function hostContext({ info = {}, gpuVendor = 'unknown', gpuName = '', osBuild =
 }
 
 /**
- * 「」，「driver」。
+ * "", "driver". 
  * @returns {{ ok:boolean, hits:string[] }}
  */
 function matchHost(match, host) {
@@ -427,14 +427,14 @@ function matchHost(match, host) {
   return { ok: hits.length > 0, hits };
 }
 
-/** "": priority ，driverapp，driverapp（） */
+/** "": priority , driverapp, driverapp() */
 function specificity(match) {
   return Object.keys(match || {}).filter((k) => k !== 'any').length;
 }
 
 /**
- * driver「 → → priority」。
- * :gpuMode/forceTcg ，args flag ，ini/env 。
+ * driver" → → priority". 
+ * :gpuMode/forceTcg , args flag , ini/env . 
  */
 function mergeEffect(drivers) {
   const effect = {
@@ -461,11 +461,11 @@ function mergeEffect(drivers) {
 }
 
 /**
- * （verify）driver，。
+ * (verify)driver, . 
  *
- * `state` （id → true/false），
- * `enabled`:default `enabled:false`，「」 state，
- * installdirectory JSON（store versiondirectory，）。
+ * `state` (id → true/false), 
+ * `enabled`:default `enabled:false`, "" state, 
+ * installdirectory JSON(store versiondirectory, ). 
  *
  * @param {object} o { drivers, host, state, disabled }
  * @returns {{ applied:Array, skipped:Array, effect:object }}
@@ -497,19 +497,19 @@ function resolve({ drivers = [], host = {}, state = {}, disabled = [] } = {}) {
 
 // ---------------- IO ----------------
 
-/** driverdirectory（settings、log，directory） */
+/** driverdirectory(settings, log, directory) */
 function userDir(store) {
   return path.join(store.DATA_DIR, 'drivers');
 }
 
-/** driver（；default enabled:false，） */
+/** driver(; default enabled:false, ) */
 function bundledDir(appRoot) {
   return path.join(appRoot || '.', 'src', 'drivers');
 }
 
 /**
- * directorydriver。driver:
- * error，。
+ * directorydriver. driver:
+ * error, . 
  * @returns {{ drivers:Array, errors:Array<{file:string, errors:string[]}>, dir:string }}
  */
 function loadDir(dir) {
@@ -544,7 +544,7 @@ function loadDir(dir) {
   return out;
 }
 
-/** directory id :directory（ id ） */
+/** directory id :directory( id ) */
 function loadAll(dirs = []) {
   const all = [];
   const errors = [];
@@ -561,8 +561,8 @@ function loadAll(dirs = []) {
 }
 
 /**
- * driver:verify， id `<id>.json`。
- * verify id ，（ ../ path）。
+ * driver:verify,  id `<id>.json`. 
+ * verify id , ( ../ path). 
  * @returns {{ ok:boolean, file?:string, driver?:object, errors?:string[] }}
  */
 function importDriver(srcFile, destDir) {
@@ -587,8 +587,8 @@ function importDriver(srcFile, destDir) {
 }
 
 /**
- * 「」: match，
- * effect 「」driver。
+ * "": match, 
+ * effect ""driver. 
  */
 function templateFromHost(host = {}, { name = 'My Machine' } = {}) {
   const gpu = host.gpuVendor && host.gpuVendor !== 'unknown' ? host.gpuVendor : 'unknown';
@@ -617,7 +617,7 @@ function templateFromHost(host = {}, { name = 'My Machine' } = {}) {
   };
 }
 
-/** gpuMode emulator -gpu （auto ） */
+/** gpuMode emulator -gpu (auto ) */
 function gpuModeToArg(mode) {
   const v = String(mode || '').trim();
   return v && v !== 'auto' ? v : '';

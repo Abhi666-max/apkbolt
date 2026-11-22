@@ -1,6 +1,6 @@
 'use strict';
 /**
- * version。， updater ↔ sources require 。
+ * version. ,  updater ↔ sources require . 
  */
 
 /** Normalizes version strings into comparable numeric arrays. */

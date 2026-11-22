@@ -1,11 +1,11 @@
 'use strict';
 /**
- * runtime：ApkStart QEMU + Android-x86 
+ * runtime: ApkStart QEMU + Android-x86 
  *
- * ：
- * - default（builtin）：adb / QEMU / system image ApkStart ，emulator
- * - Android adb，
- * - launch，reclaim；launchresident，/app
+ * : 
+ * - default(builtin): adb / QEMU / system image ApkStart , emulator
+ * - Android adb, 
+ * - launch, reclaim; launchresident, /app
  */
 const { spawn, execFile } = require('child_process');
 const net = require('net');
@@ -24,7 +24,7 @@ const MONITOR_PORT = 5556;
 const EMU_PORT = 5554;
 const EMU_SERIAL = `emulator-${EMU_PORT}`;
 
-/** TCP （emulator） */
+/** TCP (emulator) */
 function portAlive(port, timeout = 150) {
   return new Promise((resolve) => {
     const sock = net.connect({ host: '127.0.0.1', port });
@@ -54,19 +54,19 @@ class Runtime {
     this._freeformReady = false;
     this._client = null;
     this._bootLog = [];
-    this._activeApps = new Set();  // ：appwindow
-    // window（force-stop ）app；。
+    this._activeApps = new Set();  // : appwindow
+    // window(force-stop )app; . 
     this._tombstoned = new Set();
-    // networkcheckup。「network/」，，
-    // guest shell；cache，（>5 ）。
+    // networkcheckup. "network/", , 
+    // guest shell; cache, (>5 ). 
     this._lastNetwork = null;
-    this.emuSerial = EMU_SERIAL;   // ，serial
+    this.emuSerial = EMU_SERIAL;   // , serial
     /**
- * ：「Android」。
+ * : "Android". 
      *
- * 0.5.6 ****：builtin（ emulator + system image）。
- * mumu / fydeos / attach —— 、settings、configuration
- * runtime， ApkStart 、emulator。
+ * 0.5.6 ****: builtin( emulator + system image). 
+ * mumu / fydeos / attach -- , settings, configuration
+ * runtime,  ApkStart , emulator. 
      */
     this._backend = null;
     this._backendId = '';
@@ -75,7 +75,7 @@ class Runtime {
   }
 
   /**
- * （：builtin）。
+ * (: builtin). 
    * @returns {import('./backends/base').Backend}
    */
   get backend() {
@@ -90,19 +90,19 @@ class Runtime {
   }
 
   /**
- * settings。
+ * settings. 
    *
- * runtime，（system image provision ，「」）。
- * 。
+ * runtime, (system image provision , ""). 
+ * . 
    */
   async backendAvailable() {
     return { ok: true, id: 'builtin' };
   }
 
- /** id， 'builtin'；log */
+ /** id,  'builtin'; log */
   get backendId() { return this.backend.id; }
 
- /** （runtimedirectory、） */
+ /** (runtimedirectory, ) */
   resetBackend() {
     if (this._backend && this._backend.dispose) {
       try { this._backend.dispose(); } catch (_) { /* ignore */ }
@@ -121,7 +121,7 @@ class Runtime {
   adbPath() {
     const s = this.settings;
     const p = this.provisioner.paths();
-    // adb ： adb ， offline 。
+    // adb :  adb ,  offline . 
     if (fs.existsSync(p.adbExe)) return p.adbExe;
     if (s.adbPath && fs.existsSync(s.adbPath)) return s.adbPath;
     const local = path.join(this.appRoot, 'tools', 'platform-tools', 'adb.exe');
@@ -150,8 +150,8 @@ class Runtime {
   // ---------------- ----------------
 
   /**
- * networksnapshot（checkup）。
- * 5 ：，「」。
+ * networksnapshot(checkup). 
+ * 5 : , "". 
    */
   _networkSnapshot() {
     const n = this._lastNetwork;
@@ -161,20 +161,20 @@ class Runtime {
   }
 
   /**
- * networkcheckup（ status ）。
- * network， status() ， guest shell。
- * （），cache _lastNetwork，。
+ * networkcheckup( status ). 
+ * network,  status() ,  guest shell. 
+ * (), cache _lastNetwork, . 
    */
   _probeNetworkInBackground() {
     if (this._netProbing) return;
     const n = this._lastNetwork;
-    if (n && Date.now() - n.at < 60000) return;  // ，
+    if (n && Date.now() - n.at < 60000) return;  // , 
     this._netProbing = true;
     this.emulator.checkNetwork(this.adbPath())
       .then((r) => {
         this._lastNetwork = { ok: !!(r && r.ok), ip: (r && r.ip) || '', reason: (r && r.reason) || '', at: Date.now() };
       })
-      .catch(() => { /* ， */ })
+      .catch(() => { /* ,  */ })
       .finally(() => { this._netProbing = false; });
   }
 
@@ -214,7 +214,7 @@ class Runtime {
       autoProfile: this.emulator.profile ? doctor.describeProfile(this.emulator.profile) : '',
       diagnosis: this.emulator.lastDiagnosis || null,
       attempts: this.emulator.attempts || [],
-      // 「」：memory，settings/diagnose
+      // "": memory, settings/diagnose
       lastFailure: (this.emulator.lastFailure ? this.emulator.lastFailure() : null),
     };
 
@@ -244,8 +244,8 @@ class Runtime {
     if (result.deviceOnline) result.ready = true;
     else if (!env.emulator.ok) result.needsSetup = 'emulator';
     else if (!env.sysimg.ok) result.needsSetup = 'sysimg';
-    // 「hardware acceleration」：doctor software emulation，
-    // bootfailure GPU//memoryretry。
+    // "hardware acceleration": doctor software emulation, 
+    // bootfailure GPU//memoryretry. 
     else result.needsSetup = 'boot';
 
     result.phase = result.deviceOnline
@@ -260,10 +260,10 @@ class Runtime {
   }
 
   /**
- * adb （diagnose）。
+ * adb (diagnose). 
    *
- * 0.5.6 「runtime」： connect emulator，
- * adb ，「 emulator-5554」。
+ * 0.5.6 "runtime":  connect emulator, 
+ * adb , " emulator-5554". 
    */
   async probe() {
     try {
@@ -316,7 +316,7 @@ class Runtime {
     const env = await this.provisioner.checkEnv();
     this._hv = env.hypervisor;
 
-    // ： emulator（ GPU ，）
+    // :  emulator( GPU , )
     if (env.emulator.ok && env.sysimg.ok) {
       return this.bootEmulator({ env, onLog });
     }
@@ -325,8 +325,8 @@ class Runtime {
   }
 
   /**
- * emulator launch Android。
- * QEMU+ISO ，"install"：system image，launchboot。
+ * emulator launch Android. 
+ * QEMU+ISO , "install": system image, launchboot. 
    */
   async bootEmulator({ env, onLog = () => {} } = {}) {
     if (this.vmStarting) {
@@ -349,20 +349,20 @@ class Runtime {
 
     this.vmStarting = true;
     try {
-      // probe EmulatorEngine boot：exit/logparametersretry
-      // adb ： get-state + getprop + pm path ，
-      // snapshot 300~500ms，「app」。
+      // probe EmulatorEngine boot: exit/logparametersretry
+      // adb :  get-state + getprop + pm path , 
+      // snapshot 300~500ms, "app". 
       let probeStart = Date.now();
       let errStreak = 0;
       let lastHeal = 0;
-      let authHealed = false;  // start() 「」snapshotcold boot
+      let authHealed = false;  // start() ""snapshotcold boot
       const diagUnauthorized = () => ({
         code: 'ADB_UNAUTHORIZED',
         title: 'Android debugging authorization pending (click Allow)',
-        // %USERPROFILE%\.android\adbkey —— ****：
-        // ，，，
-        // （Android adb_keys ）。emulatorwindow
-        // 「」，Android。
+        // %USERPROFILE%\.android\adbkey -- ****: 
+        // , , , 
+        // (Android adb_keys ). emulatorwindow
+        // "", Android. 
         hint: 'The emulator is showing "Allow USB debugging?". Please click "Allow" in that window.'
           + 'Check "Always allow from this computer" to prevent future prompts.'
           + 'If the window does not respond: go to Settings → Runtime → Reset Android Data'
@@ -384,11 +384,11 @@ class Runtime {
           return booted ? 'pending' : 'booting';
         } catch (e) {
           errStreak += 1;
-          // ：adb shell error「boot」「」。
-          // shell ， offline：restart server
-          // 240s×4 parameters，「runtimecompleteboot」，/。
-          // error、 devices state （get-state authorized）
-          // unauthorized，snapshotcold boot + diagnose，。
+          // : adb shell error"boot""". 
+          // shell ,  offline: restart server
+          // 240s×4 parameters, "runtimecompleteboot", /. 
+          // error,  devices state (get-state authorized)
+          // unauthorized, snapshotcold boot + diagnose, . 
           const raw = String((e && (e.raw || e.stdout || e.message)) || '');
           let unauthorized = isUnauthorizedError(raw);
           if (!unauthorized) {
@@ -399,20 +399,20 @@ class Runtime {
             this.emulator.lastDiagnosis = diagUnauthorized();
             if (!authHealed) {
               authHealed = true;
-              onLog('adb pending authorization: resetting snapshot to reinject public key…');
+              onLog('adb pending authorization: resetting snapshot to reinject public key...');
               try { this.emulator.invalidateSnapshot(); } catch (_) { /* ignore */ }
-              this.emulator._coldBoot = true; // cold boot， emulator adb
+              this.emulator._coldBoot = true; // cold boot,  emulator adb
               await this.emulator.resetAdbServer().catch(() => {});
               this._probeClient = null;
             }
-            // start() parametersretry；cold boot dialog
+            // start() parametersretry; cold boot dialog
             return 'fatal';
           }
-          // adb ：restart server self-healing
+          // adb : restart server self-healing
           const now = Date.now();
           if (errStreak >= 6 && now - probeStart > 25000 && now - lastHeal > 30000) {
             lastHeal = now;
-            onLog('adb connection anomaly; restarting adb server…');
+            onLog('adb connection anomaly; restarting adb server...');
             await this.emulator.resetAdbServer().catch(() => {});
             this._probeClient = null;
           }
@@ -425,9 +425,9 @@ class Runtime {
         onLog,
         probe,
       });
-      // start() failure「 {ok:false}」（disk、retryfailure）。
-      // ， ok:true —— 「」，
-      // adb device not found，「」。
+      // start() failure" {ok:false}"(disk, retryfailure). 
+      // ,  ok:true -- "", 
+      // adb device not found, "". 
       if (!st || st.ok === false) {
         return {
           ok: false,
@@ -442,20 +442,20 @@ class Runtime {
       this.emuSerial = st.serial || this.emulator.serial;
       const client = this.client(this.emuSerial);
       await this.prepare(client);
-      // snapshot「」： 1~3GB，appdisk I/O
+      // snapshot"":  1~3GB, appdisk I/O
       this._armSnapshotSave(20000);
       return { ok: true, client, engine: 'emulator', serial: this.emuSerial, profile: st.profile, network: st.network || null };
     } catch (e) {
-      // retry/diagnose UI，「launchfailure」
+      // retry/diagnose UI, "launchfailure"
       return { ok: false, error: e.message, diagnosis: e.diagnosis, report: e.report, attempts: e.attempts };
     } finally {
       this.vmStarting = false;
     }
   }
 
-  // ---------------- （ WSA resident） ----------------
+  // ---------------- ( WSA resident) ----------------
 
- /** quickboot snapshot：appwindow，applaunch I/O */
+ /** quickboot snapshot: appwindow, applaunch I/O */
   _armSnapshotSave(delay = 20000) {
     if (!this.emulator.running()) return;
     this.emulator.scheduleSnapshotSave(this.adbPath(), {
@@ -464,16 +464,16 @@ class Runtime {
     });
   }
 
- /** install：appsnapshot，boot */
+ /** install: appsnapshot, boot */
   scheduleSnapshotSave(delay = 12000) { this._armSnapshotSave(delay); }
 
   /**
- * snapshot，****。
+ * snapshot, ****. 
    *
- * ：network、launchapp。
- * scheduleSnapshotSave appwindow，app，
- * 「network」 —— bootsnapshot
- * ，。，。
+ * : network, launchapp. 
+ * scheduleSnapshotSave appwindow, app, 
+ * "network" -- bootsnapshot
+ * , . , . 
    */
   forceSnapshotSave(delay = 3000) {
     if (!this.emulator.running()) return;
@@ -481,11 +481,11 @@ class Runtime {
   }
 
   /**
- * ：app，Android。
- * WSA / app —— resident， am start。
- * - ：、error，failureapp；
- * - ：boot Promise，；
- * - ：bootcomplete qemu 。
+ * : app, Android. 
+ * WSA / app -- resident,  am start. 
+ * - : , error, failureapp; 
+ * - : boot Promise, ; 
+ * - : bootcomplete qemu . 
    */
   prewarm({ onLog = () => {} } = {}) {
     if (this._prewarmPromise) return this._prewarmPromise;
@@ -497,7 +497,7 @@ class Runtime {
         if (!(env.adb.ok && env.emulator.ok && env.sysimg.ok)) return { ok: false, skipped: 'not-ready' };
         const r = await this.ensure({ onLog: (m) => onLog(`Prewarm: ${m}`) });
         if (r && r.ok) {
-          // app： idle
+          // app:  idle
           if (this._activeApps.size === 0) await this.emulator.setPriority('idle').catch(() => {});
           const ms = Date.now() - t0;
           this.log(`Prewarm complete (${Math.round(ms / 1000)}s)`);
@@ -528,7 +528,7 @@ class Runtime {
     const out = fs.openSync(logFile, 'a');
     fs.writeSync(out, `\n\n=== ${new Date().toISOString()} ${install ? 'INSTALL' : 'BOOT'} ===\n${env.qemu.path} ${args.join(' ')}\n`);
 
-    onLog(`Starting runtime (${env.hypervisor.whpx ? 'WHPX Hardware Acceleration' : 'Software Simulation'}）…`);
+    onLog(`Starting runtime (${env.hypervisor.whpx ? 'WHPX Hardware Acceleration' : 'Software Simulation'})...`);
     if (!env.hypervisor.whpx) onLog(env.hypervisor.note);
 
     const proc = spawn(env.qemu.path, args, {
@@ -558,7 +558,7 @@ class Runtime {
     this.vmStarting = false;
     if (!this.vmProc) throw new Error(`QEMU failed to start. See log: ${logFile}`);
 
-    // ：ISO Linux install， adb，「 adb」
+    // : ISO Linux install,  adb, " adb"
     if (install) {
       onLog('Installer started. Complete setup in VM window.');
       return { ok: true, install: true, needsManualInstall: true };
@@ -587,8 +587,8 @@ class Runtime {
   }
 
   /**
- * Android ：adb ≠ 。
- * sys.boot_completed=1 ， am start failure。
+ * Android : adb ≠ . 
+ * sys.boot_completed=1 ,  am start failure. 
    */
   async waitAndroidReady(client, timeoutMs, onLog = () => {}) {
     const start = Date.now();
@@ -604,7 +604,7 @@ class Runtime {
           const v = await client.shell('getprop sys.boot_completed').catch(() => '');
           if (String(v).trim() === '1') {
             bootCompleted = true;
-            onLog(`Android kernel booted, waiting for system services… (${Math.round((Date.now() - start) / 1000)}s)`);
+            onLog(`Android kernel booted, waiting for system services... (${Math.round((Date.now() - start) / 1000)}s)`);
           }
         }
         if (bootCompleted) {
@@ -618,8 +618,8 @@ class Runtime {
       if (Date.now() - lastNotice > 15000) {
         lastNotice = Date.now();
         onLog(bootCompleted
-          ? `Waiting for system services… ${Math.round((Date.now() - start) / 1000)}s`
-          : `Booting Android… ${Math.round((Date.now() - start) / 1000)}s`);
+          ? `Waiting for system services... ${Math.round((Date.now() - start) / 1000)}s`
+          : `Booting Android... ${Math.round((Date.now() - start) / 1000)}s`);
       }
       /* eslint-enable no-await-in-loop */
       await new Promise((r) => setTimeout(r, 2000));
@@ -633,7 +633,7 @@ class Runtime {
     const needConnect = String(client.serial || '').includes(':')
       && !/^emulator-/.test(client.serial);
     while (Date.now() - start < timeoutMs) {
-      // emulator-5554 emulator ， adb connect
+      // emulator-5554 emulator ,  adb connect
       if (needConnect) {
         // eslint-disable-next-line no-await-in-loop
         await client.connect().catch(() => false);
@@ -642,7 +642,7 @@ class Runtime {
       if (await client.isOnline()) return true;
       if (Date.now() - lastNotice > 20000) {
         lastNotice = Date.now();
-        onLog(`Waiting for Android to boot… ${Math.round((Date.now() - start) / 1000)}s`);
+        onLog(`Waiting for Android to boot... ${Math.round((Date.now() - start) / 1000)}s`);
       }
       // eslint-disable-next-line no-await-in-loop
       await new Promise((r) => setTimeout(r, 2000));
@@ -654,10 +654,10 @@ class Runtime {
     if (!this._freeformReady) {
       try { this._freeformReady = await client.ensureFreeform(); } catch (_) { /* ignore */ }
     }
-    // （ + IME）**boot**。
-    // emulator -prop （SELinux ，runtime），
-    // app locale / ，pinyinIME。
-    // settingsconfiguration（engine.chineseIme=false）。
+    // ( + IME)**boot**. 
+    // emulator -prop (SELinux , runtime), 
+    // app locale / , pinyinIME. 
+    // settingsconfiguration(engine.chineseIme=false). 
     if (!this._chineseReady && this.settings.engine.chineseIme !== false) {
       try {
         const locale = this.settings.engine.locale || 'zh-CN';
@@ -667,14 +667,14 @@ class Runtime {
         const r = await client.ensureChineseIme(apk, {
           setDefault: this.settings.engine.chineseImeDefault !== false,
         });
-        // success。failure prepare() retry ——
-        // adb IME。
+        // success. failure prepare() retry --
+        // adb IME. 
         if (r && r.ok) this._chineseReady = true;
         this.log(`Chinese IME: ${r.ok ? (r.installed ? 'installed & active' : 'ready') : (r.reason || 'not ready')}`);
-        // -change-locale 「」restart framework； quickboot snapshot
-        // 。snapshot，checksnapshot、
-        // bootcold boot（ -change-locale）。snapshot，
-        // restart。marker 。
+        // -change-locale ""restart framework;  quickboot snapshot
+        // . snapshot, checksnapshot, 
+        // bootcold boot( -change-locale). snapshot, 
+        // restart. marker . 
         await this._ensureSystemLocale(client, locale);
       } catch (e) {
         this.log(`Chinese environment initialization skipped: ${e.message}`);
@@ -684,23 +684,23 @@ class Runtime {
   }
 
   /**
- * UI （）。
+ * UI (). 
    *
- * （）：-change-locale **** persist.sys.locale，
- * ro.product.locale system image en-US；
- * `settings system system_locales`（settings「（）」， UI ）。
- * 「」 system_locales， getprop。
+ * (): -change-locale **** persist.sys.locale, 
+ * ro.product.locale system image en-US; 
+ * `settings system system_locales`(settings"()",  UI ). 
+ * "" system_locales,  getprop. 
    *
- * -change-locale 「」restart framework； quickboot snapshot
- * 。snapshot，checksnapshot、bootcold boot。
- * snapshot，restart。marker 。
+ * -change-locale ""restart framework;  quickboot snapshot
+ * . snapshot, checksnapshot, bootcold boot. 
+ * snapshot, restart. marker . 
    */
   async _ensureSystemLocale(client, locale) {
     const fs = require('fs');
     const path = require('path');
     const want = String(locale || 'zh-CN');
     if (want === 'off' || want === 'en-US') return;
-    // （system_locales ，）
+    // (system_locales , )
     const cur = await client.shell('settings get system system_locales', { timeout: 8000 }).catch(() => '');
     const s = String(cur).trim();
     if (s === want || s.indexOf(want) === 0 || /^zh[-_]/.test(s)) return;
@@ -716,23 +716,23 @@ class Runtime {
     }
   }
 
- /** ：emulator shutdown，QEMU monitor */
+ /** : emulator shutdown, QEMU monitor */
   async stop({ graceful = true } = {}) {
-    // runtime，cache guest network。rotate/restart
-    // ，waitForNetwork 8 cache ok，appblack screen。
+    // runtime, cache guest network. rotate/restart
+    // , waitForNetwork 8 cache ok, appblack screen. 
     this._lastNetwork = null;
     const adbPath = this.adbPath();
     if (this.emulator.running()) {
       await this.emulator.stop({ adbPath });
       return true;
     }
-    // emulator（adoptExisting） proc ，
-    // return false —— ， CPU/memory。
-    // path adb shutdown，fallback。
+    // emulator(adoptExisting) proc , 
+    // return false -- ,  CPU/memory. 
+    // path adb shutdown, fallback. 
     //
-    // note：emulator.exe launch，spawn qemu ，「」
-    // 。shutdown saveSnapshotNow，snapshot，
-    // cold boot（25 vs 8 ）。
+    // note: emulator.exe launch, spawn qemu , ""
+    // . shutdown saveSnapshotNow, snapshot, 
+    // cold boot(25 vs 8 ). 
     let online = false;
     try { online = await this.client().isOnline(); } catch (_) { /* ignore */ }
     if (online && this.emuSerial) {
@@ -792,7 +792,7 @@ class Runtime {
       };
       sock.setTimeout(timeout, () => done(new Error('monitor timeout')));
       sock.on('error', (e) => {
-        // QEMU quit （ECONNRESET/EPIPE），
+        // QEMU quit (ECONNRESET/EPIPE), 
         if (sent && /ECONNRESET|EPIPE/i.test(e.code || String(e))) done(null, buf);
         else done(e);
       });
@@ -833,7 +833,7 @@ class Runtime {
     return r;
   }
 
- /** installcomplete：install → → disklaunch */
+ /** installcomplete: install → → disklaunch */
   async markInstalled() {
     if (this.installing) {
       try { await this.stop({ graceful: true }); } catch (_) { /* ignore */ }
@@ -846,16 +846,16 @@ class Runtime {
   // ---------------- ensure ----------------
 
   /**
- * emulator。
- * emulator（5554/5556/…），adb +1。
- * system boot_completed，runtime，
- * 「 ApkStart app」，。
+ * emulator. 
+ * emulator(5554/5556/...), adb +1. 
+ * system boot_completed, runtime, 
+ * " ApkStart app", . 
    */
   /**
- * emulator。
- * 「 5554 」：launch（5554→5556→5558…），
- * ，。
- * qemu TCP ，。
+ * emulator. 
+ * " 5554 ": launch(5554→5556→5558...), 
+ * , . 
+ * qemu TCP , . 
    */
   async emulatorPorts() {
     const run = (cmd, args) => new Promise((resolve) => {
@@ -881,12 +881,12 @@ class Runtime {
     } catch (_) { /* probe */ }
 
     if (ports.size) {
-      // （） adb （+1），
+      // () adb (+1), 
       const all = [...ports].sort((a, b) => a - b);
       const consoles = all.filter((p) => ports.has(p + 1));
       return consoles.length ? consoles : all;
     }
-    // fallback： qemu ，probe（，）
+    // fallback:  qemu , probe(, )
     const found = [];
     for (let port = 5554; port <= 5620; port += 2) {
       // eslint-disable-next-line no-await-in-loop
@@ -903,8 +903,8 @@ class Runtime {
     }
     onLog(`Detected ${alive.length} existing runtime instance(s) (ports ${alive.join(', ')}), attempting takeover`);
 
-    // adb server offline （emulatorrestart adbd ），
-    // ， get-state offline，""。
+    // adb server offline (emulatorrestart adbd ), 
+    // ,  get-state offline, "". 
     await this.client().exec(['kill-server'], { withSerial: false, timeout: 8000 }).catch(() => {});
 
     for (const port of alive) {
@@ -924,8 +924,8 @@ class Runtime {
       }
       if (booted !== '1') {
         onLog(`Found previous instance (${serial}) but not ready; terminating before restarting`);
-        // AVD directory：exit，""。
-        // adb ，。
+        // AVD directory: exit, "". 
+        // adb , . 
         const pid = await this.pidOnPort(port);
         if (pid) {
           await new Promise((resolve) => {
@@ -947,7 +947,7 @@ class Runtime {
     return null;
   }
 
- /** TCP （emulator） */
+ /** TCP (emulator) */
   async pidOnPort(port) {
     return new Promise((resolve) => {
       const { execFile } = require('child_process');
@@ -961,18 +961,18 @@ class Runtime {
   }
 
   /**
- * clean、emulator。
- * ApkStart emulator detached ，qemu ；launch AVD ，
- * FATAL "Running multiple emulators with the same AVD"。
- * EmulatorEngine，retrypath（killAttempt）。
+ * clean, emulator. 
+ * ApkStart emulator detached , qemu ; launch AVD , 
+ * FATAL "Running multiple emulators with the same AVD". 
+ * EmulatorEngine, retrypath(killAttempt). 
    */
   async killOrphanEmulators({ onLog = () => {} } = {}) {
     return this.emulator.killOrphanProcesses({ onLog });
   }
 
   /**
- * ：， Promise，
- * 「」emulator（AVD + memory）。
+ * : ,  Promise, 
+ * ""emulator(AVD + memory). 
    */
   async ensure({ onLog = () => {} } = {}) {
     if (this._ensurePromise) return this._ensurePromise;
@@ -987,17 +987,17 @@ class Runtime {
     const client = this.client();
     if (await client.isOnline()) {
       /**
- * 「」「」。
+ * """". 
        *
- * emulatorexit、restart，adb 
- * `-s emulator-5554 get-state` `device`。
- * returned reused，orientationlaunch ——
- * `device 'emulator-5554' not found`（ ensure
- * 0.2 ""，applaunch）。
+ * emulatorexit, restart, adb 
+ * `-s emulator-5554 get-state` `device`. 
+ * returned reused, orientationlaunch --
+ * `device 'emulator-5554' not found`( ensure
+ * 0.2 "", applaunch). 
        *
- * ： getprop （ 0 
- * boot，，）；failure，
- * 。
+ * :  getprop ( 0 
+ * boot, , ); failure, 
+ * . 
        */
       const probe = await client.shell('getprop sys.boot_completed', { timeout: 5000 })
         .then((v) => String(v == null ? '' : v).trim())
@@ -1006,16 +1006,16 @@ class Runtime {
         await this.prepare(client);
         return { ok: true, client, engine: 'builtin', reused: true };
       }
-      onLog('adb reports device online but unresponsive; restarting runtime…');
+      onLog('adb reports device online but unresponsive; restarting runtime...');
     }
 
-    // ApkStart exitemulator（），
-    // ，adb server restart—— isOnline() "runtime"，
-    // 。emulator，bootmemory。
+    // ApkStart exitemulator(), 
+    // , adb server restart-- isOnline() "runtime", 
+    // . emulator, bootmemory. 
     const adopted = await this.adoptExisting({ onLog });
     if (adopted) return adopted;
 
-    // / emulator：，
+    // / emulator: , 
     try {
       const devices = await client.devices();
       const running = devices.find((d) => /^emulator-\d+$/.test(d.serial) && d.state === 'device');
@@ -1029,29 +1029,29 @@ class Runtime {
       }
     } catch (_) { /*  */ }
 
-    // （）：，
+    // (): , 
     if (this.emulator.running()) {
-      onLog('Stalled runtime detected, restarting…');
+      onLog('Stalled runtime detected, restarting...');
       await this.emulator.stop({ adbPath: this.adbPath() });
     }
 
     const s = this.settings;
 
-    // path：runtime
-    // system imagecompress，（）。
-    // failureerror： checkEnv() 「system image」，
-    // download，extractfailure（disk / ）。
+    // path: runtime
+    // system imagecompress, (). 
+    // failureerror:  checkEnv() "system image", 
+    // download, extractfailure(disk / ). 
     await this.provisioner.materializeImages(onLog).catch((e) => {
       onLog(`System image extraction failed: ${e.message}`);
       this.log(`materialize failed: ${e.message}`);
     });
     const env = await this.provisioner.checkEnv();
 
-    // emulator path：system image，"installdisk"
+    // emulator path: system image, "installdisk"
     if (env.emulator.ok && env.sysimg.ok) {
-      // ApkStart emulator（detached qemu ），
-      // AVD ， FATAL "Running multiple emulators with the same AVD"。
-      // failure，，「」。
+      // ApkStart emulator(detached qemu ), 
+      // AVD ,  FATAL "Running multiple emulators with the same AVD". 
+      // failure, , "". 
       await this.killOrphanEmulators({ onLog }).catch(() => {});
       try {
         const r = await this.boot({ onLog });
@@ -1065,7 +1065,7 @@ class Runtime {
       }
     }
 
-    // QEMU path（ ISO disk）
+    // QEMU path( ISO disk)
     if (!s.runtime.installed) {
       return {
         ok: false,
@@ -1089,13 +1089,13 @@ class Runtime {
   // ---------------- app ----------------
 
   /**
- * 「」：
- * Android resident（quickboot snapshot + adoptExisting ），
- * App am start + window，。
- * ：
- * - App ， App ；
- * - window qemu 「」；
- * - window / （ onActive UI ）。
+ * "": 
+ * Android resident(quickboot snapshot + adoptExisting ), 
+ * App am start + window, . 
+ * : 
+ * - App ,  App ; 
+ * - window qemu ""; 
+ * - window / ( onActive UI ). 
    */
   async beginApp(pkg, { onActive = () => {} } = {}) {
     const first = this._activeApps.size === 0;
@@ -1103,26 +1103,26 @@ class Runtime {
     this.touch();
     const s = this.settings;
     const mode = (s.engine && s.engine.priorityMode) || 'balanced';
-    // app。balanced normal（ below）：
-    // below qemu ，、 ——
-    // 「」。normal desktop， CPU/memory/GPU。
+    // app. balanced normal( below): 
+    // below qemu , ,  --
+    // "". normal desktop,  CPU/memory/GPU. 
     const level = mode === 'game' ? 'game' : 'normal';
 
     if (first) {
-      // app：「snapshot」，applaunchdisk
+      // app: "snapshot", applaunchdisk
       this.emulator.cancelSnapshotSave();
     }
-    // /app：endApp qemu idle，
-    // ， → 。setPriority ，
-    // 、。
+    // /app: endApp qemu idle, 
+    // ,  → . setPriority , 
+    // , . 
     await this.emulator.setPriority(level).catch(() => {});
     if (first) {
       try { onActive(true); } catch (_) { /* launchfailureapp */ }
     }
 
-    // window（B ）：app**** force-stop app，。
-    // reclaim「」，、memory。
-    // multiWindow 「」，。
+    // window(B ): app**** force-stop app, . 
+    // reclaim"", , memory. 
+    // multiWindow "", . 
     if (s.engine && s.engine.multiWindow) {
       const roles = container.sessionRoles([...this._activeApps], pkg);
       const { tombstone } = container.planTombstones({
@@ -1132,7 +1132,7 @@ class Runtime {
       const cmds = container.buildTombstoneCommands(tombstone);
       if (cmds.length) {
         await this.client().shell(cmds.join(' ; '), { timeout: 20000 }).catch(() => '');
-        for (const p of tombstone) this._tombstoned.add(p);   // ，
+        for (const p of tombstone) this._tombstoned.add(p);   // , 
         this.log(`Multi-window: foreground ${pkg}, background ${roles.background.length - tombstone.length}, tombstoned ${tombstone.length}`);
       } else {
         this.log(`Multi-window: ${roles.count} apps coexisting, no reclamation needed`);
@@ -1146,7 +1146,7 @@ class Runtime {
       pkg,
       installed,
       deep: !!(s.engine && s.engine.deepTrim),
-      // App am start ，；clean endApp
+      // App am start , ; clean endApp
       killBackground: false,
     });
     if (plan.commands.length) {
@@ -1157,9 +1157,9 @@ class Runtime {
   }
 
   /**
- * appwindow：；window，
- * 「resident」（ + Android idle + qemu ）。
- * shutdown、 AVD —— 。
+ * appwindow: ; window, 
+ * "resident"( + Android idle + qemu ). 
+ * shutdown,  AVD -- . 
    */
   async endApp(pkg, { onIdle = () => {} } = {}) {
     this._activeApps.delete(pkg);
@@ -1169,11 +1169,11 @@ class Runtime {
       const s = this.settings;
       const cmds = container.buildIdleCommands({ deep: !!(s.engine && s.engine.deepTrim) });
       await this.client().shell(cmds.join(' ; '), { timeout: 15000 }).catch(() => '');
-      // game appwindow，
-      // 、。
+      // game appwindow, 
+      // , . 
       const keepHigh = (s.engine && s.engine.priorityMode) === 'game';
       await this.emulator.setPriority(keepHigh ? 'normal' : 'idle').catch(() => {});
-      // ：memorysnapshot，bootcold boot
+      // : memorysnapshot, bootcold boot
       this._armSnapshotSave(8000);
       try { onIdle(true); } catch (_) { /* ignore */ }
       this.log('Container parked (Android resident, 0 app processes, qemu lowest priority)');
@@ -1184,7 +1184,7 @@ class Runtime {
   get activeApps() { return [...this._activeApps]; }
   get containerIdle() { return this._activeApps.size === 0; }
 
- /** settings「」 */
+ /** settings"" */
   async restoreSystemApps() {
     const cmds = container.buildRestoreCommands();
     await this.client().shell(cmds.join(' ; '), { timeout: 20000 }).catch(() => '');
@@ -1196,22 +1196,22 @@ class Runtime {
   // ---------------- reclaim ----------------
 
   /**
- * orientationself-healing：「space」「」orientation。
+ * orientationself-healing: "space"""orientation. 
    *
- * （ dumpsys window displays）：
- * init=1280x720 ... cur=1280x720 → （landscape + landscape）
- * init=1280x720 ... cur=720x1280 → ：spacerotate 90°
- * cur init ，app/orientation，
- * orientationignoreapporientation，restart。
+ * ( dumpsys window displays): 
+ * init=1280x720 ... cur=1280x720 → (landscape + landscape)
+ * init=1280x720 ... cur=720x1280 → : spacerotate 90°
+ * cur init , app/orientation, 
+ * orientationignoreapporientation, restart. 
    *
- * settings， 60 shell。
+ * settings,  60 shell. 
    */
   async _healOrientation() {
     if (!this.emulator || !this.emulator.running()) return;
     const wantLand = !!this.settings.display.landscape;
     const panelLand = typeof this.emulator.panelLandscape === 'function'
       ? this.emulator.panelLandscape() : null;
-    // orientationsettings → restart，（runLaunch.beforeStart ）
+    // orientationsettings → restart, (runLaunch.beforeStart )
     if (panelLand !== null && panelLand !== wantLand) return;
     const c = this.client();
     const out = await c.shell('dumpsys window displays', { timeout: 12000 }).catch(() => '');
@@ -1221,17 +1221,17 @@ class Runtime {
     const initLand = Number(init[1]) > Number(init[2]);
     const curLand = Number(cur[1]) > Number(cur[2]);
     if (initLand !== curLand) {
-      // ：orientation + ignoreapporientation + density
+      // : orientation + ignoreapporientation + density
       this.log(`Orientation self-healing: init=${init[1]}x${init[2]} cur=${cur[1]}x${cur[2]} collapsed, reconverging`);
       await c.resetDisplayOverrides(wantLand).catch(() => {});
       await c.setOrientation(wantLand).catch(() => {});
       return;
     }
-    // ≠ 。runtime：
-    // - mSetIgnoreOrientationRequest（landscape true，apporientation）
-    // - wm density 190（720 → sw606dp ≥ 600dp ）
-    // ， —— 「」。
-    // verify，（，）。
+    // ≠ . runtime: 
+    // - mSetIgnoreOrientationRequest(landscape true, apporientation)
+    // - wm density 190(720 → sw606dp ≥ 600dp )
+    // ,  -- "". 
+    // verify, (, ). 
     const densityWanted = (this.settings.display || {}).tabletMode !== false ? 190 : null;
     let ignoreOk = true;
     if (wantLand) {
@@ -1241,18 +1241,18 @@ class Runtime {
     let densityOk = true;
     if (densityWanted) {
       const dens = await c.shell('wm density', { timeout: 6000 }).catch(() => '');
-      // 「Override density: N」
+      // "Override density: N"
       const m = /Override density:\s*(\d+)/.exec(String(dens));
       densityOk = !!m && Number(m[1]) === densityWanted;
     }
     if (!ignoreOk || !densityOk) {
       this.log(`Display state convergence: ignore-orientation=${ignoreOk} density=${densityOk} → aligned`);
       if (!ignoreOk) await c.shell('wm set-ignore-orientation-request true', { timeout: 8000 }).catch(() => {});
-      // density **app**。
-      // configuration + Activity ，cache DisplayMetrics app
-      // （） dp，、 ——
-      // 「window」。applaunchpath，
-      // installer.launch resetDisplayOverrides am start 。
+      // density **app**. 
+      // configuration + Activity , cache DisplayMetrics app
+      // () dp, ,  --
+      // "window". applaunchpath, 
+      // installer.launch resetDisplayOverrides am start . 
       if (!densityOk) {
         if (this._activeApps.size === 0) {
           await c.shell(`wm density ${densityWanted}`, { timeout: 8000 }).catch(() => {});
@@ -1267,15 +1267,15 @@ class Runtime {
     if (this._watchdog) return;
     this._watchdog = setInterval(async () => {
       const s = this.settings;
-      // orientationself-healing：applaunch / Activity / user-rotation
-      // 「ignoreapporientation」。，landscape 90°
-      // （「 90 」）。，
-      // ****，。
+      // orientationself-healing: applaunch / Activity / user-rotation
+      // "ignoreapporientation". , landscape 90°
+      // (" 90 "). , 
+      // ****, . 
       await this._healOrientation().catch(() => {});
       const limit = (s.engine.idleShutdownMinutes || 0) * 60000;
       if (!limit) return;
-      // emulator proc ，vmRunning false：
-      // return，reclaim。 adb 。
+      // emulator proc , vmRunning false: 
+      // return, reclaim.  adb . 
       if (!this.vmRunning) {
         const online = await this.client().isOnline().catch(() => false);
         if (!online) return;
@@ -1293,7 +1293,7 @@ class Runtime {
 
   get vmRunning() { return this.emulator.running() || !!(this.vmProc && !this.vmProc.killed); }
 
-  // ---------------- diagnose / slim（ UI ） ----------------
+  // ---------------- diagnose / slim( UI ) ----------------
 
   async diagnostics() {
     const env = this.provisioner.paths();
@@ -1304,9 +1304,9 @@ class Runtime {
       emulatorVersion: checked.emulator.version || '',
       diskMB: doctor.freeDiskMB(store.DATA_DIR),
     });
-    // memory attempts ；restart。
-    // failure， emulator.log ——
-    // UNKNOWN，（issue #20/#25 ）。
+    // memory attempts ; restart. 
+    // failure,  emulator.log --
+    // UNKNOWN, (issue #20/#25 ). 
     const persisted = this.emulator.lastFailure ? this.emulator.lastFailure() : null;
     const liveAttempts = this.emulator.attempts || [];
     const attempts = liveAttempts.length ? liveAttempts : ((persisted && persisted.attempts) || []);
@@ -1335,10 +1335,10 @@ class Runtime {
   usage() { return require('./layers').summary(this.provisioner.paths().root); }
 
   /**
- * reclaimruntimesystem image / AVD / lock file / snapshot。
- * 「clean」：runtime keepSnapshots AVD 
- * launchsnapshot（≈ GB ram.img）， AVD 。
- * includeSnapshots：runtime，snapshotreclaim。
+ * reclaimruntimesystem image / AVD / lock file / snapshot. 
+ * "clean": runtime keepSnapshots AVD 
+ * launchsnapshot(≈ GB ram.img),  AVD . 
+ * includeSnapshots: runtime, snapshotreclaim. 
    */
   async cleanup({ apply = false, aggressive = false, includeSnapshots = false } = {}) {
     let stoppedVm = false;
@@ -1349,16 +1349,16 @@ class Runtime {
     const report = require('./layers').prune(this.provisioner.paths().root, {
       apply, aggressive, keepSnapshots: !includeSnapshots && this.vmRunning,
     });
-    // ，hint：restartruntime
+    // , hint: restartruntime
     return { ...report, apply, stoppedVm };
   }
 
   /**
- * Android（ /data + app + launchsnapshot），
- * AVD 「、 app」。
- * 8–16GB system image，（UI ），
- * AVD（apkstart.avd），system image、 AVD。
- * config.ini / hardware-qemu.ini，AVD ，appcold boot。
+ * Android( /data + app + launchsnapshot), 
+ * AVD ",  app". 
+ * 8-16GB system image, (UI ), 
+ * AVD(apkstart.avd), system image,  AVD. 
+ * config.ini / hardware-qemu.ini, AVD , appcold boot. 
    * @returns {{ok:boolean, reclaimed:number, avdDir:string, error?:string}}
    */
   async resetAndroidData() {
@@ -1371,10 +1371,10 @@ class Runtime {
       if (fs.existsSync(avdDir)) {
         for (const e of fs.readdirSync(avdDir, { withFileTypes: true })) {
           const p = path.join(avdDir, e.name);
-          // ：system image（ qcow2 + ）、launchsnapshot、lock file/directory。
-          // ：config.ini / hardware-qemu.ini / AVD.conf / cache.img / encryptionkey* / initrd /
-          // modem_simulator / *.ini / *.txt / *.cache —— AVD ，
-          // AVD boot。app，emulator -wipe-data /data。
+          // : system image( qcow2 + ), launchsnapshot, lock file/directory. 
+          // : config.ini / hardware-qemu.ini / AVD.conf / cache.img / encryptionkey* / initrd /
+          // modem_simulator / *.ini / *.txt / *.cache -- AVD , 
+          // AVD boot. app, emulator -wipe-data /data. 
           const isUserdata = /^userdata(-qemu)?(-[0-9]+)?\.img(\.qcow2)?$/.test(e.name)
             || /^userdata\.img(\.qcow2)?\.\d+$/.test(e.name);
           const isSnapshot = /^snapshots(\.stale-\d+)?$/.test(e.name);
@@ -1391,11 +1391,11 @@ class Runtime {
               fs.rmSync(p, { force: true });
               reclaimed += s;
             }
-          } catch (_) { /* ， */ }
+          } catch (_) { /* ,  */ }
         }
       }
-      // system image，「install app」，
-      // desktop/launch app。
+      // system image, "install app", 
+      // desktop/launch app. 
       try { store.saveApps([]); } catch (_) { /* ignore */ }
       return { ok: true, reclaimed, avdDir };
     } catch (e) {
@@ -1404,8 +1404,8 @@ class Runtime {
   }
 
   /**
- * 「」 AndroidWifi （，restart、）。
- * emulator.repairWifi。
+ * "" AndroidWifi (, restart, ). 
+ * emulator.repairWifi. 
    *
  * @returns {Promise<boolean>} 
    */
@@ -1415,12 +1415,12 @@ class Runtime {
   }
 
   /**
- * 。
+ * . 
    *
- * ：`sys.boot_completed` ，Wi-Fi + DHCP 
- * 10.0.2.16。app，
- * （），
- * 「black screen」。appnetwork。
+ * : `sys.boot_completed` , Wi-Fi + DHCP 
+ * 10.0.2.16. app, 
+ * (), 
+ * "black screen". appnetwork. 
    *
    * @returns {Promise<{ok:boolean,reason:string,ip?:string,gateway?:string}>}
    */
@@ -1429,12 +1429,12 @@ class Runtime {
       this._lastNetwork = { ok: !!(r && r.ok), ip: (r && r.ip) || '', reason: (r && r.reason) || '', at: Date.now() };
       return r;
     };
-    // ：launch / rotaterestart，launchpath
-    // （restartForOrientation 、installer.launch ）。
-    // network，8 ， adb
-    // （ isOnline + checkNetwork shell， 1 ）。
-    // window 8 ：，。
-    // note stop() _lastNetwork，restartshutdown。
+    // : launch / rotaterestart, launchpath
+    // (restartForOrientation , installer.launch ). 
+    // network, 8 ,  adb
+    // ( isOnline + checkNetwork shell,  1 ). 
+    // window 8 : , . 
+    // note stop() _lastNetwork, restartshutdown. 
     const cached = this._lastNetwork;
     if (cached && cached.ok && Date.now() - cached.at < 8000) return cached;
     const t0 = Date.now();
@@ -1445,8 +1445,8 @@ class Runtime {
     while (Date.now() - t0 < timeoutMs) {
       const online = await this.client().isOnline().catch(() => false);
       if (!online) {
-        // restart adb ， offline
-        // （： device-offline，「repairfailure」）。
+        // restart adb ,  offline
+        // (:  device-offline, "repairfailure"). 
         if (!offlineSince) offlineSince = Date.now();
         if (Date.now() - offlineSince > 45000) return done({ ok: false, reason: 'device-offline' });
       } else {
@@ -1454,12 +1454,12 @@ class Runtime {
         // eslint-disable-next-line no-await-in-loop
         last = await this.emulator.checkNetwork(adbPath || this.adbPath()).catch(() => null);
         if (last && last.ok) return done(last);
-        // `wifi-not-connected` 「Wi-Fi 」，「 DHCP」。
-        // timeout：boot（ AndroidWifi
-        // 「」）。，
-        // ， 20 。
-        // 3 （≈9 ） 2 ：boot Wi-Fi ，
-        // settings，。
+        // `wifi-not-connected` "Wi-Fi ", " DHCP". 
+        // timeout: boot( AndroidWifi
+        // ""). , 
+        // ,  20 . 
+        // 3 (≈9 ) 2 : boot Wi-Fi , 
+        // settings, . 
         if (last && last.reason === 'wifi-not-connected') {
           notConnectedStreak += 1;
           if (notConnectedStreak >= 3) return done(last);
@@ -1469,7 +1469,7 @@ class Runtime {
       }
       if (Date.now() - lastNotice > 10000) {
         lastNotice = Date.now();
-        onLog(`Waiting for Android VM network connection… ${Math.round((Date.now() - t0) / 1000)}s`);
+        onLog(`Waiting for Android VM network connection... ${Math.round((Date.now() - t0) / 1000)}s`);
       }
       // eslint-disable-next-line no-await-in-loop
       await new Promise((r) => setTimeout(r, 3000));
@@ -1478,27 +1478,27 @@ class Runtime {
   }
 
   /**
- * repair「Androidnetwork」。
- * Wi-Fi bootcomplete，restart，
- * ****；timeouthint「Android」。
+ * repair"Androidnetwork". 
+ * Wi-Fi bootcomplete, restart, 
+ * ****; timeouthint"Android". 
    *
    * @returns {Promise<{ok:boolean, network?:object, boot?:boolean, error?:string}>}
    */
   /**
- * ：，cold boot（「」snapshot）。
- * 「black screen」：appnetworklaunch。
+ * : , cold boot(""snapshot). 
+ * "black screen": appnetworklaunch. 
    *
    * @returns {Promise<{ok:boolean,reason?:string,ip?:string,gateway?:string}>}
    */
   async ensureNetwork({ onLog = () => {}, firstWaitMs = 25000, secondWaitMs = 90000 } = {}) {
     let net = await this.waitForNetwork({ onLog, timeoutMs: firstWaitMs });
     if (net && net.ok) return net;
-    // ：「」 AndroidWifi 。
-    // cold boot、——restart、。
-    // 「」（ emulator.repairWifi ）。
+    // : "" AndroidWifi . 
+    // cold boot, --restart, . 
+    // ""( emulator.repairWifi ). 
     if (!this._wifiRepairTried) {
       this._wifiRepairTried = true;
-      onLog('VM unable to connect to Wi-Fi; attempting reconnect…');
+      onLog('VM unable to connect to Wi-Fi; attempting reconnect...');
       try {
         const fixed = await this.emulator.repairWifi(this.adbPath());
         if (fixed) {
@@ -1511,11 +1511,11 @@ class Runtime {
         }
       } catch (_) { /* repairfailurepath */ }
     }
-    // cold boot（），：app，
-    // 「」。
+    // cold boot(), : app, 
+    // "". 
     if (this._netColdBootTried) return net;
     this._netColdBootTried = true;
-    onLog('Network still offline; cold-booting VM to retry…');
+    onLog('Network still offline; cold-booting VM to retry...');
     try {
       await this.stop({ graceful: false }).catch(() => {});
       this.emulator.forceColdBootOnNextStart();
@@ -1526,25 +1526,25 @@ class Runtime {
     }
     net = await this.waitForNetwork({ onLog, timeoutMs: secondWaitMs });
     if (net && net.ok) {
-      // networksnapshot，
+      // networksnapshot, 
       try { await this.emulator.saveSnapshotNow(this.adbPath(), { timeout: 90000 }); } catch (_) { /* ignore */ }
     }
     return net;
   }
 
   /**
- * repair「Androidnetwork」。
- * ：cold boot（）→ network → （app）。
+ * repair"Androidnetwork". 
+ * : cold boot()→ network → (app). 
    *
    * @returns {Promise<{ok:boolean, network?:object, boot?:boolean, wiped?:boolean, error?:string}>}
    */
   async repairNetwork({ onLog = () => {} } = {}) {
     try {
-      // repair，，：
-      // 1) Wi-Fi（restart、）
-      // 2) cold boot（snapshot，）
+      // repair, , : 
+      // 1) Wi-Fi(restart, )
+      // 2) cold boot(snapshot, )
       // 3)
-      onLog('Repairing VM network: attempting Wi-Fi reconnect (data preserved)…');
+      onLog('Repairing VM network: attempting Wi-Fi reconnect (data preserved)...');
       if (!this.vmRunning) {
         const boot0 = await this.ensure({ onLog });
         if (!boot0 || !boot0.ok) {
@@ -1562,8 +1562,8 @@ class Runtime {
           return { ok: true, network: net1, boot: true, wiped: false };
         }
       }
-      // 2 ：cold boot，「」snapshot
-      onLog('Reconnect unsuccessful; cold-booting VM (data preserved)…');
+      // 2 : cold boot, ""snapshot
+      onLog('Reconnect unsuccessful; cold-booting VM (data preserved)...');
       await this.stop({ graceful: false }).catch(() => {});
       await new Promise((r) => setTimeout(r, 2500));
       this.emulator.forceColdBootOnNextStart();
@@ -1577,10 +1577,10 @@ class Runtime {
         onLog(`Network restored (${network.ip || ''}); saved snapshot.`);
         return { ok: true, network, boot: true, wiped: false };
       }
-      // 3 ：，（app）
-      onLog('Still offline; resetting Android data and rebooting (app list preserved)…');
+      // 3 : , (app)
+      onLog('Still offline; resetting Android data and rebooting (app list preserved)...');
       if (this.vmRunning) await this.stop({ graceful: false }).catch(() => {});
-      // qemu / netsimd ， -wipe-data AVD
+      // qemu / netsimd ,  -wipe-data AVD
       await new Promise((r) => setTimeout(r, 2500));
       this.emulator.forceWipeOnNextStart();
       const boot2 = await this.ensure({ onLog });
@@ -1589,8 +1589,8 @@ class Runtime {
       }
       network = await this.waitForNetwork({ onLog, timeoutMs: 240000 });
       if (network && network.ok) {
-        // 「network」snapshot：，
-        // 。
+        // "network"snapshot: , 
+        // . 
         try { await this.emulator.saveSnapshotNow(this.adbPath(), { timeout: 90000 }); } catch (_) { /* ignore */ }
         onLog(`Network restored (${network.ip || ''}, gateway reachable); saved snapshot.`);
       } else {
@@ -1605,16 +1605,16 @@ class Runtime {
   dispose() {
     if (this._watchdog) clearInterval(this._watchdog);
     if (this._client && this._client.disposeInput) this._client.disposeInput();
-    // runtime；dispose clean，emulator
+    // runtime; dispose clean, emulator
     if (this._backend && this._backend.dispose) {
       try { this._backend.dispose(); } catch (_) { /* ignore */ }
     }
     this.emulator.cancelSnapshotSave();
-    // 【】 qemu：
-    // 1) quickboot snapshot， GB ram.img ，
-    // bootfailure → cold boot，「」；
-    // 2) ， ApkStart ，app（WSA / app）。
-    // uninstall（app:removeSelf clean）。
+    // [] qemu: 
+    // 1) quickboot snapshot,  GB ram.img , 
+    // bootfailure → cold boot, ""; 
+    // 2) ,  ApkStart , app(WSA / app). 
+    // uninstall(app:removeSelf clean). 
     if (this.vmProc) {
       try { this.vmProc.kill(); } catch (_) { /* ignore */ }
       this.vmProc = null;

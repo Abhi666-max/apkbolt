@@ -1,16 +1,16 @@
 'use strict';
 /**
- * ： Google Android Emulator（QEMU ）
+ * :  Google Android Emulator(QEMU )
  *
- * ApkStart default，「」：
- * adb / emulator / system image ApkStart download，
- * emulator。
+ * ApkStart default, "": 
+ * adb / emulator / system image ApkStart download, 
+ * emulator. 
  *
- * core/engine.js（Runtime） core/emulator.js（EmulatorEngine），
- * ，，
- * 。
+ * core/engine.js(Runtime) core/emulator.js(EmulatorEngine), 
+ * , , 
+ * . 
  *
- * note： Runtime ， deps.runtime 。
+ * note:  Runtime ,  deps.runtime . 
  */
 const fs = require('fs');
 const path = require('path');
@@ -42,9 +42,9 @@ class BuiltinBackend extends Backend {
     ]);
   }
 
-  // serial getter： `this.serial = ''`，
-  // getter， TypeError（ getter ）。
-  // ensure() Runtime 。
+  // serial getter:  `this.serial = ''`, 
+  // getter,  TypeError( getter ). 
+  // ensure() Runtime . 
   syncSerial() {
     if (this.rt) this.serial = this.rt.emuSerial || '';
     return this.serial;
@@ -75,7 +75,7 @@ class BuiltinBackend extends Backend {
     if (!this.rt) return { ok: false, error: 'Runtime not initialized' };
     const r = await this.rt.ensure({ onLog });
     if (!r || !r.ok) return { ok: false, error: (r && r.error) || 'Android runtime failed to start' };
-    // serial （ syncSerial ），ensure success
+    // serial ( syncSerial ), ensure success
     this.syncSerial();
     this.adbPath = this.rt.adbPath();
     return {
@@ -84,15 +84,15 @@ class BuiltinBackend extends Backend {
   }
 
   /**
- * emulator window：directory WinAgent 
- * FindEmulator() （ core/win/agent.ps1），window。
+ * emulator window: directory WinAgent 
+ * FindEmulator() ( core/win/agent.ps1), window. 
    */
   async windowTargets() { return []; }
 
   /**
- * window。
- * isEmbedded WinAgent （ agent.ps1 _emu window），
- * true：path，。
+ * window. 
+ * isEmbedded WinAgent ( agent.ps1 _emu window), 
+ * true: path, . 
    */
   async windowReady({ isEmbedded } = {}) {
     if (typeof isEmbedded !== 'function') return { ok: true };
@@ -125,9 +125,9 @@ class BuiltinBackend extends Backend {
   dataInfo() { return this.rt ? this.rt.emulator.dataInfo() : { ok: false }; }
 
   /**
- * settings： + 。
- * runtimememory/CPU qemu ，Android；
- * data partition（resizeData），app。
+ * settings:  + . 
+ * runtimememory/CPU qemu , Android; 
+ * data partition(resizeData), app. 
    */
   resources() {
     const info = this.dataInfo() || {};
@@ -149,14 +149,14 @@ class BuiltinBackend extends Backend {
       freeMB,
       pending: false,
       verdict: memVerdict(memMB, host.totalMB),
-      note: 'Built-in runtime: memory/CPU changes take effect on the next Android start. After increasing the data partition, click "Expand Now" — if live expansion is possible, installed apps are preserved; if Android is using the quickboot diff disk, you will be prompted to reset and rebuild at the new size.',
+      note: 'Built-in runtime: memory/CPU changes take effect on the next Android start. After increasing the data partition, click "Expand Now" - if live expansion is possible, installed apps are preserved; if Android is using the quickboot diff disk, you will be prompted to reset and rebuild at the new size.',
     };
   }
 
   /**
- * ：disk， /data 。
- * 50GB downloadfailure， userdata system image
- * default 6/8GB —— dexopt INSTALL_INSUFFICIENT_STORAGE。
+ * : disk,  /data . 
+ * 50GB downloadfailure,  userdata system image
+ * default 6/8GB -- dexopt INSTALL_INSUFFICIENT_STORAGE. 
    */
   checkDiskFor(bytes) {
     const info = this.dataInfo() || {};
@@ -168,7 +168,7 @@ class BuiltinBackend extends Backend {
       return {
         ok: false,
         message: `Android data partition too small: currently ${capGB} GB, this game needs at least ${Math.ceil(need / 1024)} GB. `
-          + 'Increase the data partition size in Settings → Engine, then restart Android (live expansion — installed apps are preserved).',
+          + 'Increase the data partition size in Settings → Engine, then restart Android (live expansion - installed apps are preserved).',
       };
     }
     return { ok: true, requiredMB: need };
@@ -179,7 +179,7 @@ class BuiltinBackend extends Backend {
   async resetData() { return this.rt ? this.rt.resetAndroidData() : { ok: false }; }
 
   dispose() {
-    // Runtime.dispose()： qemu ，launch
+    // Runtime.dispose():  qemu , launch
   }
 
   diagnose() {

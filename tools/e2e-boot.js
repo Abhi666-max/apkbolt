@@ -1,8 +1,8 @@
 'use strict';
 /**
- * ：driver Runtime，。
- * ：node tools/e2e-boot.js <appRoot> [--stop|--keep]
- * appRoot = installdirectory resources/app（ runtime/ ）
+ * : driver Runtime, . 
+ * : node tools/e2e-boot.js <appRoot> [--stop|--keep]
+ * appRoot = installdirectory resources/app( runtime/ )
  */
 const path = require('path');
 const { Runtime } = require('../src/core/engine');

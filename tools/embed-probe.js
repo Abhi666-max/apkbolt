@@ -1,22 +1,22 @@
 'use strict';
 /**
- * （，）
+ * (, )
  *
- * ： Electron window「window」，
- * 、app，。
+ * :  Electron window"window", 
+ * , app, . 
  *
- * Electron app（tools/embed-probe/）：
- * electron.exe 「directory（ package.json）」 app， .js 。
+ * Electron app(tools/embed-probe/): 
+ * electron.exe "directory( package.json)" app,  .js . 
  *
- * ：
+ * : 
  *   set APKSTART_BACKEND=mumu  &  node_modules\electron\dist\electron.exe tools\embed-probe
- * note ELECTRON_RUN_AS_NODE（ 1， electron node ）。
+ * note ELECTRON_RUN_AS_NODE( 1,  electron node ). 
  *
- * ：
- * 1. id ，ensure() boot；
- * 2. window（windowReady）；
- * 3. path（WinAgent.embed， targets）window；
- * 4. .probe/embed-probe-<id>.png，exit。
+ * : 
+ * 1. id , ensure() boot; 
+ * 2. window(windowReady); 
+ * 3. path(WinAgent.embed,  targets)window; 
+ * 4. .probe/embed-probe-<id>.png, exit. 
  */
 const { BrowserWindow } = require('electron');
 const fs = require('fs');
@@ -30,7 +30,7 @@ function outDir() {
   return OUT_DIR;
 }
 
-/** ：Electron stdout launch */
+/** : Electron stdout launch */
 function log(m) {
   const line = `[probe] ${m}\n`;
   try { fs.appendFileSync(path.join(outDir(), 'probe.log'), line); } catch (_) { /* ignore */ }
@@ -42,7 +42,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function run(appRoot) {
   try { fs.writeFileSync(path.join(outDir(), 'probe.log'), ''); } catch (_) { /* ignore */ }
 
-  // require Electron ： app.whenReady()
+  // require Electron :  app.whenReady()
   const backends = require(path.join(appRoot, 'src', 'core', 'backends'));
   const { WinAgent } = require(path.join(appRoot, 'src', 'core', 'agent'));
 
@@ -50,16 +50,16 @@ async function run(appRoot) {
   if (!Cls) { log(` ${backendId}`); return; }
   const backend = new Cls(appRoot, { runtime: null, store: null, log });
 
-  log(`probe ${backendId} …`);
+  log(`probe ${backendId} ...`);
   const probe = await backend.probe();
   log(`probe → ${JSON.stringify(probe)}`);
   if (!probe.found) { log(''); return; }
 
-  log('ensure() …');
+  log('ensure() ...');
   const t0 = Date.now();
   const ens = await backend.ensure({ onLog: (m) => log(`  ${m}`) });
   log(`ensure → ok=${ens.ok} serial=${ens.serial} reused=${ens.reused} (${Date.now() - t0}ms)`);
-  if (!ens.ok) { log(`：${ens.error}`); return; }
+  if (!ens.ok) { log(`: ${ens.error}`); return; }
 
   const win = new BrowserWindow({
     width: 560,
@@ -82,7 +82,7 @@ async function run(appRoot) {
 
   const targets = await backend.windowTargets().catch(() => []);
   log(`targets → ${JSON.stringify(targets)}`);
-  if (!targets.length) { log('，'); return; }
+  if (!targets.length) { log(', '); return; }
 
   const buf = win.getNativeWindowHandle();
   const hwnd = buf.length >= 8 ? buf.readBigUInt64LE(0) : BigInt(buf.readUInt32LE(0));

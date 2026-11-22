@@ -1,16 +1,16 @@
 'use strict';
 /**
- * key —— 
+ * key -- 
  *
- * keyAndroid。：
+ * keyAndroid. : 
  * { key: 'w', action: 'tap', x: 0.15, y: 0.85 } // (0~1)
  *   { key: 'space', action: 'tap', x: 0.5, y: 0.9 }
  *   { key: 'j', action: 'swipe', x1: 0.7, y1: 0.5, x2: 0.3, y2: 0.5, duration: 100 }
  *
- * LCD (0~1)，runtime wm size 。
+ * LCD (0~1), runtime wm size . 
  *
- * ：
- * - fps: WASD + mouse（mouse Qt ，）
+ * : 
+ * - fps: WASD + mouse(mouse Qt , )
  * - rpg: WASD + J/K/L + Space 
  * - generic: orientation + Enter/Space
  */
@@ -58,8 +58,8 @@ const PRESETS = {
 };
 
 /**
- * Electron key 。
- * Electron KeyboardEvent.key 'w', 'W', 'ArrowUp', ' ', 'Enter' 。
+ * Electron key . 
+ * Electron KeyboardEvent.key 'w', 'W', 'ArrowUp', ' ', 'Enter' . 
  */
 function normalizeKey(key) {
   if (!key) return '';
@@ -69,7 +69,7 @@ function normalizeKey(key) {
 }
 
 /**
- * key。
+ * key. 
  * @param {Array} mappings 
  * @param {string} key Electron KeyboardEvent.key
  * @returns {object|null} 
@@ -81,11 +81,11 @@ function lookup(mappings, key) {
 }
 
 /**
- * + LCD adb shell 。
+ * + LCD adb shell . 
  * @param {object} mapping 
- * @param {number} width LCD （）
- * @param {number} height LCD （）
- * @returns {string} adb shell （ 'input tap 192 612'）
+ * @param {number} width LCD ()
+ * @param {number} height LCD ()
+ * @returns {string} adb shell ( 'input tap 192 612')
  */
 function toCommand(mapping, width, height) {
   if (!mapping) return '';

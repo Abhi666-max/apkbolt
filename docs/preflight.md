@@ -29,7 +29,7 @@ When the user selects **Apply Recommended Settings**, ApkBolt balances resources
   - < 8 GB Host → 2 GB Android RAM (never exceeds 50% of available physical RAM)
 - **CPU Cores (`cores`)**:
   - 8+ Threads → 4 vCPUs allocated
-  - 4–7 Threads → 2–3 vCPUs allocated
+  - 4-7 Threads → 2-3 vCPUs allocated
   - Always leaves at least 1 core dedicated to Windows.
 - **Rendering Resolution (`renderSize`)**:
   - High-performance GPU → Native auto DPI

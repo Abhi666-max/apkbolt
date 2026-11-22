@@ -1,13 +1,13 @@
 'use strict';
 /**
- * ZIP （ Node zlib）
- * directory，extract， APK extractmemory。
+ * ZIP ( Node zlib)
+ * directory, extract,  APK extractmemory. 
  *
- * note：「」，「」。「」：
- * - Buffer （Node 2GB）， GB ZipFile + pipeTo；
- * - ZIP EOCD 16/32 ， 0xffff/0xffffffff，
- * Zip64 EOCD（0x06064b50） Zip64 （id=0x0001）。
- * path，system image「」。
+ * note: "", "". "": 
+ * - Buffer (Node 2GB),  GB ZipFile + pipeTo; 
+ * - ZIP EOCD 16/32 ,  0xffff/0xffffffff, 
+ * Zip64 EOCD(0x06064b50) Zip64 (id=0x0001). 
+ * path, system image"". 
  */
 const zlib = require('zlib');
 const fs = require('fs');
@@ -20,15 +20,15 @@ const ZIP64_EOCD_SIG = 0x06064b50;
 const ZIP64_LOC_SIG = 0x07064b50;
 const MAX32 = 0xffffffff;
 const MAX16 = 0xffff;
-// read() ： pipeTo（），memory
+// read() :  pipeTo(), memory
 const MAX_READ = 256 * 1024 * 1024;
 
-/** BigInt Number（ZIP 2^53 ） */
+/** BigInt Number(ZIP 2^53 ) */
 function toNum(v) { return typeof v === 'bigint' ? Number(v) : v; }
 
 /**
- * Zip64 （0x0001），directory 0xffffffff 。
- * ：compress、compress、、disk；「」。
+ * Zip64 (0x0001), directory 0xffffffff . 
+ * : compress, compress, , disk; "". 
  * @param {Buffer} extra directory
  * @param {{uncompSize:number, compSize:number, localOffset:number}} fields
  */
@@ -60,10 +60,10 @@ function applyZip64Extra(extra, fields) {
 }
 
 /**
- * EOCD / directory / directory， Zip64。
+ * EOCD / directory / directory,  Zip64. 
  * @param {Buffer} buf EOCD 
  * @param {number} eocd EOCD buf 
- * @param {number} base buf[0] （ZipFile window）
+ * @param {number} base buf[0] (ZipFile window)
  * @returns {{total:number, cdSize:number, cdOffset:number, eocdAbs:number}}
  */
 function readEndOfCentralDirectory(buf, eocd, base) {
@@ -165,9 +165,9 @@ class ZipArchive {
   }
 
   /**
- * extract。
- * system.img GB inflate memory（ Node 2GB Buffer ），
- * extract。
+ * extract. 
+ * system.img GB inflate memory( Node 2GB Buffer ), 
+ * extract. 
    */
   pipeTo(name, dest) {
     const e = this.entries.get(name);
@@ -193,7 +193,7 @@ class ZipArchive {
       if (e.method !== 8) return done(new Error(`Unsupported compression method ${e.method}: ${name}`));
 
       const inflater = zlib.createInflateRaw();
-      // split， GB zlib
+      // split,  GB zlib
       const SLICE = 1 << 20;
       let pos = 0;
       const pump = () => {
@@ -216,9 +216,9 @@ class ZipArchive {
 }
 
 /**
- * ZIP ：directorymemory， fd 。
- * emulator / system image GB install—— fs.readFileSync 
- * memory OOM，「download」。
+ * ZIP : directorymemory,  fd . 
+ * emulator / system image GB install-- fs.readFileSync 
+ * memory OOM, "download". 
  */
 class ZipFile {
   constructor(filePath) {
@@ -240,7 +240,7 @@ class ZipFile {
     if (n > 0) {
       let got = 0;
       while (got < n) {
-        // readSync （），
+        // readSync (), 
         const r = fs.readSync(this.fd, b, got, n - got, pos + got);
         if (r <= 0) break;
         got += r;
@@ -268,7 +268,7 @@ class ZipFile {
     let cd = tail;
     let cdBase = tailBase;
     if (cdOffset < tailBase || cdOffset + cdSize > eocdAbs) {
-      // directory（ / ），
+      // directory( / ), 
       const len = Math.min(cdSize, 256 * 1024 * 1024);
       if (len <= 0) throw new Error('ZIP central directory offset is invalid');
       cd = this._readAt(cdOffset, len);
@@ -321,10 +321,10 @@ class ZipFile {
 
   read(name) {
     const { e, start } = this._range(name);
-    // read() memory：，
-    // GB system image（ issue #21 「」）。
+    // read() memory: , 
+    // GB system image( issue #21 ""). 
     if (e.compSize > MAX_READ) {
-      throw new Error(`Entry too large (${(e.compSize / 1048576).toFixed(0)} MB) — use pipeTo instead: ${name}`);
+      throw new Error(`Entry too large (${(e.compSize / 1048576).toFixed(0)} MB) - use pipeTo instead: ${name}`);
     }
     const raw = this._readAt(start, e.compSize);
     if (raw.length < e.compSize) throw new Error(`Entry data truncated: ${name}`);
@@ -356,20 +356,20 @@ class ZipFile {
 }
 
 /**
- * ZIP destDir ， zip-slip（issue #2 P0-4）。
- * "../evil"、path、、"C:\..."、UNC 。
- * null ，。
+ * ZIP destDir ,  zip-slip(issue #2 P0-4). 
+ * "../evil", path, , "C:\...", UNC . 
+ * null , . 
  */
 function resolveZipEntry(destDir, name) {
   if (typeof name !== 'string' || !name) return null;
-  // ： Windows path
+  // :  Windows path
   const normalized = name.replace(/\\/g, '/');
   if (normalized.startsWith('/') || /^[A-Za-z]:/.test(normalized) || normalized.includes('\0')) return null;
   const segments = normalized.split('/');
   if (segments.some((s) => s === '..')) return null;
   const root = path.resolve(destDir);
   const target = path.resolve(root, ...segments.filter((s) => s && s !== '.'));
-  // path.resolve /directory，
+  // path.resolve /directory, 
   if (target !== root && !target.startsWith(root + path.sep)) return null;
   return target;
 }

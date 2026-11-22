@@ -2,8 +2,8 @@
 /**
  * ↔ Android directory
  *
- * root 「」directory，incremental：
- * /，。
+ * root ""directory, incremental: 
+ * /, . 
  */
 const fs = require('fs');
 const path = require('path');
@@ -69,10 +69,10 @@ class Sharer {
       const state = this.loadState();
 
       // --- → ---
-      // 「 mtime」「 mtime」。
-      // mtime、，
-      // —— → 8 ，，
-      // ……「、、space」。
+      // " mtime"" mtime". 
+      // mtime, , 
+      // -- → 8 , , 
+      // ......", , space". 
       const stateOf = (prev) => (prev ? {
         size: prev.size,
         lmtime: prev.lmtime || prev.mtime || 0,
@@ -97,7 +97,7 @@ class Sharer {
       }
 
       // --- → ---
-      // toybox stat mtime； ls （）
+      // toybox stat mtime;  ls ()
       let remoteList = null;
       try {
         remoteList = await client.listRemoteStat(this.remoteDir);
@@ -109,15 +109,15 @@ class Sharer {
       }
 
       for (const r of remoteList) {
-        // （/）：directorycache
+        // (/): directorycache
         if (r.size > MAX_FILE) continue;
         const prev = stateOf(state[r.rel]);
         const sizeSame = !!prev && prev.size === r.size;
         const rmtimeSame = !!(prev && prev.rmtime && r.mtime)
           && Math.abs(prev.rmtime - r.mtime) <= 1500;
         if (prev && sizeSame && (rmtimeSame || prev.dir === 'up')) {
-          // ，、：
-          // ，download
+          // , , : 
+          // , download
           if (r.mtime && prev.rmtime !== r.mtime) {
             state[r.rel] = { ...prev, rmtime: r.mtime };
           }
@@ -149,7 +149,7 @@ class Sharer {
 
   async listRemoteRecursive(client, base, prefix = '', depth = 0, out = []) {
     if (depth > 6) return out;
-    // find + stat （directory ls -l ，）
+    // find + stat (directory ls -l , )
     if (depth === 0 && !prefix) {
       try {
         const text = await client.shell(

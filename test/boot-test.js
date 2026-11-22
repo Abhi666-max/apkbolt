@@ -1,18 +1,18 @@
 'use strict';
 /**
- * （，`npm run test:boot` ）
- *  61MB  Alpine virt ISO ：
+ * (, `npm run test:boot` )
+ *  61MB  Alpine virt ISO : 
  *    qcow2  →  →  → 
- * ：「，」（machine 、accel、
- * 、virtio 、ACPI ）。 QEMU +  guest 。
- *  Android ，。
+ * : ", "(machine , accel, 
+ * , virtio , ACPI ).  QEMU +  guest . 
+ *  Android , . 
  */
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 
-// ：/
+// : /
 process.env.APPDATA = path.join(os.tmpdir(), `apkstart-boot-test-${Date.now()}`);
 fs.mkdirSync(path.join(process.env.APPDATA, 'apkstart'), { recursive: true });
 
@@ -32,7 +32,7 @@ const log = (m) => console.log(`  ${m}`);
 async function ensureIso() {
   if (fs.existsSync(ISO) && fs.statSync(ISO).size > 50 * 1024 * 1024) return;
   fs.mkdirSync(WORK, { recursive: true });
-  log(' Alpine virt ISO（ 61MB）…');
+  log(' Alpine virt ISO( 61MB)...');
   await downloadParallel(ISO_URL, ISO, { connections: 8, minChunk: 4 * 1024 * 1024 });
 }
 
@@ -41,20 +41,20 @@ async function ensureIso() {
   const runtime = new Runtime(path.join(__dirname, '..'));
   const env = await runtime.provisioner.checkEnv();
   if (!env.qemu.ok) {
-    console.error('  ： QEMU');
+    console.error('  :  QEMU');
     process.exit(0);
   }
-  log(`QEMU ${env.qemu.version} · ${env.qemu.path}`);
+  log(`QEMU ${env.qemu.version}  -  ${env.qemu.path}`);
 
   await ensureIso();
   log(`ISO ${(fs.statSync(ISO).size / 1048576).toFixed(0)}MB`);
 
-  // 1) qemu-img （ createDisk ）
+  // 1) qemu-img ( createDisk )
   const img = path.join(path.dirname(env.qemu.path), 'qemu-img.exe');
   try { fs.rmSync(DISK, { force: true }); } catch (_) { /* ignore */ }
   const { execFileSync } = require('child_process');
   execFileSync(img, ['create', '-f', 'qcow2', DISK, '2G'], { windowsHide: true });
-  log(` ${(fs.statSync(DISK).size / 1024).toFixed(0)}KB（）`);
+  log(` ${(fs.statSync(DISK).size / 1024).toFixed(0)}KB()`);
 
   // 2)
   runtime._hv = env.hypervisor;
@@ -66,12 +66,12 @@ async function ensureIso() {
   args.push('-serial', `file:${SERIAL}`, '-no-reboot');
   try { fs.rmSync(SERIAL, { force: true }); } catch (_) { /* ignore */ }
 
-  log(`：${args.filter((a) => !a.includes('=')).slice(0, 8).join(' ')} …`);
+  log(`: ${args.filter((a) => !a.includes('=')).slice(0, 8).join(' ')} ...`);
   const proc = spawn(env.qemu.path, args, { stdio: 'ignore', windowsHide: true });
   let exited = false;
   proc.on('exit', () => { exited = true; });
 
-  // 3)  guest （）
+  // 3)  guest ()
   const start = Date.now();
   let booted = false;
   while (Date.now() - start < 180000) {
@@ -86,13 +86,13 @@ async function ensureIso() {
   const elapsed = ((Date.now() - start) / 1000).toFixed(0);
   if (!booted) {
     const tail = fs.existsSync(SERIAL) ? fs.readFileSync(SERIAL, 'latin1').slice(-600) : '()';
-    console.error(`  ✗ （${elapsed}s）：\n${tail}`);
+    console.error(`  ✗ (${elapsed}s): \n${tail}`);
     try { proc.kill(); } catch (_) { /* ignore */ }
     process.exit(1);
   }
-  log(`✓ guest （${elapsed}s）`);
+  log(`✓ guest (${elapsed}s)`);
 
-  // 4) ： system_powerdown， quit（ stop() ）
+  // 4) :  system_powerdown,  quit( stop() )
   let graceful = false;
   try {
     await runtime.monitorCmd('system_powerdown');
@@ -101,7 +101,7 @@ async function ensureIso() {
       await sleep(500);
     }
     if (!exited) {
-      log('guest  ACPI ， quit（）…');
+      log('guest  ACPI ,  quit()...');
       await runtime.monitorCmd('quit');
       for (let i = 0; i < 10; i++) {
         if (exited) break;
@@ -109,15 +109,15 @@ async function ensureIso() {
       }
     }
   } catch (e) {
-    log(`monitor ：${e.message}`);
+    log(`monitor : ${e.message}`);
   }
   if (!exited) { try { proc.kill(); } catch (_) { /* ignore */ } }
-  log(exited ? `✓ （${graceful ? 'ACPI ' : 'quit '}）` : '✗ ');
+  log(exited ? `✓ (${graceful ? 'ACPI ' : 'quit '})` : '✗ ');
 
   try { fs.rmSync(DISK, { force: true }); } catch (_) { /* ignore */ }
-  console.log(`\n：${exited ? '' : ''}\n`);
+  console.log(`\n: ${exited ? '' : ''}\n`);
   process.exit(exited ? 0 : 1);
 })().catch((e) => {
-  console.error('  ：', e.message);
+  console.error('  : ', e.message);
   process.exit(1);
 });
