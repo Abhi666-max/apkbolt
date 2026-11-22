@@ -1,0 +1,162 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Portable Distribution & Publish
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Package portable build
+        run: npm run pack
+
+      - name: Compress portable package
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          node build/zip.js dist/ApkStart-win64-portable "ApkBolt-$tag-win64-portable.zip" --limit-mb 100
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Item "ApkBolt-$tag-win64-portable.zip" | Select-Object Name, Length
+
+      - name: Generate incremental update assets
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          node build/incremental.js dist/ApkStart-win64-portable $tag
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Create Release and upload assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          $zip = "ApkBolt-$tag-win64-portable.zip"
+          $ver = $tag.TrimStart('v')
+          $manifest = "ApkBolt-v$ver-manifest.json"
+          $appzip = "ApkBolt-v$ver-app.zip"
+          $existing = gh release view $tag --json tagName -q .tagName 2>$null
+          $notes = ".github/release-notes-$tag.md"
+          if (-not $existing) {
+            if (Test-Path $notes) {
+              gh release create $tag --title "ApkBolt $tag" --notes-file $notes
+            } else {
+              gh release create $tag --title "ApkBolt $tag" --generate-notes
+            }
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+          $ok = $false
+          for ($i = 1; $i -le 3 -and -not $ok; $i++) {
+            gh release upload $tag $zip $manifest $appzip --clobber
+            if ($LASTEXITCODE -eq 0) { $ok = $true } else { Start-Sleep -Seconds 15 }
+          }
+          if (-not $ok) { Write-Error "Upload failed: $zip / $manifest / $appzip"; exit 1 }
+          gh release view $tag --json assets --jq '.assets[].name'
+
+  full:
+    name: Build Full Offline Distribution
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Assemble runtime
+        run: node build/fetch-runtime.js engine
+
+      - name: Prepare runtime components
+        run: node build/prepare-runtime.js --force
+        env:
+          XZ_PRESET: '6'
+          XZ_TIMEOUT_MS: '3600000'
+
+      - name: Download VC++ Redistributable
+        shell: pwsh
+        run: |
+          $dir = "build\runtime"
+          if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+          $out = "$dir\vc_redist.x64.exe"
+          Write-Output "Downloading VC++ 2015-2022 x64 Redistributable..."
+          curl.exe -L -o $out "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+          if (-not (Test-Path $out) -or (Get-Item $out).Length -lt 1MB) { Write-Error "vc_redist download failed" }
+          Get-Item $out | Select-Object Name, Length
+
+      - name: Build Windows NSIS Setup Installer
+        run: npx electron-builder --win nsis --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload Setup to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          $setup = Get-ChildItem dist/release/*Setup.exe | Select-Object -First 1
+          if (-not $setup) { Write-Error "Setup.exe not found"; exit 1 }
+          Write-Output ("Uploading {0} ({1:N0} MB)" -f $setup.Name, ($setup.Length / 1MB))
+          $ok = $false
+          for ($i = 1; $i -le 3 -and -not $ok; $i++) {
+            gh release upload $tag $setup.FullName --clobber
+            if ($LASTEXITCODE -eq 0) { $ok = $true } else { Start-Sleep -Seconds 20 }
+          }
+          if (-not $ok) { Write-Error "Upload failed: $($setup.Name)"; exit 1 }
+          gh release view $tag --json assets --jq '.assets[] | "\(.name) \(.size)"'
+
+      - name: Package offline runtime bundle
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          $zip = "ApkBolt-runtime-$tag.zip"
+          if (-not (Test-Path "build\runtime\emulator\emulator.exe")) { Write-Error "build\runtime incomplete"; exit 1 }
+          tar.exe -a -cf $zip -C "build\runtime" .
+          if ($LASTEXITCODE -ne 0) { Write-Error "Runtime packaging failed"; exit 1 }
+          Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}}
+
+      - name: Upload runtime bundle to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$tag" }
+          $zip = "ApkBolt-runtime-$tag.zip"
+          $ok = $false
+          for ($i = 1; $i -le 3 -and -not $ok; $i++) {
+            gh release upload $tag $zip --clobber
+            if ($LASTEXITCODE -eq 0) { $ok = $true } else { Start-Sleep -Seconds 20 }
+          }
+          if (-not $ok) { Write-Error "Upload failed: $zip"; exit 1 }
+          gh release view $tag --json assets --jq '.assets[] | "\(.name) \(.size)"'

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; }
+  :root { --bg: #0d0f14; --acc: #f5a623; --acc-glow: #ffc247; }
+  html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+  body { display: grid; width: 100vw; height: 100vh; place-items: center; }
+  .stage { position: relative; overflow: hidden; }
+
+  /* ================= Main Logo (1024) ================= */
+  .square-stage { display: grid; width: 1024px; height: 1024px; place-items: center; }
+  .tile {
+    position: relative; width: 896px; height: 896px; border-radius: 208px;
+    background:
+      radial-gradient(120% 90% at 20% 10%, #1e2430 0%, #12151c 46%, #0a0c10 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.16), inset 0 -30px 70px rgba(0,0,0,.7);
+    overflow: hidden;
+  }
+  /* Diagonal Sheen */
+  .tile::before {
+    content: ""; position: absolute; inset: -40% -20% auto -60%; height: 130%;
+    background: linear-gradient(104deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.08) 47%, rgba(255,255,255,0) 60%);
+    transform: rotate(-6deg);
+  }
+  /* Grid Dots */
+  .dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(245,166,35,.15) 1.6px, transparent 1.7px);
+    background-size: 46px 46px; background-position: 22px 22px;
+    opacity: .4;
+    mask-image: radial-gradient(78% 78% at 50% 46%, #000 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(78% 78% at 50% 46%, #000 30%, transparent 78%);
+  }
+  /* Bottom Amber Glow */
+  .glow {
+    position: absolute; left: 50%; bottom: -180px; width: 860px; height: 460px;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(245,166,35,.45), rgba(245,166,35,0) 72%);
+    filter: blur(12px);
+  }
+  .content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  
+  .bolt-icon {
+    width: 220px;
+    height: 220px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 32px rgba(245, 166, 35, 0.7)) drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+  }
+  
+  .apk {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Black", "Arial Black", sans-serif;
+    font-weight: 900; font-size: 210px; line-height: .86; letter-spacing: -4px;
+    background: linear-gradient(178deg, #ffffff 26%, #e6edf3 62%, #aab6c2 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 12px 34px rgba(0,0,0,.5);
+    margin-top: 10px;
+  }
+  .bar {
+    width: 380px; height: 10px; border-radius: 8px; margin: 18px 0 20px;
+    background: linear-gradient(90deg, rgba(245,166,35,0) 0%, #f5a623 25%, #ffc247 50%, #f5a623 75%, rgba(245,166,35,0) 100%);
+    box-shadow: 0 0 32px rgba(245,166,35,.75);
+  }
+  .bolt-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+    font-weight: 800; font-size: 110px; line-height: 1; letter-spacing: 12px;
+    color: #f5a623;
+    text-shadow: 0 0 36px rgba(245,166,35,.6);
+  }
+  /* Spark Accents */
+  .spark { position: absolute; background: #ffc247; border-radius: 50%; box-shadow: 0 0 26px rgba(255,194,71,.9); }
+  .s1 { width: 16px; height: 16px; right: 176px; top: 214px; opacity: .95; }
+  .s2 { width: 9px; height: 9px; right: 136px; top: 268px; opacity: .6; }
+  .s3 { width: 11px; height: 11px; left: 168px; bottom: 236px; opacity: .55; }
+
+  /* Corner Brackets */
+  .corner { position: absolute; width: 62px; height: 62px; border: 5px solid rgba(245,166,35,.25); border-radius: 18px; }
+  .c1 { left: 92px; top: 92px; border-right: 0; border-bottom: 0; }
+  .c2 { right: 92px; bottom: 92px; border-left: 0; border-top: 0; }
+
+  /* Scaled Tile */
+  .scaled-tile { position: relative; overflow: hidden; flex: none; }
+  .scaled-tile > .tile { position: absolute; top: 0; left: 0; transform-origin: top left; }
+  .scaled-tile.wide-mark { width: 176px; height: 176px; }
+  .scaled-tile.wide-mark > .tile { transform: scale(0.196429); }   /* 176 / 896 */
+  .scaled-tile.splash-mark { width: 236px; height: 236px; }
+  .scaled-tile.splash-mark > .tile { transform: scale(0.263393); } /* 236 / 896 */
+
+  /* Wide Stage (620x300) */
+  .wide-stage { display: none; width: 620px; height: 300px; }
+  .wide-tile {
+    position: relative; width: 620px; height: 300px; overflow: hidden;
+    background: radial-gradient(130% 150% at 8% 0%, #1e2430 0%, #12151c 50%, #0a0c10 100%);
+    display: flex; align-items: center; padding: 0 46px; gap: 38px;
+  }
+  .wide-tile .dots { opacity: .28; }
+  .wide-tile .glow { width: 620px; height: 260px; left: 22%; bottom: -130px; opacity: .8; }
+  .wide-tile .corner { width: 34px; height: 34px; border-width: 3px; border-radius: 10px; }
+  .wide-tile .c1 { left: 26px; top: 26px; }
+  .wide-tile .c2 { right: 26px; bottom: 26px; }
+  .wide-text { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; }
+  .wide-name {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 800; font-size: 46px; line-height: 1.1; letter-spacing: 1px;
+    color: #f5a623;
+  }
+  .wide-sub {
+    margin-top: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 22px; letter-spacing: .5px; color: #8b949e;
+  }
+  .wide-sub b { color: #f5a623; font-weight: 600; }
+
+  /* Splash Stage (1240x600) */
+  .splash-stage { display: none; width: 1240px; height: 600px; }
+  .splash-tile {
+    position: relative; width: 1240px; height: 600px; overflow: hidden;
+    background: radial-gradient(120% 120% at 50% 0%, #1e2430 0%, #12151c 48%, #0a0c10 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+  }
+  .splash-tile .dots { opacity: .3; }
+  .splash-tile .glow { width: 900px; height: 380px; bottom: -210px; }
+  .splash-sub {
+    position: relative; z-index: 2;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 28px; letter-spacing: 4px; color: #8b949e;
+  }
+
+  body.layout-wide .square-stage,
+  body.layout-splash .square-stage { display: none; }
+  body.layout-wide .wide-stage { display: grid; place-items: center; }
+  body.layout-splash .splash-stage { display: grid; place-items: center; }
+</style>
+</head>
+<body>
+  <div class="stage square-stage">
+    <div class="tile" id="brand-tile">
+      <div class="dots"></div>
+      <div class="glow"></div>
+      <div class="corner c1"></div>
+      <div class="corner c2"></div>
+      <div class="content">
+        <svg class="bolt-icon" viewBox="0 0 24 24">
+          <path fill="url(#boltGrad)" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          <defs>
+            <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fff275"/>
+              <stop offset="60%" stop-color="#f5a623"/>
+              <stop offset="100%" stop-color="#d47a00"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="apk">APK</div>
+        <div class="bar"></div>
+        <div class="bolt-text">BOLT</div>
+      </div>
+      <div class="spark s1"></div>
+      <div class="spark s2"></div>
+      <div class="spark s3"></div>
+    </div>
+  </div>
+
+  <div class="stage wide-stage">
+    <div class="wide-tile">
+      <div class="dots"></div>
+      <div class="glow"></div>
+      <div class="corner c1"></div>
+      <div class="corner c2"></div>
+      <div class="scaled-tile wide-mark"></div>
+      <div class="wide-text">
+        <div class="wide-name">ApkBolt</div>
+        <div class="wide-sub">Android Apps. <b>Instant & Native.</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage splash-stage">
+    <div class="splash-tile">
+      <div class="dots"></div>
+      <div class="glow"></div>
+      <div class="scaled-tile splash-mark"></div>
+      <div class="splash-sub">Android Apps. Instant & Native.</div>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var layout = q.get('layout') || 'square';
+    document.body.classList.add('layout-' + layout);
+    var src = document.getElementById('brand-tile');
+    if (src) {
+      document.querySelectorAll('.scaled-tile').forEach(function (host) {
+        var clone = src.cloneNode(true);
+        clone.removeAttribute('id');
+        host.appendChild(clone);
+      });
+    }
+  })();
+</script>
+</body>
+</html>
